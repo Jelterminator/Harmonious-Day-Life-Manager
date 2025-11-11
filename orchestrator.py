@@ -5,6 +5,7 @@ from googleapiclient.errors import HttpError
 from auth import get_google_services
 from deepseek_integration import get_groq_api_key, call_groq_llm, pretty_print_schedule
 from task_processor import process_tasks
+from collections import defaultdict
 
 SHEET_ID = "1rdyKSYIT7NsIFtKg6UUeCnPEUUDtceKF3sfoVSwiaDM"
 HABIT_RANGE = "Habits!A1:G100"
@@ -145,30 +146,51 @@ def get_google_tasks(service):
     all_tasks = []
     try:
         task_lists = service.tasklists().list().execute().get('items', [])
+        print(f"DEBUG: Found {len(task_lists)} task lists")
         
         for tlist in task_lists:
-            tasks_result = service.tasks().list(
-                tasklist=tlist['id'],
-                showCompleted=False,
-                maxResults=500
-            ).execute()
+            print(f"DEBUG: Processing task list: {tlist['title']}")
             
-            tasks = tasks_result.get('items', [])
+            tasks = []
+            page_token = None
+            
+            # Handle pagination
+            while True:
+                tasks_result = service.tasks().list(
+                    tasklist=tlist['id'],
+                    showCompleted=False,
+                    maxResults=500,
+                    pageToken=page_token
+                ).execute()
+                
+                page_tasks = tasks_result.get('items', [])
+                tasks.extend(page_tasks)
+                
+                page_token = tasks_result.get('nextPageToken')
+                if not page_token:
+                    break
+            
+            print(f"DEBUG: Found {len(tasks)} tasks in '{tlist['title']}'")
             
             for task in tasks:
                 all_tasks.append({
                     "title": task.get('title', 'No Title'),
                     "list": tlist['title'],
                     "id": task['id'],
-                    "parent": task.get('parent'),   # <-- Capture parent relationship
+                    "parent": task.get('parent'),
                     "due": task.get('due'),
-                    "notes": task.get('notes')
+                    "notes": task.get('notes'),
+                    "position": task.get('position', '0'),  # CRITICAL: Add position for ordering
+                    "updated": task.get('updated')
                 })
+                
+        print(f"DEBUG: Total tasks fetched: {len(all_tasks)}")
         return all_tasks
     except Exception as e:
         print(f"Error fetching tasks: {e}")
         return []
 
+    
 def get_habits(service, sheet_id, range_name):
     """Fetch habits from Google Sheets."""
     print("Fetching habits from Google Sheets...")
@@ -208,7 +230,6 @@ def get_daily_sport(sport_schedule):
 
 # --- WORLD PROMPT BUILDER ---
 
-import datetime
 
 def build_world_prompt(rules, calendar_events, tasks, habits):
     """Assemble all data into a World Prompt for AI scheduling based on Harmonious Day philosophy."""
@@ -217,11 +238,18 @@ def build_world_prompt(rules, calendar_events, tasks, habits):
 
     prompt = f"# SCHEDULE GENERATION REQUEST\n\nToday is: {today_str}\n\n"
     prompt += "Create a complete daily schedule based on the Harmonious Day philosophy.\n\n"
+    
+    # Add task statistics for context
+    if tasks:
+        t1_count = sum(1 for t in tasks if t['priority'] == 'T1')
+        t2_count = sum(1 for t in tasks if t['priority'] == 'T2')
+        total_effort = sum(t['effort_hours'] for t in tasks)
+        prompt += f"**TASK OVERVIEW**: {len(tasks)} tasks ({t1_count} URGENT T1, {t2_count} HIGH T2) = ~{total_effort:.1f}h total effort\n\n"
 
     # 1. Phases
     prompt += "## 1. HARMONIOUS DAY PHASES\n"
     for phase in rules.get('phases', []):
-        phase_name = phase['name'].split()[-1]  # Take last word as simple phase name
+        phase_name = phase['name'].split()[-1]
         prompt += f"**{phase_name}** ({phase['start']}-{phase['end']})\n"
         prompt += f"- {phase['qualities']}\n"
         prompt += f"- Ideal Tasks: {', '.join(phase['ideal_tasks'])}\n\n"
@@ -233,34 +261,70 @@ def build_world_prompt(rules, calendar_events, tasks, habits):
 
     # 3. Calendar Events
     prompt += "\n## 3. EXISTING CALENDAR EVENTS (Do Not Schedule Over)\n"
-    prompt += "THESE ARE FIXED APPOINTMENTS (Meetings, etc.). DO NOT MODIFY OR DELETE THEM.\n"
+    prompt += "THESE ARE FIXED APPOINTMENTS. DO NOT MODIFY OR DELETE THEM.\n"
     if calendar_events:
         for event in calendar_events:
             prompt += f"- **{event['summary']}** ({event['start']} to {event['end']})\n"
     else:
         prompt += "No existing fixed appointments.\n"
 
-    # 4. Tasks
-    prompt += "\n## 4. TASKS TO SCHEDULE (Prioritized & Filtered)\n"
-    prompt += "The following tasks are P1-P3 and represent critical work. Use Priority and Effort to guide placement.\n"
+    # 4. Tasks - with detailed project context
+    prompt += "\n## 4. TASKS TO SCHEDULE (Prioritized by Urgency)\n"
+    prompt += "**CRITICAL CONTEXT**: For multi-step tasks, priority is calculated based on TOTAL remaining work vs deadline.\n"
+    prompt += "**RULE**: Only the FIRST incomplete subtask of each parent is shown. Complete it today to unlock the next.\n\n"
+    
     if tasks:
+        # Group by priority for clarity
+        by_priority = defaultdict(list)
         for task in tasks:
-            effort = f"{task['effort_hours']:.1f}h"
-            deadline = task.get('deadline_str', 'N/A')
-            prompt += f"- [{task['priority']}] **{task['title']}** (Effort: {effort}, Due: {deadline})\n"
-            if task.get('notes'):
-                # Clean up newlines in task notes for the prompt
-                prompt += f"  Notes: {task['notes'].replace(chr(10), ' ').strip()}\n"
+            by_priority[task['priority']].append(task)
+        
+        for priority in ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']:
+            if priority in by_priority:
+                priority_tasks = by_priority[priority]
+                total_hours = sum(t['effort_hours'] for t in priority_tasks)
+                
+                if priority == 'T1':
+                    prompt += f"### 🚨 {priority} - CRITICAL URGENCY - {len(priority_tasks)} tasks, {total_hours:.1f}h\n"
+                    prompt += "These require >8h/day of work to meet deadline, or are past due. MUST schedule today.\n\n"
+                elif priority == 'T2':
+                    prompt += f"### ⚠️ {priority} - HIGH URGENCY - {len(priority_tasks)} tasks, {total_hours:.1f}h\n"
+                    prompt += "These require 6-8h/day of work to meet deadline. Schedule as much as possible.\n\n"
+                elif priority == 'T3':
+                    prompt += f"### {priority} - MODERATE - {len(priority_tasks)} tasks, {total_hours:.1f}h\n"
+                else:
+                    prompt += f"### {priority} - {len(priority_tasks)} tasks, {total_hours:.1f}h\n"
+                
+                for task in priority_tasks:
+                    this_task_effort = f"{task['effort_hours']:.1f}h"
+                    total_remaining = f"{task['total_remaining_effort']:.1f}h"
+                    deadline = task.get('deadline_str', 'N/A')
+                    days_left = f"{task.get('days_until_deadline', 0):.1f}"
+                    hours_per_day = f"{task.get('hours_per_day_needed', 0):.1f}"
+                    
+                    if task.get('is_subtask'):
+                        prompt += f"- **{task['title']}** [Step 1 of {task['remaining_subtasks']} in: {task.get('parent_title', 'Unknown')}]\n"
+                        prompt += f"  - THIS task: {this_task_effort} | TOTAL project: {total_remaining} remaining\n"
+                        prompt += f"  - Deadline: {deadline} ({days_left} days) | Need: {hours_per_day}h/day to finish on time\n"
+                    else:
+                        prompt += f"- **{task['title']}**\n"
+                        prompt += f"  - Effort: {this_task_effort}\n"
+                        prompt += f"  - Deadline: {deadline} ({days_left} days) | Need: {hours_per_day}h/day\n"
+                    
+                    if task.get('notes'):
+                        notes_clean = task['notes'].replace('\n', ' ').strip()
+                        if notes_clean and not notes_clean.startswith('[Effort:'):
+                            prompt += f"  - Notes: {notes_clean}\n"
+                    
+                    prompt += "\n"
     else:
         prompt += "No high-priority tasks.\n"
 
     # 5. Habits
     prompt += "\n## 5. HABITS TO SCHEDULE\n"
     prompt += (
-        "Important: There are too many habits to do all in one day. "
-        "Tasks (P1-P3) take priority. Include habits proportionally to remaining time, "
-        "aim for a rough Task-time:Habit-time ratio of 3:1 (or adjust based on day's load). "
-        "Have a preference for habits that have not been executed the longest.\n"
+        "Tasks take absolute priority. Only include habits that fit after T1/T2 tasks are scheduled.\n"
+        "Aim for Task:Habit ratio of 3:1. Prefer habits not done recently.\n\n"
     )
     if habits:
         for habit in habits:
@@ -268,7 +332,7 @@ def build_world_prompt(rules, calendar_events, tasks, habits):
             if habit.get('frequency'):
                 prompt += f" (Frequency: {habit.get('frequency')})"
             if habit.get('last_completed'):
-                prompt += f"  Last: {habit.get('last_completed')}"
+                prompt += f" | Last: {habit.get('last_completed')}"
             prompt += "\n"
     else:
         prompt += "No habits.\n"
@@ -276,14 +340,15 @@ def build_world_prompt(rules, calendar_events, tasks, habits):
     # 6. Output Requirements
     prompt += "\n## 6. OUTPUT REQUIREMENTS\n"
     prompt += "Rules:\n"
-    prompt += "- Respect anchors and calendar events\n"
-    prompt += "- Schedule tasks first, habits second\n"
-    prompt += "- Match tasks and habits to ideal phases whenever possible\n"
-    prompt += "- Never allow a habits into the wrong phase\n"
-    prompt += "- Split long tasks, over 90 min maximum gets divided into smaller blocks\n"
-    prompt += "- Be realistic, do not overschedule\n"
-    prompt += "- High-priority tasks (P1, P2) must be scheduled even if it means bending phase rules\n"
-    prompt += "- Include only as many habits as realistically fit, with preference to those not executed recently\n\n"
+    prompt += "- **T1/T2 PRIORITY**: Schedule all T1 tasks, as many T2 as possible. These are calculated based on total remaining effort vs deadline.\n"
+    prompt += "- **ONE SUBTASK PER PARENT**: Only schedule the first incomplete subtask shown. Don't invent additional steps.\n"
+    prompt += "- **SEQUENTIAL**: Complete today's subtask before tomorrow's subtask can be scheduled.\n"
+    prompt += "- Respect anchors and fixed calendar events\n"
+    prompt += "- Match tasks to ideal phases when possible, but urgency overrides phase preference\n"
+    prompt += "- Split tasks over 90 minutes into smaller blocks with breaks\n"
+    prompt += "- Be realistic: 6-8 hours of focused work max\n"
+    prompt += "- Include breaks between blocks (10-15 min)\n"
+    prompt += "- Habits only in remaining time after tasks\n\n"
     
     prompt += "Return JSON with this structure:\n"
     prompt += '{\n  "schedule_entries": [\n'
@@ -291,6 +356,7 @@ def build_world_prompt(rules, calendar_events, tasks, habits):
     prompt += '  ]\n}\n'
 
     return prompt
+
 
 
 def save_schedule_to_file(schedule_data, filename="generated_schedule.json"):
@@ -414,6 +480,40 @@ def filter_conflicting_entries(schedule_entries, existing_events):
     return filtered
 
 
+# Add this temporary debug function to call before the main processing
+def debug_task_structure(raw_tasks):
+    """Debug function to see the actual task structure"""
+    print("\n=== TASK STRUCTURE DEBUG ===")
+    
+    # Find all parents
+    parents = [t for t in raw_tasks if not t.get('parent')]
+    subtasks = [t for t in raw_tasks if t.get('parent')]
+    
+    print(f"Total tasks: {len(raw_tasks)}")
+    print(f"Parent tasks: {len(parents)}")
+    print(f"Subtasks: {len(subtasks)}")
+    
+    for parent in parents:
+        print(f"\nParent: '{parent.get('title')}'")
+        children = [t for t in subtasks if t.get('parent') == parent['id']]
+        print(f"  Subtasks: {len(children)}")
+        for i, child in enumerate(children):
+            print(f"    {i}: '{child.get('title')}'")
+    
+    print("=== END DEBUG ===\n")
+
+# Add this temporary debug to see what task lists exist
+def debug_task_lists(service):
+    """Debug function to see all task lists"""
+    print("\n=== TASK LISTS DEBUG ===")
+    try:
+        task_lists = service.tasklists().list().execute().get('items', [])
+        for tlist in task_lists:
+            print(f"List: '{tlist['title']}' (ID: {tlist['id']})")
+    except Exception as e:
+        print(f"Error fetching task lists: {e}")
+    print("=== END TASK LISTS DEBUG ===\n")
+
 # --- MAIN ORCHESTRATOR EXECUTION ---
 
 if __name__ == "__main__":
@@ -446,6 +546,10 @@ if __name__ == "__main__":
         print("❌ Config load failed")
         exit(1)
     print("✓ Config loaded\n")
+
+    # Call this right after authentication
+    debug_task_lists(tasks_service)
+
     
     # --- CRITICAL CLEANUP STEP ---
     # This runs BEFORE fetching constraints or generating the schedule.
@@ -469,6 +573,9 @@ if __name__ == "__main__":
     print(f"✓ {len(tasks)} prioritized tasks ({len(raw_tasks)} total)") 
     print(f"✓ {len(habits)} habits")
     print(f"✓ Sport: {daily_sport['name']}\n")
+
+    # Call this in your main function before process_tasks:
+    debug_task_structure(raw_tasks)
     
     print("Building World Prompt...")
     world_prompt = build_world_prompt(rules, calendar_events, tasks, habits)

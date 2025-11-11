@@ -146,10 +146,8 @@ def get_google_tasks(service):
     all_tasks = []
     try:
         task_lists = service.tasklists().list().execute().get('items', [])
-        print(f"DEBUG: Found {len(task_lists)} task lists")
         
         for tlist in task_lists:
-            print(f"DEBUG: Processing task list: {tlist['title']}")
             
             tasks = []
             page_token = None
@@ -170,8 +168,6 @@ def get_google_tasks(service):
                 if not page_token:
                     break
             
-            print(f"DEBUG: Found {len(tasks)} tasks in '{tlist['title']}'")
-            
             for task in tasks:
                 all_tasks.append({
                     "title": task.get('title', 'No Title'),
@@ -183,8 +179,7 @@ def get_google_tasks(service):
                     "position": task.get('position', '0'),  # CRITICAL: Add position for ordering
                     "updated": task.get('updated')
                 })
-                
-        print(f"DEBUG: Total tasks fetched: {len(all_tasks)}")
+
         return all_tasks
     except Exception as e:
         print(f"Error fetching tasks: {e}")
@@ -220,16 +215,7 @@ def get_habits(service, sheet_id, range_name):
         return []
 
 
-def get_daily_sport(sport_schedule):
-    """Get today's sport from schedule."""
-    # datetime.date.today().weekday() returns 0 (Monday) to 6 (Sunday)
-    # The config expects a string key, e.g., "0" for Monday
-    today_weekday_str = str(datetime.date.today().weekday()) 
-    return sport_schedule.get(today_weekday_str, {"name": "Rest Day", "details": "No sport scheduled."})
-
-
 # --- WORLD PROMPT BUILDER ---
-
 
 def build_world_prompt(rules, calendar_events, tasks, habits):
     """Assemble all data into a World Prompt for AI scheduling based on Harmonious Day philosophy."""
@@ -479,41 +465,6 @@ def filter_conflicting_entries(schedule_entries, existing_events):
 
     return filtered
 
-
-# Add this temporary debug function to call before the main processing
-def debug_task_structure(raw_tasks):
-    """Debug function to see the actual task structure"""
-    print("\n=== TASK STRUCTURE DEBUG ===")
-    
-    # Find all parents
-    parents = [t for t in raw_tasks if not t.get('parent')]
-    subtasks = [t for t in raw_tasks if t.get('parent')]
-    
-    print(f"Total tasks: {len(raw_tasks)}")
-    print(f"Parent tasks: {len(parents)}")
-    print(f"Subtasks: {len(subtasks)}")
-    
-    for parent in parents:
-        print(f"\nParent: '{parent.get('title')}'")
-        children = [t for t in subtasks if t.get('parent') == parent['id']]
-        print(f"  Subtasks: {len(children)}")
-        for i, child in enumerate(children):
-            print(f"    {i}: '{child.get('title')}'")
-    
-    print("=== END DEBUG ===\n")
-
-# Add this temporary debug to see what task lists exist
-def debug_task_lists(service):
-    """Debug function to see all task lists"""
-    print("\n=== TASK LISTS DEBUG ===")
-    try:
-        task_lists = service.tasklists().list().execute().get('items', [])
-        for tlist in task_lists:
-            print(f"List: '{tlist['title']}' (ID: {tlist['id']})")
-    except Exception as e:
-        print(f"Error fetching task lists: {e}")
-    print("=== END TASK LISTS DEBUG ===\n")
-
 # --- MAIN ORCHESTRATOR EXECUTION ---
 
 if __name__ == "__main__":
@@ -546,10 +497,6 @@ if __name__ == "__main__":
         print("❌ Config load failed")
         exit(1)
     print("✓ Config loaded\n")
-
-    # Call this right after authentication
-    debug_task_lists(tasks_service)
-
     
     # --- CRITICAL CLEANUP STEP ---
     # This runs BEFORE fetching constraints or generating the schedule.
@@ -567,15 +514,10 @@ if __name__ == "__main__":
     # --------------------------
     
     habits = get_habits(sheets_service, SHEET_ID, HABIT_RANGE)
-    daily_sport = get_daily_sport(rules.get('sport_schedule', {}))
     
     print(f"✓ {len(calendar_events)} fixed calendar events (Meetings, etc.)")
     print(f"✓ {len(tasks)} prioritized tasks ({len(raw_tasks)} total)") 
     print(f"✓ {len(habits)} habits")
-    print(f"✓ Sport: {daily_sport['name']}\n")
-
-    # Call this in your main function before process_tasks:
-    debug_task_structure(raw_tasks)
     
     print("Building World Prompt...")
     world_prompt = build_world_prompt(rules, calendar_events, tasks, habits)

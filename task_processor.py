@@ -3,46 +3,68 @@ import re
 from collections import defaultdict
 
 # --- CONFIG ---
-MAX_EFFORT_HOURS_FOR_AI = 12  # max hours to schedule tasks in a day
+MAX_URGENT_TASKS = 7  # Aantal "Stones" (T1-T5) om aan de AI te geven
+MAX_CHORE_TASKS = 3   # Aantal "Sand" (T6-T7) om te garanderen dat klusjes meegaan
 
 # Priority tiers based on Critical Ratio + effort weight
 PRIORITY_TIERS = ['T1','T2','T3','T4','T5','T6','T7']
 
 # --- HELPERS ---
 
+def extract_number_from_title(title):
+    """
+    Extraheert een numerieke sorteersleutel uit taaktitels.
+    Retourneert float('inf') als er geen nummer is gevonden.
+    """
+    if not title:
+        return float('inf')
+    
+    # Zoek naar patroon "01. Taaknaam" aan het begin
+    match = re.match(r'^\s*(\d+)\.', title.strip())
+    if match:
+        return int(match.group(1))
+    
+    return float('inf')  # Geen nummer gevonden = zet aan het einde
+
 def group_parent_and_subtasks(raw_tasks):
     """
-    FIXED: Ensure subtasks maintain their proper sequential order using position field.
+    Groepeert sub-taken onder ouders en sorteert ze op nummer in titel.
     """
     task_map = {t['id']: t for t in raw_tasks}
     subtasks_map = defaultdict(list)
     parent_ids = set()
     
-    # First pass: group subtasks under parents
+    # 1. Groepeer sub-taken onder ouders
     for t in raw_tasks:
         if t.get('parent'):
             subtasks_map[t['parent']].append(t)
             parent_ids.add(t['parent'])
     
-    # CRITICAL FIX: Sort subtasks by position (Google Tasks order)
+    # 2. Sorteer sub-taken op nummer in titel
     for parent_id in subtasks_map:
-        # Convert position to integer for proper sorting
-        subtasks_map[parent_id].sort(key=lambda x: int(x.get('position', 0)))
+        subtasks = subtasks_map[parent_id]
+        
+        # Sorteer op geëxtraheerd nummer, dan op positie
+        subtasks_with_keys = []
+        for task in subtasks:
+            task_number = extract_number_from_title(task.get('title', ''))
+            subtasks_with_keys.append((task_number, task))
+        
+        subtasks_with_keys.sort(key=lambda x: (x[0], int(x[1].get('position', 0))))
+        subtasks_map[parent_id] = [task for _, task in subtasks_with_keys]
     
+    # 3. Bouw geaggregeerde lijst
     aggregated = []
     processed_ids = set()
     
-    # Second pass: build aggregated list with proper ordering
     for t in raw_tasks:
         if t['id'] in processed_ids:
             continue
             
         if t.get('parent'):
-            # Skip subtasks here; they'll be added under their parents
-            continue
+            continue  # Skip sub-taken, worden toegevoegd onder ouders
             
         subtasks = subtasks_map.get(t['id'], [])
-        # Mark subtasks as processed
         for sub in subtasks:
             processed_ids.add(sub['id'])
             
@@ -54,78 +76,77 @@ def group_parent_and_subtasks(raw_tasks):
     return aggregated, parent_ids
 
 def parse_effort(task):
-    """Extract effort in hours from task notes or default to 1h."""
+    """Extraheert inspanning in uren uit taaktitel of notities."""
+    # Eerst titel controleren op patronen zoals "Taaknaam (3u)"
+    title = task.get('title', '')
+    title_match = re.search(r'\((\d+(?:\.\d+)?)[hu]\)', title, re.IGNORECASE)
+    if title_match:
+        return float(title_match.group(1))
+    
+    # Dan notities controleren op [Effort: ...] formaat
     notes = task.get('notes') or ''
-    effort_hours = 0.0
-
-    effort_match = re.search(r'\[Effort:\s*(\d+[hu]\s*(\d+m)?|\d+\.\d+[hu])\]', notes, re.IGNORECASE)
+    effort_match = re.search(r'\[Effort:\s*(\d+(?:\.\d+)?)[hu]\]', notes, re.IGNORECASE)
     if effort_match:
-        effort_str = effort_match.group(1).lower().replace(' ', '')
-        h = m = 0
-        if 'h' in effort_str:
-            h_match = re.search(r'(\d+)h', effort_str)
-            if h_match:
-                h = int(h_match.group(1))
-        if 'm' in effort_str:
-            m_match = re.search(r'(\d+)m', effort_str)
-            if m_match:
-                m = int(m_match.group(1))
-        effort_hours = h + m / 60.0
-    if effort_hours == 0.0:
-        effort_hours = 1.0
-    return effort_hours
+        return float(effort_match.group(1))
+    
+    # Standaard naar 1 uur als geen inspanning gespecificeerd
+    return 1.0
 
 def parse_deadline(task):
-    """Parse deadline string to datetime or None."""
+    """Parse deadline van taak's due datum."""
     due_str = task.get('due')
-    if not due_str:
-        return None
-    try:
-        if 'T' in due_str:
-            return datetime.datetime.fromisoformat(due_str.replace('Z', '+00:00'))
-        else:
-            dt = datetime.datetime.strptime(due_str, '%Y-%m-%d')
-            return dt.replace(hour=23, minute=59, second=59, tzinfo=datetime.timezone.utc)
-    except ValueError:
-        return None
+    if due_str:
+        try:
+            if 'T' in due_str:
+                return datetime.datetime.fromisoformat(due_str.replace('Z', '+00:00'))
+            else:
+                dt = datetime.datetime.strptime(due_str, '%Y-%m-%d')
+                return dt.replace(hour=23, minute=59, second=59, tzinfo=datetime.timezone.utc)
+        except ValueError:
+            pass
+    
+    return None
+
+def get_project_deadline(parent_task, subtasks):
+    """
+    Krijgt de meest urgente deadline (vroegste datum) van een project.
+    Checkt de ouder-taak en alle sub-taken.
+    """
+    parent_deadline = parse_deadline(parent_task)
+    subtask_deadlines = [parse_deadline(sub) for sub in subtasks]
+    subtask_deadlines = [d for d in subtask_deadlines if d]
+    
+    all_deadlines = [d for d in [parent_deadline] + subtask_deadlines if d]
+    
+    return min(all_deadlines) if all_deadlines else None
 
 def calculate_priority(total_effort_hours, deadline_dt):
     """
-    Compute priority T1-T7 based on total remaining effort vs time until deadline.
-    
-    FIXED: Now properly calculates how many hours per day are needed to complete
-    ALL remaining work before the deadline.
+    Berekent prioriteit T1-T7 gebaseerd op 'uren per dag nodig'.
     """
     now = datetime.datetime.now(datetime.timezone.utc)
     
     if not deadline_dt:
-        return 'T7', float('inf'), 0
+        return 'T7', float('inf'), 0  # Geen deadline
     
     hours_until_deadline = (deadline_dt - now).total_seconds() / 3600
     days_until_deadline = hours_until_deadline / 24.0
     
-    # Past due - MAXIMUM URGENCY
     if days_until_deadline <= 0:
-        return 'T1', 0, total_effort_hours
+        return 'T1', 0, total_effort_hours  # Te laat
     
-    # CRITICAL FIX: Calculate realistic hours per day needed
-    # Assuming 8 productive hours per day maximum
+    # Bereken realistisch benodigde uren per dag
     if days_until_deadline <= 1:
-        # Due tomorrow or today - need to work ALL remaining hours today
         hours_per_day_needed = total_effort_hours
     else:
-        # Spread over available days, but cap at 8h/day maximum sustainable
         hours_per_day_needed = total_effort_hours / days_until_deadline
     
-    # Priority based on daily effort required - UPDATED THRESHOLDS
+    # Prioriteit gebaseerd op dagelijkse inspanning
     if hours_per_day_needed > 8 or days_until_deadline <= 1:
-        # Need more than 8h/day OR due within 1 day = CRITICAL
         return 'T1', days_until_deadline, hours_per_day_needed
     elif hours_per_day_needed > 6:
-        # Need 6-8h/day = HIGH urgency  
         return 'T2', days_until_deadline, hours_per_day_needed
     elif hours_per_day_needed > 4:
-        # Need 4-6h/day = MODERATE urgency
         return 'T3', days_until_deadline, hours_per_day_needed
     elif hours_per_day_needed > 2:
         return 'T4', days_until_deadline, hours_per_day_needed
@@ -136,40 +157,31 @@ def calculate_priority(total_effort_hours, deadline_dt):
 
 # --- MAIN PROCESSOR ---
 
-def process_tasks(raw_tasks, max_hours=MAX_EFFORT_HOURS_FOR_AI):
+def process_tasks(raw_tasks):
     """
-    FIXED: Properly identifies and shows only the FIRST incomplete subtask of each project,
-    while prioritizing projects based on overall urgency.
+    Verwerkt taken en retourneert een geprioriteerde lijst met de 
+    EERSTE incomplete subtaak per project.
     """
-    # First, let's debug what we're receiving
-    print(f"DEBUG: Received {len(raw_tasks)} raw tasks")
-    for i, task in enumerate(raw_tasks):
-        print(f"  {i}: '{task.get('title', 'No title')}' - parent: {task.get('parent')} - id: {task['id']}")
-
     grouped_tasks, parent_ids = group_parent_and_subtasks(raw_tasks)
-    print(f"DEBUG: Found {len(grouped_tasks)} grouped tasks, {len(parent_ids)} parent IDs")
-    
-    processed = []
+
     project_urgency = []
 
     for task in grouped_tasks:
         if task.get('subtasks'):
-            # Calculate TOTAL effort for ALL remaining subtasks
-            total_subtask_effort = sum(parse_effort(sub) for sub in task['subtasks'])
+            # --- PROJECT MET SUB-TAKEN ---
+            subtasks = task['subtasks']
             
-            # Get the parent's deadline
-            parent_deadline = parse_deadline(task)
-            if not parent_deadline:
-                # Use earliest subtask deadline
-                subtask_deadlines = [parse_deadline(sub) for sub in task['subtasks']]
-                subtask_deadlines = [d for d in subtask_deadlines if d]
-                parent_deadline = min(subtask_deadlines) if subtask_deadlines else None
+            # Bereken TOTALE effort voor ALLE resterende sub-taken
+            total_subtask_effort = sum(parse_effort(sub) for sub in subtasks)
             
-            # Calculate priority based on TOTAL remaining work
-            priority, days_left, hours_per_day = calculate_priority(total_subtask_effort, parent_deadline)
+            # Krijg de meest urgente deadline
+            project_deadline = get_project_deadline(task, subtasks)
             
-            # CRITICAL: Only take the FIRST subtask
-            first_subtask = task['subtasks'][0]
+            # Bereken prioriteit gebaseerd op TOTAAL resterend werk
+            priority, days_left, hours_per_day = calculate_priority(total_subtask_effort, project_deadline)
+            
+            # Neem alleen de EERSTE subtaak (ze zijn al gesorteerd)
+            first_subtask = subtasks[0]
             
             project_urgency.append({
                 'parent_task': task,
@@ -178,12 +190,13 @@ def process_tasks(raw_tasks, max_hours=MAX_EFFORT_HOURS_FOR_AI):
                 'hours_per_day_needed': hours_per_day,
                 'total_effort': total_subtask_effort,
                 'first_subtask': first_subtask,
-                'deadline_str': parent_deadline.strftime("%Y-%m-%d") if parent_deadline else "N/A",
-                'all_subtasks': task['subtasks']  # Keep for debugging
+                'deadline_str': project_deadline.strftime("%Y-%m-%d") if project_deadline else "N/A",
+                'deadline_dt': project_deadline,
+                'all_subtasks': subtasks
             })
             
         else:
-            # Standalone task
+            # --- LOSSTAANDE TAAK ---
             effort = parse_effort(task)
             deadline = parse_deadline(task)
             priority, days_left, hours_per_day = calculate_priority(effort, deadline)
@@ -194,68 +207,69 @@ def process_tasks(raw_tasks, max_hours=MAX_EFFORT_HOURS_FOR_AI):
                 'days_until_deadline': days_left,
                 'hours_per_day_needed': hours_per_day,
                 'total_effort': effort,
-                'first_subtask': None,  # Mark as standalone
-                'deadline_str': deadline.strftime("%Y-%m-%d") if deadline else "N/A"
+                'first_subtask': None,
+                'deadline_str': deadline.strftime("%Y-%m-%d") if deadline else "N/A",
+                'deadline_dt': deadline
             })
 
-    # Sort by urgency (priority first, then hours needed per day)
+    # Sorteer op urgentie (prioriteit, dan benodigde uren per dag)
     project_urgency.sort(key=lambda p: (
         PRIORITY_TIERS.index(p['priority']), 
         -p['hours_per_day_needed']
     ))
 
-    # Debug: Show what we found
-    print(f"\nDEBUG: Project urgency ranking:")
-    for i, project in enumerate(project_urgency):
-        if project['first_subtask']:
-            print(f"  {i}: {project['priority']} - '{project['first_subtask'].get('title')}' (from '{project['parent_task'].get('title')}')")
-        else:
-            print(f"  {i}: {project['priority']} - '{project['parent_task'].get('title')}' (standalone)")
-
-    # Build final task list
-    total_hours = 0
+    # --- Bouw de definitieve takenlijst ---
+    urgent_projects = []
+    chore_projects = []
+    
+    # Sorteer projecten in T1-T5 (urgent) en T6-T7 (chores)
     for project in project_urgency:
-        if total_hours >= max_hours:
-            break
-            
+        if project['priority'] in ['T1', 'T2', 'T3', 'T4', 'T5']:
+            urgent_projects.append(project)
+        else:  # T6, T7
+            chore_projects.append(project)
+    
+    # Selecteer de top van elke lijst
+    selected_projects = urgent_projects[:MAX_URGENT_TASKS] + chore_projects[:MAX_CHORE_TASKS]
+
+    processed = []
+    total_hours_selected = 0
+
+    for project in selected_projects:
         if project['first_subtask']:
-            # This is a project with subtasks - use the FIRST one only
+            # Project - gebruik de EERSTE subtaak
             first_sub = project['first_subtask']
             first_sub_effort = parse_effort(first_sub)
-            
-            if total_hours + first_sub_effort <= max_hours:
-                processed.append({
-                    **first_sub,
-                    'effort_hours': first_sub_effort,
-                    'deadline_dt': parse_deadline(project['parent_task']),
-                    'priority': project['priority'],
-                    'days_until_deadline': project['days_until_deadline'],
-                    'hours_per_day_needed': project['hours_per_day_needed'],
-                    'deadline_str': project['deadline_str'],
-                    'parent_title': project['parent_task'].get('title', 'Unknown'),
-                    'total_remaining_effort': project['total_effort'],
-                    'remaining_subtasks': len(project['all_subtasks']),
-                    'is_subtask': True
-                })
-                total_hours += first_sub_effort
+            processed.append({
+                **first_sub,
+                'effort_hours': first_sub_effort,
+                'deadline_dt': project['deadline_dt'],
+                'priority': project['priority'],
+                'days_until_deadline': project['days_until_deadline'],
+                'hours_per_day_needed': project['hours_per_day_needed'],
+                'deadline_str': project['deadline_str'],
+                'parent_title': project['parent_task'].get('title', 'Unknown'),
+                'total_remaining_effort': project['total_effort'],
+                'remaining_subtasks': len(project['all_subtasks']),
+                'is_subtask': True
+            })
+            total_hours_selected += first_sub_effort
         else:
-            # Standalone task
+            # Losstaande taak
             effort = parse_effort(project['parent_task'])
-            if total_hours + effort <= max_hours:
-                processed.append({
-                    **project['parent_task'],
-                    'effort_hours': effort,
-                    'deadline_dt': parse_deadline(project['parent_task']),
-                    'priority': project['priority'],
-                    'days_until_deadline': project['days_until_deadline'],
-                    'hours_per_day_needed': project['hours_per_day_needed'],
-                    'deadline_str': project['deadline_str'],
-                    'parent_title': None,
-                    'total_remaining_effort': effort,
-                    'remaining_subtasks': 1,
-                    'is_subtask': False
-                })
-                total_hours += effort
+            processed.append({
+                **project['parent_task'],
+                'effort_hours': effort,
+                'deadline_dt': project['deadline_dt'],
+                'priority': project['priority'],
+                'days_until_deadline': project['days_until_deadline'],
+                'hours_per_day_needed': project['hours_per_day_needed'],
+                'deadline_str': project['deadline_str'],
+                'parent_title': None,
+                'total_remaining_effort': effort,
+                'remaining_subtasks': 1,
+                'is_subtask': False
+            })
+            total_hours_selected += effort
 
-    print(f"DEBUG: Final processed tasks: {len(processed)}")
     return processed

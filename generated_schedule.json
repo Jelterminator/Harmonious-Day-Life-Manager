@@ -13,69 +13,57 @@
       "phase": "Wood"
     },
     {
-      "title": "Meditation",
+      "title": "Makko Ho",
       "start_time": "07:00",
       "end_time": "07:30",
       "phase": "Wood"
     },
     {
-      "title": "Reading (Wood Phase)",
+      "title": "Meditation",
       "start_time": "07:30",
       "end_time": "08:00",
       "phase": "Wood"
     },
     {
-      "title": "Smoothie",
+      "title": "Reading (Wood Phase)",
       "start_time": "08:00",
-      "end_time": "08:15",
-      "phase": "Wood"
-    },
-    {
-      "title": "Plan the Day",
-      "start_time": "08:15",
       "end_time": "08:30",
       "phase": "Wood"
     },
     {
-      "title": "Morning run",
+      "title": "Smoothie",
       "start_time": "08:30",
+      "end_time": "08:45",
+      "phase": "Wood"
+    },
+    {
+      "title": "Plan the Day",
+      "start_time": "08:45",
       "end_time": "09:00",
       "phase": "Wood"
     },
     {
-      "title": "Deep Work",
+      "title": "Deep Work Start",
       "start_time": "09:00",
       "end_time": "09:15",
       "phase": "Fire"
     },
     {
-      "title": "Stofzuigen",
+      "title": "Studie: Hume & Logisch Positivisme (2u)",
       "start_time": "09:15",
-      "end_time": "10:15",
+      "end_time": "11:15",
       "phase": "Fire"
     },
     {
       "title": "Break",
-      "start_time": "10:15",
-      "end_time": "10:30",
-      "phase": "Fire"
-    },
-    {
-      "title": "Opruimen",
-      "start_time": "10:30",
+      "start_time": "11:15",
       "end_time": "11:30",
       "phase": "Fire"
     },
     {
-      "title": "Break",
+      "title": "Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)",
       "start_time": "11:30",
-      "end_time": "11:45",
-      "phase": "Fire"
-    },
-    {
-      "title": "Vaatwas",
-      "start_time": "11:45",
-      "end_time": "12:45",
+      "end_time": "14:30",
       "phase": "Fire"
     },
     {
@@ -93,12 +81,6 @@
     {
       "title": "Lunch & Mindful Eating",
       "start_time": "13:45",
-      "end_time": "14:15",
-      "phase": "Earth"
-    },
-    {
-      "title": "Integration Walk",
-      "start_time": "14:15",
       "end_time": "14:30",
       "phase": "Earth"
     },
@@ -109,27 +91,15 @@
       "phase": "Metal"
     },
     {
-      "title": "Brainstorm merch concepten (2u)",
+      "title": "Vertaal: Worm & Vlieg (1u)",
       "start_time": "15:15",
       "end_time": "16:15",
       "phase": "Metal"
     },
     {
-      "title": "Break",
+      "title": "Brainstorm merch concepten (2u)",
       "start_time": "16:15",
-      "end_time": "16:30",
-      "phase": "Metal"
-    },
-    {
-      "title": "Design wireframes en sitemap (3u)",
-      "start_time": "16:30",
-      "end_time": "17:30",
-      "phase": "Metal"
-    },
-    {
-      "title": "DataForce by TransPerfect | Crossbill Audio Collection",
-      "start_time": "17:30",
-      "end_time": "18:30",
+      "end_time": "18:00",
       "phase": "Metal"
     },
     {
@@ -151,9 +121,15 @@
       "phase": "Water"
     },
     {
-      "title": "Yoga Nidra (Before sleep)",
+      "title": "Design wireframes en sitemap (3u)",
       "start_time": "20:00",
-      "end_time": "20:30",
+      "end_time": "21:00",
+      "phase": "Water"
+    },
+    {
+      "title": "Yoga Nidra (Before sleep)",
+      "start_time": "21:00",
+      "end_time": "21:30",
       "phase": "Water"
     },
     {

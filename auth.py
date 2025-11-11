@@ -8,9 +8,9 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 SCOPES = [
-    "httpss://www.googleapis.com/auth/calendar",
-    "httpss://www.googleapis.com/auth/spreadsheets",
-    "httpss://www.googleapis.com/auth/tasks.readonly"
+    "https://www.googleapis.com/auth/calendar",
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/tasks.readonly"
 ]
 
 def get_google_services():

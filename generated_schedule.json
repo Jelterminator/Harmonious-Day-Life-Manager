@@ -1,0 +1,148 @@
+{
+  "schedule_entries": [
+    {
+      "title": "Fajr & Centering",
+      "start_time": "05:30",
+      "end_time": "05:40",
+      "phase": "Wood"
+    },
+    {
+      "title": "Tummo",
+      "start_time": "05:40",
+      "end_time": "06:10",
+      "phase": "Wood"
+    },
+    {
+      "title": "Makko Ho",
+      "start_time": "06:10",
+      "end_time": "06:40",
+      "phase": "Wood"
+    },
+    {
+      "title": "Meditation",
+      "start_time": "06:40",
+      "end_time": "07:10",
+      "phase": "Wood"
+    },
+    {
+      "title": "Reading (Wood Phase)",
+      "start_time": "07:10",
+      "end_time": "07:40",
+      "phase": "Wood"
+    },
+    {
+      "title": "Morning run",
+      "start_time": "07:40",
+      "end_time": "08:10",
+      "phase": "Wood"
+    },
+    {
+      "title": "Smoothie",
+      "start_time": "08:10",
+      "end_time": "08:20",
+      "phase": "Wood"
+    },
+    {
+      "title": "Plan the Day",
+      "start_time": "08:20",
+      "end_time": "08:30",
+      "phase": "Wood"
+    },
+    {
+      "title": "Illustreer Hap. Slik. Weg.",
+      "start_time": "09:00",
+      "end_time": "10:30",
+      "phase": "Fire"
+    },
+    {
+      "title": "Merch ontwerpen en produceren",
+      "start_time": "10:30",
+      "end_time": "12:00",
+      "phase": "Fire"
+    },
+    {
+      "title": "Website bouwen jeltesjoerd.com",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "phase": "Fire"
+    },
+    {
+      "title": "Zuhr, Lunch & Grounding",
+      "start_time": "13:00",
+      "end_time": "13:30",
+      "phase": "Earth"
+    },
+    {
+      "title": "Ba Duan Jin (post-lunch stretch)",
+      "start_time": "13:30",
+      "end_time": "13:50",
+      "phase": "Earth"
+    },
+    {
+      "title": "Lunch & Mindful Eating",
+      "start_time": "13:50",
+      "end_time": "14:20",
+      "phase": "Earth"
+    },
+    {
+      "title": "Integration Walk",
+      "start_time": "14:20",
+      "end_time": "14:40",
+      "phase": "Earth"
+    },
+    {
+      "title": "Asr & Refinement",
+      "start_time": "15:00",
+      "end_time": "15:15",
+      "phase": "Metal"
+    },
+    {
+      "title": "Petra",
+      "start_time": "16:00",
+      "end_time": "17:00",
+      "phase": "Metal"
+    },
+    {
+      "title": "Stofzuigen",
+      "start_time": "17:00",
+      "end_time": "18:00",
+      "phase": "Metal"
+    },
+    {
+      "title": "Work Shutdown & Maghrib",
+      "start_time": "18:00",
+      "end_time": "18:20",
+      "phase": "Water"
+    },
+    {
+      "title": "Opruimen",
+      "start_time": "18:20",
+      "end_time": "19:20",
+      "phase": "Water"
+    },
+    {
+      "title": "Was",
+      "start_time": "19:20",
+      "end_time": "20:20",
+      "phase": "Water"
+    },
+    {
+      "title": "Vaatwas",
+      "start_time": "20:20",
+      "end_time": "21:00",
+      "phase": "Water"
+    },
+    {
+      "title": "Isha & Deep Wind-Down",
+      "start_time": "21:00",
+      "end_time": "21:30",
+      "phase": "Water"
+    },
+    {
+      "title": "Yoga Nidra (Before sleep)",
+      "start_time": "21:30",
+      "end_time": "21:45",
+      "phase": "Water"
+    }
+  ]
+}

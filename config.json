@@ -2,105 +2,81 @@
   "phases": [
     {
       "name": "🌳 WOOD",
-      "start": "05:30",
+      "start": "05:00",
       "end": "09:00",
       "qualities": "Growth, Planning, Vitality, New Beginnings.",
-      "ideal_tasks": ["spiritual", "planning", "growth", "learning"]
+      "ideal_tasks": ["spiritual", "planning", "growth", "learning"],
+      "habits": [
+        {"id": "H01", "title": "Tummo", "duration_min": 15, "frequency": "Daily", "task_type": "spiritual"},
+        {"id": "H02", "title": "Makko Ho", "duration_min": 15, "frequency": "Daily", "task_type": "spiritual"},
+        {"id": "H03", "title": "Meditation", "duration_min": 10, "frequency": "Daily", "task_type": "spiritual"},
+        {"id": "H04", "title": "Reading (Wood Phase)", "duration_min": 45, "frequency": "Daily", "task_type": "learning"},
+        {"id": "H05", "title": "Morning run", "duration_min": 30, "frequency": "Daily", "task_type": "growth"},
+        {"id": "H06", "title": "Smoothie", "duration_min": 10, "frequency": "Daily", "task_type": "nourishment"},
+        {"id": "H07", "title": "Plan the Day", "duration_min": 15, "frequency": "Daily", "task_type": "planning"},
+        {"id": "H15", "title": "Circuit training", "duration_min": 40, "frequency": "Daily", "task_type": "growth"},
+        {"id": "H16", "title": "Ji Jin Jing (Cooling Down)", "duration_min": 20, "frequency": "Daily", "task_type": "growth"},
+        {"id": "H17", "title": "Warm-up stretches", "duration_min": 15, "frequency": "Daily", "task_type": "growth"}
+      ]
     },
     {
       "name": "🔥 FIRE",
       "start": "09:00",
-      "end": "12:00",
+      "end": "13:00",
       "qualities": "Peak Energy, Expression, Focus, Radiant Output.",
-      "ideal_tasks": ["deep_work", "pomodoro"]
+      "ideal_tasks": ["deep_work", "pomodoro"],
+      "habits": []
     },
     {
       "name": "🟡 EARTH",
-      "start": "12:00",
+      "start": "13:00",
       "end": "15:00",
       "qualities": "Stability, Nourishment, Integration, Grounding.",
-      "ideal_tasks": ["spiritual", "integration", "rest"]
+      "ideal_tasks": ["spiritual", "integration", "rest"],
+      "habits": [
+        {"id": "H12", "title": "Ba Duan Jin (post-lunch stretch)", "duration_min": 10, "frequency": "Daily", "task_type": "rest"},
+        {"id": "H13", "title": "Lunch & Mindful Eating", "duration_min": 30, "frequency": "Daily", "task_type": "nourishment"},
+        {"id": "H14", "title": "Integration Walk", "duration_min": 15, "frequency": "Daily", "task_type": "rest"}
+      ]
     },
     {
       "name": "🟤 METAL",
       "start": "15:00",
-      "end": "17:00",
+      "end": "18:00",
       "qualities": "Precision, Organization, Letting Go, Refinement.",
-      "ideal_tasks": ["admin", "planning", "spiritual", "pomodoro"]
+      "ideal_tasks": ["admin", "planning", "spiritual", "pomodoro"],
+      "habits": [
+        {"id": "H11", "title": "Weekly Reflection", "duration_min": 20, "frequency": "Weekly", "task_type": "reflection"}
+      ]
     },
     {
       "name": "💧 WATER",
-      "start": "17:00",
+      "start": "18:00",
       "end": "21:30",
       "qualities": "Rest, Storage, Wisdom, Introspection.",
-      "ideal_tasks": ["spiritual", "physical_training", "learning", "reflection", "rest"]
+      "ideal_tasks": ["spiritual", "physical_training", "learning", "reflection", "rest"],
+      "habits": [
+        {"id": "H08", "title": "Journaling", "duration_min": 15, "frequency": "Daily", "task_type": "reflection"},
+        {"id": "H09", "title": "Yoga Nidra (Before sleep)", "duration_min": 20, "frequency": "Daily", "task_type": "rest"},
+        {"id": "H10", "title": "Call Family", "duration_min": 30, "frequency": "Weekly", "task_type": "personal"},
+        {"id": "H18", "title": "Reading (Water Phase)", "duration_min": 75, "frequency": "Daily", "task_type": "rest"},
+        {"id": "S01", "title": "Ma: Wu bu quan (leg strength)", "duration_min": 60, "frequency": "Weekly", "task_type": "physical_training"},
+        {"id": "S02", "title": "Di: Hua quan (swimming & stoombad)", "duration_min": 90, "frequency": "Weekly", "task_type": "physical_training"},
+        {"id": "S03", "title": "Wo: Lianhuan quan (torso & neck)", "duration_min": 60, "frequency": "Weekly", "task_type": "physical_training"},
+        {"id": "S04", "title": "Do: Chan gong rou quan (endurance)", "duration_min": 30, "frequency": "Weekly", "task_type": "physical_training"},
+        {"id": "S05", "title": "Vrij: Jin gang quan (HIIT sprint)", "duration_min": 30, "frequency": "Weekly", "task_type": "physical_training"},
+        {"id": "S06", "title": "Za: Wu xing quan (arms neck & calves)", "duration_min": 60, "frequency": "Weekly", "task_type": "physical_training"},
+        {"id": "S07", "title": "Zo: Luohan quan (long endurance)", "duration_min": 90, "frequency": "Weekly", "task_type": "physical_training"}
+      ]
     }
   ],
   "anchors": [
-    {
-      "name": "Fajr & Centering",
-      "time": "~05:30",
-      "phase": "Wood"
-    },
-    {
-      "name": "Deep Work Start",
-      "time": "09:00",
-      "phase": "Fire"
-    },
-    {
-      "name": "Zuhr, Lunch & Grounding",
-      "time": "12:00",
-      "phase": "Earth"
-    },
-    {
-      "name": "Asr & Refinement",
-      "time": "15:00",
-      "phase": "Metal"
-    },
-    {
-      "name": "Work Shutdown & Maghrib",
-      "time": "17:00",
-      "phase": "Water"
-    },
-    {
-      "name": "Isha & Deep Wind-Down",
-      "time": "~19:30",
-      "phase": "Water"
-    },
-    {
-      "name": "Bedtime",
-      "time": "21:30",
-      "phase": "Water"
-    }
-  ],
-  "sport_schedule": {
-    "0": {
-      "name": "Ma: Wu bu quan",
-      "details": "krachttraining beenspieren, poses voor het 1e chakra"
-    },
-    "1": {
-      "name": "Di: Hua quan",
-      "details": "zwemmen & stoombad, poses voor het 2e chakra"
-    },
-    "2": {
-      "name": "Wo: Lianhuan quan",
-      "details": "krachttraining torso & nek, poses voor het 3e chakra"
-    },
-    "3": {
-      "name": "Do: Chan gong rou quan",
-      "details": "30 min duursport, poses voor het 4e chakra"
-    },
-    "4": {
-      "name": "Vrij: Jin gang quan",
-      "details": "HIIT sprinten, poses voor het 5e chakra"
-    },
-    "5": {
-      "name": "Za: Wu xing quan",
-      "details": "krachttraining armen, nek & kuiten, poses voor het 6e chakra"
-    },
-    "6": {
-      "name": "Zo: Luohan quan",
-      "details": "1h+ duursport, poses voor het 7e chakra"
-    }
-  }
+    {"name": "Fajr & Centering", "time": "~05:30-5:40", "phase": "Wood"},
+    {"name": "Deep Work", "time": "09:00-9:15", "phase": "Fire"},
+    {"name": "Zuhr, Lunch & Grounding", "time": "13:00-13:30", "phase": "Earth"},
+    {"name": "Asr & Refinement", "time": "15:00-15:30", "phase": "Metal"},
+    {"name": "Work Shutdown & Maghrib", "time": "18:00-18:20", "phase": "Water"},
+    {"name": "Isha & Deep Wind-Down", "time": "21:00-21:30", "phase": "Water"},
+    {"name": "Bedtime", "time": "~21:30", "phase": "Water"}
+  ]
 }

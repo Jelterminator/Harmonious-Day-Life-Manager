@@ -1,0 +1,96 @@
+# SCHEDULE GENERATION REQUEST
+
+Today is: Tuesday, November 11, 2025
+
+Create a complete daily schedule based on the Harmonious Day philosophy.
+
+## 1. HARMONIOUS DAY PHASES
+**WOOD** (05:00-09:00)
+- Growth, Planning, Vitality, New Beginnings.
+- Ideal Tasks: spiritual, planning, growth, learning
+
+**FIRE** (09:00-13:00)
+- Peak Energy, Expression, Focus, Radiant Output.
+- Ideal Tasks: deep_work, pomodoro
+
+**EARTH** (13:00-15:00)
+- Stability, Nourishment, Integration, Grounding.
+- Ideal Tasks: spiritual, integration, rest
+
+**METAL** (15:00-18:00)
+- Precision, Organization, Letting Go, Refinement.
+- Ideal Tasks: admin, planning, spiritual, pomodoro
+
+**WATER** (18:00-21:30)
+- Rest, Storage, Wisdom, Introspection.
+- Ideal Tasks: spiritual, physical_training, learning, reflection, rest
+
+## 2. SACRED ANCHOR POINTS (Fixed)
+- ~05:30-5:40: Fajr & Centering
+- 09:00-9:15: Deep Work
+- 13:00-13:30: Zuhr, Lunch & Grounding
+- 15:00-15:30: Asr & Refinement
+- 18:00-18:20: Work Shutdown & Maghrib
+- 21:00-21:30: Isha & Deep Wind-Down
+- ~21:30: Bedtime
+
+## 3. EXISTING CALENDAR EVENTS (Do Not Schedule Over)
+THESE ARE FIXED APPOINTMENTS (Meetings, etc.). DO NOT MODIFY OR DELETE THEM.
+- **Petra** (2025-11-11T16:00:00+01:00 to 2025-11-11T17:00:00+01:00)
+
+## 4. TASKS TO SCHEDULE (Prioritized & Filtered)
+The following tasks are P1-P3 and represent critical work. Use Priority and Effort to guide placement.
+- [T4] **Illustreer Hap. Slik. Weg.** (Effort: 51.0h, Due: N/A)
+- [T4] **Merch ontwerpen en produceren** (Effort: 17.0h, Due: N/A)
+- [T4] **Website bouwen jeltesjoerd.com** (Effort: 16.0h, Due: N/A)
+- [T4] **Stofzuigen** (Effort: 1.0h, Due: N/A)
+- [T4] **Opruimen** (Effort: 1.0h, Due: N/A)
+- [T4] **Was** (Effort: 1.0h, Due: N/A)
+- [T4] **Vaatwas** (Effort: 1.0h, Due: N/A)
+- [T4] **Start SQL MOOC** (Effort: 1.0h, Due: N/A)
+
+## 5. HABITS TO SCHEDULE
+Important: There are too many habits to do all in one day. Tasks (P1-P3) take priority. Include habits proportionally to remaining time, aim for a rough Task-time:Habit-time ratio of 3:1 (or adjust based on day's load). Have a preference for habits that have not been executed the longest.
+- [ ] **Tummo** (Frequency: Daily)
+- [ ] **Makko Ho** (Frequency: Daily)
+- [ ] **Meditation** (Frequency: Daily)
+- [ ] **Reading (Wood Phase)** (Frequency: Daily)
+- [ ] **Morning run** (Frequency: Daily)
+- [ ] **Smoothie** (Frequency: Daily)
+- [ ] **Plan the Day** (Frequency: Daily)
+- [ ] **Journaling** (Frequency: Daily)
+- [ ] **Yoga Nidra (Before sleep)** (Frequency: Daily)
+- [ ] **Call Family** (Frequency: Weekly)
+- [ ] **Weekly Reflection** (Frequency: Weekly)
+- [ ] **Ma: Wu bu quan (leg strength)** (Frequency: Weekly)
+- [ ] **Di: Hua quan (swimming & stoombad)** (Frequency: Weekly)
+- [ ] **Wo: Lianhuan quan (torso & neck)** (Frequency: Weekly)
+- [ ] **Do: Chan gong rou quan (endurance)** (Frequency: Weekly)
+- [ ] **Vrij: Jin gang quan (HIIT sprint)** (Frequency: Weekly)
+- [ ] **Za: Wu xing quan (arms neck & calves)** (Frequency: Weekly)
+- [ ] **Zo: Luohan quan (long endurance)** (Frequency: Weekly)
+- [ ] **Ba Duan Jin (post-lunch stretch)** (Frequency: Daily)
+- [ ] **Lunch & Mindful Eating** (Frequency: Daily)
+- [ ] **Integration Walk** (Frequency: Daily)
+- [ ] **Circuit training** (Frequency: Daily)
+- [ ] **Ji Jin Jing (Cooling Down)** (Frequency: Daily)
+- [ ] **Warm-up stretches** (Frequency: Daily)
+- [ ] **Reading (Water Phase)** (Frequency: Daily)
+
+## 6. OUTPUT REQUIREMENTS
+Rules:
+- Respect anchors and calendar events
+- Schedule tasks first, habits second
+- Match tasks and habits to ideal phases whenever possible
+- Never allow a habits into the wrong phase
+- Split long tasks, over 90 min maximum gets divided into smaller blocks
+- Be realistic, do not overschedule
+- High-priority tasks (P1, P2) must be scheduled even if it means bending phase rules
+- Include only as many habits as realistically fit, with preference to those not executed recently
+
+Return JSON with this structure:
+{
+  "schedule_entries": [
+    {"title": "...", "start_time": "HH:MM", "end_time": "HH:MM", "phase": "Wood|Fire|Earth|Metal|Water"}
+  ]
+}

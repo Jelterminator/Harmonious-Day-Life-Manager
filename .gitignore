@@ -1,0 +1,10 @@
+# Google API Credentials
+credentials.json
+token.json
+
+# Environment variables (if you start using them)
+.env
+
+# Python artifacts
+__pycache__/
+*.pyc

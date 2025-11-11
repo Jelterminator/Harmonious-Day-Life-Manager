@@ -1,0 +1,106 @@
+{
+  "phases": [
+    {
+      "name": "🌳 WOOD",
+      "start": "05:30",
+      "end": "09:00",
+      "qualities": "Growth, Planning, Vitality, New Beginnings.",
+      "ideal_tasks": ["spiritual", "planning", "growth", "learning"]
+    },
+    {
+      "name": "🔥 FIRE",
+      "start": "09:00",
+      "end": "12:00",
+      "qualities": "Peak Energy, Expression, Focus, Radiant Output.",
+      "ideal_tasks": ["deep_work", "pomodoro"]
+    },
+    {
+      "name": "🟡 EARTH",
+      "start": "12:00",
+      "end": "15:00",
+      "qualities": "Stability, Nourishment, Integration, Grounding.",
+      "ideal_tasks": ["spiritual", "integration", "rest"]
+    },
+    {
+      "name": "🟤 METAL",
+      "start": "15:00",
+      "end": "17:00",
+      "qualities": "Precision, Organization, Letting Go, Refinement.",
+      "ideal_tasks": ["admin", "planning", "spiritual", "pomodoro"]
+    },
+    {
+      "name": "💧 WATER",
+      "start": "17:00",
+      "end": "21:30",
+      "qualities": "Rest, Storage, Wisdom, Introspection.",
+      "ideal_tasks": ["spiritual", "physical_training", "learning", "reflection", "rest"]
+    }
+  ],
+  "anchors": [
+    {
+      "name": "Fajr & Centering",
+      "time": "~05:30",
+      "phase": "Wood"
+    },
+    {
+      "name": "Deep Work Start",
+      "time": "09:00",
+      "phase": "Fire"
+    },
+    {
+      "name": "Zuhr, Lunch & Grounding",
+      "time": "12:00",
+      "phase": "Earth"
+    },
+    {
+      "name": "Asr & Refinement",
+      "time": "15:00",
+      "phase": "Metal"
+    },
+    {
+      "name": "Work Shutdown & Maghrib",
+      "time": "17:00",
+      "phase": "Water"
+    },
+    {
+      "name": "Isha & Deep Wind-Down",
+      "time": "~19:30",
+      "phase": "Water"
+    },
+    {
+      "name": "Bedtime",
+      "time": "21:30",
+      "phase": "Water"
+    }
+  ],
+  "sport_schedule": {
+    "0": {
+      "name": "Ma: Wu bu quan",
+      "details": "krachttraining beenspieren, poses voor het 1e chakra"
+    },
+    "1": {
+      "name": "Di: Hua quan",
+      "details": "zwemmen & stoombad, poses voor het 2e chakra"
+    },
+    "2": {
+      "name": "Wo: Lianhuan quan",
+      "details": "krachttraining torso & nek, poses voor het 3e chakra"
+    },
+    "3": {
+      "name": "Do: Chan gong rou quan",
+      "details": "30 min duursport, poses voor het 4e chakra"
+    },
+    "4": {
+      "name": "Vrij: Jin gang quan",
+      "details": "HIIT sprinten, poses voor het 5e chakra"
+    },
+    "5": {
+      "name": "Za: Wu xing quan",
+      "details": "krachttraining armen, nek & kuiten, poses voor het 6e chakra"
+    },
+    "6": {
+      "name": "Zo: Luohan quan",
+      "details": "1h+ duursport, poses voor het 7e chakra"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # SCHEDULE GENERATION REQUEST
 
-Today is: Tuesday, November 11, 2025
+Today is: Wednesday, November 12, 2025
 
 Create a complete daily schedule based on the Harmonious Day philosophy.
 
@@ -29,43 +29,46 @@ Create a complete daily schedule based on the Harmonious Day philosophy.
 
 ## 2. SACRED ANCHOR POINTS (Fixed)
 - ~05:30-5:40: Fajr & Centering
-- 09:00-9:15: Deep Work
-- 13:00-13:30: Zuhr, Lunch & Grounding
-- 15:00-15:30: Asr & Refinement
-- 18:00-18:20: Work Shutdown & Maghrib
-- 21:00-21:30: Isha & Deep Wind-Down
+- 09:00: Deep Work
+- 13:00-13:20: Zuhr, Lunch & Grounding
+- 15:40-16:00: Asr & Refinement
+- 18:00-18:15: Work Shutdown & Maghrib
+- 21:00-21:20: Isha & Deep Wind-Down
 - ~21:30: Bedtime
 
 ## 3. EXISTING CALENDAR EVENTS (Do Not Schedule Over)
 THESE ARE FIXED APPOINTMENTS. DO NOT MODIFY OR DELETE THEM.
-- **Get crypto in trust wallet** (2025-11-11T20:30:00+01:00 to 2025-11-11T21:00:00+01:00)
+- **Hardlopen** (2025-11-12T07:00:00+01:00 to 2025-11-12T08:00:00+01:00)
+- **Outlier inlezen** (2025-11-12T08:00:00+01:00 to 2025-11-12T09:00:00+01:00)
+- **Outlier.ai** (2025-11-12T09:00:00+01:00 to 2025-11-12T12:00:00+01:00)
+- **Hallo language assessment** (2025-11-12T12:00:00+01:00 to 2025-11-12T13:00:00+01:00)
+- **ErasmusTalent testen** (2025-11-12T16:30:00+01:00 to 2025-11-12T17:30:00+01:00)
 
 ## 4. TASKS TO SCHEDULE (Prioritized by Urgency)
 **CRITICAL CONTEXT**: For multi-step tasks, priority is calculated based on TOTAL remaining work vs deadline.
 **RULE**: Only the FIRST incomplete subtask of each parent is shown. Complete it today to unlock the next.
 
-### T3 - MODERATE - 1 tasks, 2.0h
+### T4 - 2 tasks, 5.0h
 - **01. Studie: Hume & Logisch Positivisme (2u)** [Step 1 of 33 in: Schrijf De Aap is gaan staan]
-  - THIS task: 2.0h | TOTAL project: 97.0h remaining
-  - Deadline: 2025-12-06 (24.2 days) | Need: 4.0h/day to finish on time
+  - THIS task: 2.0h | TOTAL project: 91.0h remaining
+  - Deadline: 2025-12-06 (23.8 days) | Need: 3.8h/day to finish on time
 
-### T4 - 1 tasks, 3.0h
 - **02. Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)** [Step 1 of 50 in: Hap. Slik. Weg. geïllustreerd]
   - THIS task: 3.0h | TOTAL project: 240.0h remaining
-  - Deadline: 2026-01-24 (73.2 days) | Need: 3.3h/day to finish on time
+  - Deadline: 2026-01-24 (72.8 days) | Need: 3.3h/day to finish on time
 
 ### T6 - 3 tasks, 6.0h
 - **01. Vertaal: Worm & Vlieg (1u)** [Step 1 of 25 in: Chomp. Gulp. Gone.]
   - THIS task: 1.0h | TOTAL project: 34.5h remaining
-  - Deadline: 2025-12-20 (38.2 days) | Need: 0.9h/day to finish on time
+  - Deadline: 2025-12-20 (37.8 days) | Need: 0.9h/day to finish on time
 
 - **01. Brainstorm merch concepten (2u)** [Step 1 of 16 in: Merch ontwerpen]
   - THIS task: 2.0h | TOTAL project: 39.0h remaining
-  - Deadline: 2026-01-03 (52.2 days) | Need: 0.7h/day to finish on time
+  - Deadline: 2026-01-03 (51.8 days) | Need: 0.8h/day to finish on time
 
 - **01. Design wireframes en sitemap (3u)** [Step 1 of 15 in: Website jeltesjoerd.com bouwen]
   - THIS task: 3.0h | TOTAL project: 42.0h remaining
-  - Deadline: 2026-01-17 (66.2 days) | Need: 0.6h/day to finish on time
+  - Deadline: 2026-01-17 (65.8 days) | Need: 0.6h/day to finish on time
 
 
 ## 5. HABITS TO SCHEDULE

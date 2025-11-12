@@ -345,6 +345,7 @@ def build_world_prompt(rules, calendar_events, tasks, habits):
 
 
 
+
 def save_schedule_to_file(schedule_data, filename="generated_schedule.json"):
     """Save schedule JSON to file."""
     try:
@@ -373,8 +374,8 @@ def create_calendar_events(calendar_service, schedule_entries, date_str):
     color_map = {
         'Wood': '2',   # Green (Growth)
         'Fire': '11',  # Orange/Red (Energy/Deep Work)
-        'Earth': '1',  # Light Blue/Default (Integration/Rest)
-        'Metal': '5',  # Yellow/Gold (Planning/Admin)
+        'Earth': '5',  # Yellow/Gold (Integration/Rest)
+        'Metal': '1',  # Light Blue/Default (Planning/Admin)
         'Water': '10'  # Purple (Rest/Training)
     }
     

@@ -3,138 +3,138 @@
     {
       "title": "Fajr & Centering",
       "start_time": "05:30",
-      "end_time": "06:30",
+      "end_time": "05:40",
+      "phase": "Wood"
+    },
+    {
+      "title": "Morning run",
+      "start_time": "05:40",
+      "end_time": "06:10",
       "phase": "Wood"
     },
     {
       "title": "Tummo",
-      "start_time": "06:30",
-      "end_time": "07:00",
+      "start_time": "06:10",
+      "end_time": "06:30",
       "phase": "Wood"
     },
     {
       "title": "Makko Ho",
-      "start_time": "07:00",
-      "end_time": "07:30",
+      "start_time": "06:30",
+      "end_time": "06:50",
       "phase": "Wood"
     },
     {
       "title": "Meditation",
-      "start_time": "07:30",
+      "start_time": "06:50",
+      "end_time": "07:10",
+      "phase": "Wood"
+    },
+    {
+      "title": "Hardlopen",
+      "start_time": "07:00",
       "end_time": "08:00",
       "phase": "Wood"
     },
     {
-      "title": "Reading (Wood Phase)",
+      "title": "Outlier inlezen",
       "start_time": "08:00",
-      "end_time": "08:30",
-      "phase": "Wood"
-    },
-    {
-      "title": "Smoothie",
-      "start_time": "08:30",
-      "end_time": "08:45",
-      "phase": "Wood"
-    },
-    {
-      "title": "Plan the Day",
-      "start_time": "08:45",
       "end_time": "09:00",
       "phase": "Wood"
     },
     {
-      "title": "Deep Work Start",
+      "title": "Outlier.ai",
       "start_time": "09:00",
-      "end_time": "09:15",
+      "end_time": "12:00",
       "phase": "Fire"
     },
     {
-      "title": "Studie: Hume & Logisch Positivisme (2u)",
-      "start_time": "09:15",
-      "end_time": "11:15",
-      "phase": "Fire"
-    },
-    {
-      "title": "Break",
-      "start_time": "11:15",
-      "end_time": "11:30",
-      "phase": "Fire"
-    },
-    {
-      "title": "Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)",
-      "start_time": "11:30",
-      "end_time": "14:30",
+      "title": "Hallo language assessment",
+      "start_time": "12:00",
+      "end_time": "13:00",
       "phase": "Fire"
     },
     {
       "title": "Zuhr, Lunch & Grounding",
       "start_time": "13:00",
-      "end_time": "13:30",
+      "end_time": "13:20",
       "phase": "Earth"
     },
     {
       "title": "Ba Duan Jin (post-lunch stretch)",
-      "start_time": "13:30",
-      "end_time": "13:45",
+      "start_time": "13:20",
+      "end_time": "13:30",
       "phase": "Earth"
     },
     {
       "title": "Lunch & Mindful Eating",
-      "start_time": "13:45",
+      "start_time": "13:30",
+      "end_time": "14:00",
+      "phase": "Earth"
+    },
+    {
+      "title": "Integration Walk",
+      "start_time": "14:00",
       "end_time": "14:30",
       "phase": "Earth"
     },
     {
+      "title": "Studie: Hume & Logisch Positivisme (2u)",
+      "start_time": "14:30",
+      "end_time": "16:30",
+      "phase": "Metal"
+    },
+    {
       "title": "Asr & Refinement",
-      "start_time": "15:00",
-      "end_time": "15:15",
+      "start_time": "15:40",
+      "end_time": "16:00",
       "phase": "Metal"
     },
     {
-      "title": "Vertaal: Worm & Vlieg (1u)",
-      "start_time": "15:15",
-      "end_time": "16:15",
+      "title": "ErasmusTalent testen",
+      "start_time": "16:30",
+      "end_time": "17:30",
       "phase": "Metal"
     },
     {
-      "title": "Brainstorm merch concepten (2u)",
-      "start_time": "16:15",
-      "end_time": "18:00",
+      "title": "Illustrate p2-3 Lege bladzij/Titel+Auteur (1u)",
+      "start_time": "17:30",
+      "end_time": "18:30",
       "phase": "Metal"
     },
     {
       "title": "Work Shutdown & Maghrib",
       "start_time": "18:00",
-      "end_time": "18:20",
+      "end_time": "18:15",
       "phase": "Water"
     },
     {
-      "title": "Hallo language assessment",
-      "start_time": "18:30",
-      "end_time": "19:30",
+      "title": "Illustrate p2-3 Lege bladzij/Titel+Auteur (2u)",
+      "start_time": "18:15",
+      "end_time": "20:15",
       "phase": "Water"
     },
     {
-      "title": "Get crypto in trust wallet",
-      "start_time": "19:30",
-      "end_time": "20:00",
-      "phase": "Water"
-    },
-    {
-      "title": "Design wireframes en sitemap (3u)",
-      "start_time": "20:00",
-      "end_time": "21:00",
+      "title": "Journaling",
+      "start_time": "20:15",
+      "end_time": "20:30",
       "phase": "Water"
     },
     {
       "title": "Yoga Nidra (Before sleep)",
-      "start_time": "21:00",
-      "end_time": "21:30",
+      "start_time": "20:30",
+      "end_time": "21:00",
       "phase": "Water"
     },
     {
       "title": "Isha & Deep Wind-Down",
       "start_time": "21:00",
+      "end_time": "21:20",
+      "phase": "Water"
+    },
+    {
+      "title": "Reading (Water Phase)",
+      "start_time": "21:20",
       "end_time": "21:30",
       "phase": "Water"
     }

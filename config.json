@@ -72,11 +72,11 @@
   ],
   "anchors": [
     {"name": "Fajr & Centering", "time": "~05:30-5:40", "phase": "Wood"},
-    {"name": "Deep Work", "time": "09:00-9:15", "phase": "Fire"},
-    {"name": "Zuhr, Lunch & Grounding", "time": "13:00-13:30", "phase": "Earth"},
-    {"name": "Asr & Refinement", "time": "15:00-15:30", "phase": "Metal"},
-    {"name": "Work Shutdown & Maghrib", "time": "18:00-18:20", "phase": "Water"},
-    {"name": "Isha & Deep Wind-Down", "time": "21:00-21:30", "phase": "Water"},
+    {"name": "Deep Work", "time": "09:00", "phase": "Fire"},
+    {"name": "Zuhr, Lunch & Grounding", "time": "13:00-13:20", "phase": "Earth"},
+    {"name": "Asr & Refinement", "time": "15:40-16:00", "phase": "Metal"},
+    {"name": "Work Shutdown & Maghrib", "time": "18:00-18:15", "phase": "Water"},
+    {"name": "Isha & Deep Wind-Down", "time": "21:00-21:20", "phase": "Water"},
     {"name": "Bedtime", "time": "~21:30", "phase": "Water"}
   ]
 }

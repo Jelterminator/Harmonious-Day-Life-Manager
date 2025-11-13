@@ -2,81 +2,46 @@
   "phases": [
     {
       "name": "🌳 WOOD",
-      "start": "05:00",
+      "start": "05:30",
       "end": "09:00",
-      "qualities": "Growth, Planning, Vitality, New Beginnings.",
-      "ideal_tasks": ["spiritual", "planning", "growth", "learning"],
-      "habits": [
-        {"id": "H01", "title": "Tummo", "duration_min": 15, "frequency": "Daily", "task_type": "spiritual"},
-        {"id": "H02", "title": "Makko Ho", "duration_min": 15, "frequency": "Daily", "task_type": "spiritual"},
-        {"id": "H03", "title": "Meditation", "duration_min": 10, "frequency": "Daily", "task_type": "spiritual"},
-        {"id": "H04", "title": "Reading (Wood Phase)", "duration_min": 45, "frequency": "Daily", "task_type": "learning"},
-        {"id": "H05", "title": "Morning run", "duration_min": 30, "frequency": "Daily", "task_type": "growth"},
-        {"id": "H06", "title": "Smoothie", "duration_min": 10, "frequency": "Daily", "task_type": "nourishment"},
-        {"id": "H07", "title": "Plan the Day", "duration_min": 15, "frequency": "Daily", "task_type": "planning"},
-        {"id": "H15", "title": "Circuit training", "duration_min": 40, "frequency": "Daily", "task_type": "growth"},
-        {"id": "H16", "title": "Ji Jin Jing (Cooling Down)", "duration_min": 20, "frequency": "Daily", "task_type": "growth"},
-        {"id": "H17", "title": "Warm-up stretches", "duration_min": 15, "frequency": "Daily", "task_type": "growth"}
-      ]
+      "qualities": "Growth, Planning, Vitality, New Beginnings. Consists of a spiritual hour first, a sports hour second and breakfast and then preparation time until 9am.",
+      "ideal_tasks": ["spiritual", "planning", "growth", "learning"]
     },
     {
       "name": "🔥 FIRE",
       "start": "09:00",
       "end": "13:00",
-      "qualities": "Peak Energy, Expression, Focus, Radiant Output.",
-      "ideal_tasks": ["deep_work", "pomodoro"],
-      "habits": []
+      "qualities": "Peak Energy, Expression, Focus, Radiant Output. Ideal for deep work tasks.",
+      "ideal_tasks": ["deep_work", "pomodoro"]
     },
     {
       "name": "🟡 EARTH",
       "start": "13:00",
       "end": "15:00",
-      "qualities": "Stability, Nourishment, Integration, Grounding.",
-      "ideal_tasks": ["spiritual", "integration", "rest"],
-      "habits": [
-        {"id": "H12", "title": "Ba Duan Jin (post-lunch stretch)", "duration_min": 10, "frequency": "Daily", "task_type": "rest"},
-        {"id": "H13", "title": "Lunch & Mindful Eating", "duration_min": 30, "frequency": "Daily", "task_type": "nourishment"},
-        {"id": "H14", "title": "Integration Walk", "duration_min": 15, "frequency": "Daily", "task_type": "rest"}
-      ]
+      "qualities": "Stability, Nourishment, Integration, Grounding. The second hour can be used for habits too, but is especially good for housework tasks.",
+      "ideal_tasks": ["spiritual", "integration", "rest"]
     },
     {
       "name": "🟤 METAL",
       "start": "15:00",
       "end": "18:00",
-      "qualities": "Precision, Organization, Letting Go, Refinement.",
-      "ideal_tasks": ["admin", "planning", "spiritual", "pomodoro"],
-      "habits": [
-        {"id": "H11", "title": "Weekly Reflection", "duration_min": 20, "frequency": "Weekly", "task_type": "reflection"}
-      ]
+      "qualities": "Precision, Organization, Letting Go, Refinement. Ideal for administrative tasks, cleaning or study tasks.",
+      "ideal_tasks": ["admin", "planning", "spiritual", "pomodoro"]
     },
     {
       "name": "💧 WATER",
       "start": "18:00",
-      "end": "21:30",
-      "qualities": "Rest, Storage, Wisdom, Introspection.",
-      "ideal_tasks": ["spiritual", "physical_training", "learning", "reflection", "rest"],
-      "habits": [
-        {"id": "H08", "title": "Journaling", "duration_min": 15, "frequency": "Daily", "task_type": "reflection"},
-        {"id": "H09", "title": "Yoga Nidra (Before sleep)", "duration_min": 20, "frequency": "Daily", "task_type": "rest"},
-        {"id": "H10", "title": "Call Family", "duration_min": 30, "frequency": "Weekly", "task_type": "personal"},
-        {"id": "H18", "title": "Reading (Water Phase)", "duration_min": 75, "frequency": "Daily", "task_type": "rest"},
-        {"id": "S01", "title": "Ma: Wu bu quan (leg strength)", "duration_min": 60, "frequency": "Weekly", "task_type": "physical_training"},
-        {"id": "S02", "title": "Di: Hua quan (swimming & stoombad)", "duration_min": 90, "frequency": "Weekly", "task_type": "physical_training"},
-        {"id": "S03", "title": "Wo: Lianhuan quan (torso & neck)", "duration_min": 60, "frequency": "Weekly", "task_type": "physical_training"},
-        {"id": "S04", "title": "Do: Chan gong rou quan (endurance)", "duration_min": 30, "frequency": "Weekly", "task_type": "physical_training"},
-        {"id": "S05", "title": "Vrij: Jin gang quan (HIIT sprint)", "duration_min": 30, "frequency": "Weekly", "task_type": "physical_training"},
-        {"id": "S06", "title": "Za: Wu xing quan (arms neck & calves)", "duration_min": 60, "frequency": "Weekly", "task_type": "physical_training"},
-        {"id": "S07", "title": "Zo: Luohan quan (long endurance)", "duration_min": 90, "frequency": "Weekly", "task_type": "physical_training"}
-      ]
+      "end": "21:45",
+      "qualities": "Rest, Storage, Wisdom, Introspection. The time for work is over, however Quiet Time (19:30-21:00) can be used for lightweight study tasks, creative tasks, or housework tasks.",
+      "ideal_tasks": ["spiritual", "physical_training", "learning", "reflection", "rest"]
     }
   ],
   "anchors": [
-    {"name": "Fajr & Centering", "time": "~05:30-5:40", "phase": "Wood"},
-    {"name": "Deep Work", "time": "09:00", "phase": "Fire"},
-    {"name": "Zuhr, Lunch & Grounding", "time": "13:00-13:20", "phase": "Earth"},
-    {"name": "Asr & Refinement", "time": "15:40-16:00", "phase": "Metal"},
-    {"name": "Work Shutdown & Maghrib", "time": "18:00-18:15", "phase": "Water"},
-    {"name": "Isha & Deep Wind-Down", "time": "21:00-21:20", "phase": "Water"},
-    {"name": "Bedtime", "time": "~21:30", "phase": "Water"}
+    {"name": "Fajr", "time": "~05:30-5:40", "phase": "Wood"},
+    {"name": "Zuhr", "time": "13:00-13:20", "phase": "Earth"},
+    {"name": "Asr", "time": "15:00-15:20", "phase": "Metal"},
+    {"name": "Maghrib", "time": "18:00-18:15", "phase": "Water"},
+    {"name": "Isha", "time": "21:00-21:20", "phase": "Water"},
+    {"name": "Bedtime", "time": "~21:45", "phase": "Water"}
   ]
 }

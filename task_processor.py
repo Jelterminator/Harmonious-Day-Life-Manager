@@ -4,7 +4,7 @@ from collections import defaultdict
 
 # --- CONFIG ---
 MAX_URGENT_TASKS = 7  # Aantal "Stones" (T1-T5) om aan de AI te geven
-MAX_CHORE_TASKS = 3   # Aantal "Sand" (T6-T7) om te garanderen dat klusjes meegaan
+MAX_CHORE_TASKS = 5   # Aantal "Sand" (T6-T7) om te garanderen dat klusjes meegaan
 
 # Priority tiers based on Critical Ratio + effort weight
 PRIORITY_TIERS = ['T1','T2','T3','T4','T5','T6','T7']
@@ -127,7 +127,7 @@ def calculate_priority(total_effort_hours, deadline_dt):
     now = datetime.datetime.now(datetime.timezone.utc)
     
     if not deadline_dt:
-        return 'T7', float('inf'), 0  # Geen deadline
+        return 'T6', float('inf'), 0  # Geen deadline
     
     hours_until_deadline = (deadline_dt - now).total_seconds() / 3600
     days_until_deadline = hours_until_deadline / 24.0
@@ -153,7 +153,7 @@ def calculate_priority(total_effort_hours, deadline_dt):
     elif hours_per_day_needed > 1:
         return 'T5', days_until_deadline, hours_per_day_needed
     else:
-        return 'T6', days_until_deadline, hours_per_day_needed
+        return 'T7', days_until_deadline, hours_per_day_needed
 
 # --- MAIN PROCESSOR ---
 

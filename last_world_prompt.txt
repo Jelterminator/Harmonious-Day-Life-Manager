@@ -1,118 +1,107 @@
 # SCHEDULE GENERATION REQUEST
+Create a schedule for the rest of today and all of tomorrow based on the Harmonious Day philosophy.
 
-Today is: Wednesday, November 12, 2025
+The schedule window is from 2025-11-13 18:15 until the end of 2025-11-14 23:59.
 
-Create a complete daily schedule based on the Harmonious Day philosophy.
-
-**TASK OVERVIEW**: 5 tasks (0 URGENT T1, 0 HIGH T2) = ~11.0h total effort
+**TASK OVERVIEW**: 8 tasks (1 URGENT T1, 0 HIGH T2) = ~40.0h total effort
 
 ## 1. HARMONIOUS DAY PHASES
-**WOOD** (05:00-09:00)
-- Growth, Planning, Vitality, New Beginnings.
-- Ideal Tasks: spiritual, planning, growth, learning
-
+**WOOD** (05:30-09:00)
+- Growth, Planning, Vitality, New Beginnings. Consists of a spiritual hour first, a sports hour second and breakfast and then preparation time until 9am.
 **FIRE** (09:00-13:00)
-- Peak Energy, Expression, Focus, Radiant Output.
-- Ideal Tasks: deep_work, pomodoro
-
+- Peak Energy, Expression, Focus, Radiant Output. Ideal for deep work tasks.
 **EARTH** (13:00-15:00)
-- Stability, Nourishment, Integration, Grounding.
-- Ideal Tasks: spiritual, integration, rest
-
+- Stability, Nourishment, Integration, Grounding. The second hour can be used for habits too, but is especially good for housework tasks.
 **METAL** (15:00-18:00)
-- Precision, Organization, Letting Go, Refinement.
-- Ideal Tasks: admin, planning, spiritual, pomodoro
-
-**WATER** (18:00-21:30)
-- Rest, Storage, Wisdom, Introspection.
-- Ideal Tasks: spiritual, physical_training, learning, reflection, rest
-
+- Precision, Organization, Letting Go, Refinement. Ideal for administrative tasks, cleaning or study tasks.
+**WATER** (18:00-21:45)
+- Rest, Storage, Wisdom, Introspection. The time for work is over, however Quiet Time (19:30-21:00) can be used for lightweight study tasks, creative tasks, or housework tasks.
 ## 2. SACRED ANCHOR POINTS (Fixed)
-- ~05:30-5:40: Fajr & Centering
-- 09:00: Deep Work
-- 13:00-13:20: Zuhr, Lunch & Grounding
-- 15:40-16:00: Asr & Refinement
-- 18:00-18:15: Work Shutdown & Maghrib
-- 21:00-21:20: Isha & Deep Wind-Down
-- ~21:30: Bedtime
+- ~05:30-5:40: Fajr
+- 13:00-13:20: Zuhr
+- 15:00-15:20: Asr
+- 18:00-18:15: Maghrib
+- 21:00-21:20: Isha
+- ~21:45: Bedtime
 
 ## 3. EXISTING CALENDAR EVENTS (Do Not Schedule Over)
-THESE ARE FIXED APPOINTMENTS. DO NOT MODIFY OR DELETE THEM.
-- **Hardlopen** (2025-11-12T07:00:00+01:00 to 2025-11-12T08:00:00+01:00)
-- **Outlier inlezen** (2025-11-12T08:00:00+01:00 to 2025-11-12T09:00:00+01:00)
-- **Outlier.ai** (2025-11-12T09:00:00+01:00 to 2025-11-12T12:00:00+01:00)
-- **Hallo language assessment** (2025-11-12T12:00:00+01:00 to 2025-11-12T13:00:00+01:00)
-- **ErasmusTalent testen** (2025-11-12T16:30:00+01:00 to 2025-11-12T17:30:00+01:00)
+THESE ARE FIXED APPOINTMENTS: THEY CANNOT BE CANCELLED, RESCHEDULED OR MOVED. DO NOT MODIFY OR DELETE THEM.
+- **Bij ma, theater, leuk** (2025-11-13T18:30:00+01:00 to 2025-11-13T22:30:00+01:00)
+- **Klussen** (2025-11-14T08:00:00+01:00 to 2025-11-14T13:00:00+01:00)
+- **Hallo language assessment** (2025-11-14T14:00:00+01:00 to 2025-11-14T15:00:00+01:00)
 
 ## 4. TASKS TO SCHEDULE (Prioritized by Urgency)
 **CRITICAL CONTEXT**: For multi-step tasks, priority is calculated based on TOTAL remaining work vs deadline.
-**RULE**: Only the FIRST incomplete subtask of each parent is shown. Complete it today to unlock the next.
+### T1 - CRITICAL URGENCY - 1 tasks, 1.0h
+These require >8h/day of work to meet deadline, or are past due. MUST schedule today.
+
+- **Opruimen**
+  - Effort: 1.0h
+  - Deadline: 2025-11-14 (0.3 days) | Need: 1.0h/day
 
 ### T4 - 2 tasks, 5.0h
-- **01. Studie: Hume & Logisch Positivisme (2u)** [Step 1 of 33 in: Schrijf De Aap is gaan staan]
-  - THIS task: 2.0h | TOTAL project: 91.0h remaining
-  - Deadline: 2025-12-06 (23.8 days) | Need: 3.8h/day to finish on time
-
 - **02. Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)** [Step 1 of 50 in: Hap. Slik. Weg. geïllustreerd]
   - THIS task: 3.0h | TOTAL project: 240.0h remaining
-  - Deadline: 2026-01-24 (72.8 days) | Need: 3.3h/day to finish on time
+  - Deadline: 2026-01-24 (71.3 days) | Need: 3.4h/day to finish on time
 
-### T6 - 3 tasks, 6.0h
+- **01. Studie: Hume & Logisch Positivisme (2u)** [Step 1 of 33 in: Schrijf De Aap is gaan staan]
+  - THIS task: 2.0h | TOTAL project: 74.0h remaining
+  - Deadline: 2025-12-06 (22.3 days) | Need: 3.3h/day to finish on time
+
+### T6 - 4 tasks, 33.0h
+- **Badkamer**
+  - Effort: 1.0h
+  - Deadline: N/A (inf days) | Need: 0.0h/day
+
+- **Stofzuigen**
+  - Effort: 1.0h
+  - Deadline: N/A (inf days) | Need: 0.0h/day
+
+- **Vaatwas**
+  - Effort: 1.0h
+  - Deadline: N/A (inf days) | Need: 0.0h/day
+
+- **01. Udemy: The Complete SQL Bootcamp (30u)** [Step 1 of 30 in: MOOCs]
+  - THIS task: 30.0h | TOTAL project: 829.0h remaining
+  - Deadline: N/A (inf days) | Need: 0.0h/day to finish on time
+
+### T7 - 1 tasks, 1.0h
 - **01. Vertaal: Worm & Vlieg (1u)** [Step 1 of 25 in: Chomp. Gulp. Gone.]
   - THIS task: 1.0h | TOTAL project: 34.5h remaining
-  - Deadline: 2025-12-20 (37.8 days) | Need: 0.9h/day to finish on time
+  - Deadline: 2025-12-20 (36.3 days) | Need: 1.0h/day to finish on time
 
-- **01. Brainstorm merch concepten (2u)** [Step 1 of 16 in: Merch ontwerpen]
-  - THIS task: 2.0h | TOTAL project: 39.0h remaining
-  - Deadline: 2026-01-03 (51.8 days) | Need: 0.8h/day to finish on time
-
-- **01. Design wireframes en sitemap (3u)** [Step 1 of 15 in: Website jeltesjoerd.com bouwen]
-  - THIS task: 3.0h | TOTAL project: 42.0h remaining
-  - Deadline: 2026-01-17 (65.8 days) | Need: 0.6h/day to finish on time
-
+Try to plan tasks for more time than their project requires per day, otherwise the deadline will be missed.
+A single caledar input does not need to be the whole task, and if a task is long its pieces may be planned as multiple events over the course of a day. And even if the full task cannot be completed it is good to plan a part: something is better than nothing.
+Remember to change the time of the end of each event, so that the pieces of tasks do not become doubly planned agenda items.
 
 ## 5. HABITS TO SCHEDULE
 Tasks take absolute priority. Only include habits that fit after T1/T2 tasks are scheduled.
-Aim for Task:Habit ratio of 3:1. Prefer habits not done recently.
+Aim for a Task:Habit ratio of 3:1. Just plan tasks first, and see which habits are possible after.
+The time habits take is very flexible and can be increased or decreased with up to 50%, if desired.Reading must happen every day and the minimum time requirement is low: as few as 20 minutes can already be a reading event.
 
-- [ ] **Tummo** (Frequency: Daily)
-- [ ] **Makko Ho** (Frequency: Daily)
-- [ ] **Meditation** (Frequency: Daily)
-- [ ] **Reading (Wood Phase)** (Frequency: Daily)
-- [ ] **Morning run** (Frequency: Daily)
-- [ ] **Smoothie** (Frequency: Daily)
-- [ ] **Plan the Day** (Frequency: Daily)
-- [ ] **Journaling** (Frequency: Daily)
-- [ ] **Yoga Nidra (Before sleep)** (Frequency: Daily)
-- [ ] **Call Family** (Frequency: Weekly)
-- [ ] **Weekly Reflection** (Frequency: Weekly)
-- [ ] **Ma: Wu bu quan (leg strength)** (Frequency: Weekly)
-- [ ] **Di: Hua quan (swimming & stoombad)** (Frequency: Weekly)
-- [ ] **Wo: Lianhuan quan (torso & neck)** (Frequency: Weekly)
-- [ ] **Do: Chan gong rou quan (endurance)** (Frequency: Weekly)
-- [ ] **Vrij: Jin gang quan (HIIT sprint)** (Frequency: Weekly)
-- [ ] **Za: Wu xing quan (arms neck & calves)** (Frequency: Weekly)
-- [ ] **Zo: Luohan quan (long endurance)** (Frequency: Weekly)
-- [ ] **Ba Duan Jin (post-lunch stretch)** (Frequency: Daily)
-- [ ] **Lunch & Mindful Eating** (Frequency: Daily)
-- [ ] **Integration Walk** (Frequency: Daily)
-- [ ] **Circuit training** (Frequency: Daily)
-- [ ] **Ji Jin Jing (Cooling Down)** (Frequency: Daily)
-- [ ] **Warm-up stretches** (Frequency: Daily)
-- [ ] **Reading (Water Phase)** (Frequency: Daily)
+- [ ] **Tummo** (Ideal duration: 15 minutes) (Frequency: Daily) (Phase: WOOD)
+- [ ] **Makko Ho** (Ideal duration: 15 minutes) (Frequency: Daily) (Phase: WOOD)
+- [ ] **Meditation (Wood Phase)** (Ideal duration: 10 minutes) (Frequency: Daily) (Phase: WOOD)
+- [ ] **Reading (Wood Phase)** (Ideal duration: 60 minutes) (Frequency: Daily) (Phase: WOOD)
+- [ ] **Warm-up stretches** (Ideal duration: 15 minutes) (Frequency: Daily) (Phase: WOOD)
+- [ ] **Circuit training** (Ideal duration: 40 minutes) (Frequency: Daily) (Phase: WOOD)
+- [ ] **Ji Jin Jing (Cooling Down)** (Ideal duration: 20 minutes) (Frequency: Daily) (Phase: WOOD)
+- [ ] **Lunch & Mindful Eating** (Ideal duration: 30 minutes) (Frequency: Daily) (Phase: EARTH)
+- [ ] **Ba Duan Jin (post-lunch stretch)** (Ideal duration: 10 minutes) (Frequency: Daily) (Phase: EARTH)
+- [ ] **Meditation (Earth Phase)** (Ideal duration: 10 minutes) (Frequency: Daily) (Phase: EARTH)
+- [ ] **Yang Style Tai Chi** (Ideal duration: 10 minutes) (Frequency: Daily) (Phase: METAL)
+- [ ] **Do: Chan gong rou quan (endurance)** (Ideal duration: 30 minutes) (Frequency: Weekly) (Phase: WATER)
+- [ ] **Xi Sui Jing** (Ideal duration: 20 minutes) (Frequency: Daily) (Phase: WATER)
+- [ ] **Reading (Water Phase)** (Ideal duration: 90 minutes) (Frequency: Daily) (Phase: WATER)
+- [ ] **Yoga Nidra** (Ideal duration: 20 minutes) (Frequency: Daily) (Phase: WATER)
+- [ ] **Journaling** (Ideal duration: 15 minutes) (Frequency: Daily) (Phase: WATER)
 
 ## 6. OUTPUT REQUIREMENTS
 Rules:
 - **T1/T2 PRIORITY**: Schedule all T1 tasks, as many T2 as possible. These are calculated based on total remaining effort vs deadline.
-- **ONE SUBTASK PER PARENT**: Only schedule the first incomplete subtask shown. Don't invent additional steps.
-- **SEQUENTIAL**: Complete today's subtask before tomorrow's subtask can be scheduled.
-- Respect anchors and fixed calendar events
+- Respect anchors and fixed calendar events, and never let events overlap.
 - Match tasks to ideal phases when possible, but urgency overrides phase preference
-- Split tasks over 90 minutes into smaller blocks with breaks
-- Be realistic: 6-8 hours of focused work max
-- Include breaks between blocks (10-15 min)
-- Habits only in remaining time after tasks
-
+- Be realistic: 6-10 hours of focused work max
 Return JSON with this structure:
 {
   "schedule_entries": [

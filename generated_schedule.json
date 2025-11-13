@@ -1,141 +1,159 @@
 {
   "schedule_entries": [
     {
-      "title": "Fajr & Centering",
-      "start_time": "05:30",
-      "end_time": "05:40",
-      "phase": "Wood"
-    },
-    {
-      "title": "Morning run",
-      "start_time": "05:40",
-      "end_time": "06:10",
-      "phase": "Wood"
-    },
-    {
-      "title": "Tummo",
-      "start_time": "06:10",
-      "end_time": "06:30",
-      "phase": "Wood"
-    },
-    {
-      "title": "Makko Ho",
-      "start_time": "06:30",
-      "end_time": "06:50",
-      "phase": "Wood"
-    },
-    {
-      "title": "Meditation",
-      "start_time": "06:50",
-      "end_time": "07:10",
-      "phase": "Wood"
-    },
-    {
-      "title": "Hardlopen",
-      "start_time": "07:00",
-      "end_time": "08:00",
-      "phase": "Wood"
-    },
-    {
-      "title": "Outlier inlezen",
-      "start_time": "08:00",
-      "end_time": "09:00",
-      "phase": "Wood"
-    },
-    {
-      "title": "Outlier.ai",
-      "start_time": "09:00",
-      "end_time": "12:00",
-      "phase": "Fire"
-    },
-    {
-      "title": "Hallo language assessment",
-      "start_time": "12:00",
-      "end_time": "13:00",
-      "phase": "Fire"
-    },
-    {
-      "title": "Zuhr, Lunch & Grounding",
-      "start_time": "13:00",
-      "end_time": "13:20",
-      "phase": "Earth"
-    },
-    {
-      "title": "Ba Duan Jin (post-lunch stretch)",
-      "start_time": "13:20",
-      "end_time": "13:30",
-      "phase": "Earth"
-    },
-    {
-      "title": "Lunch & Mindful Eating",
-      "start_time": "13:30",
-      "end_time": "14:00",
-      "phase": "Earth"
-    },
-    {
-      "title": "Integration Walk",
-      "start_time": "14:00",
-      "end_time": "14:30",
-      "phase": "Earth"
-    },
-    {
-      "title": "Studie: Hume & Logisch Positivisme (2u)",
-      "start_time": "14:30",
-      "end_time": "16:30",
-      "phase": "Metal"
-    },
-    {
-      "title": "Asr & Refinement",
-      "start_time": "15:40",
-      "end_time": "16:00",
-      "phase": "Metal"
-    },
-    {
-      "title": "ErasmusTalent testen",
-      "start_time": "16:30",
-      "end_time": "17:30",
-      "phase": "Metal"
-    },
-    {
-      "title": "Illustrate p2-3 Lege bladzij/Titel+Auteur (1u)",
-      "start_time": "17:30",
-      "end_time": "18:30",
-      "phase": "Metal"
-    },
-    {
-      "title": "Work Shutdown & Maghrib",
-      "start_time": "18:00",
-      "end_time": "18:15",
+      "title": "Bij ma, theater, leuk",
+      "start_time": "18:30",
+      "end_time": "22:30",
       "phase": "Water"
     },
     {
-      "title": "Illustrate p2-3 Lege bladzij/Titel+Auteur (2u)",
-      "start_time": "18:15",
-      "end_time": "20:15",
+      "title": "Opruimen",
+      "start_time": "22:30",
+      "end_time": "23:30",
       "phase": "Water"
     },
     {
-      "title": "Journaling",
-      "start_time": "20:15",
-      "end_time": "20:30",
-      "phase": "Water"
-    },
-    {
-      "title": "Yoga Nidra (Before sleep)",
-      "start_time": "20:30",
-      "end_time": "21:00",
-      "phase": "Water"
-    },
-    {
-      "title": "Isha & Deep Wind-Down",
+      "title": "Isha",
       "start_time": "21:00",
       "end_time": "21:20",
       "phase": "Water"
     },
     {
-      "title": "Reading (Water Phase)",
+      "title": "Final Winddown",
       "start_time": "21:20",
-      "end_time": "21:30",
+      "end_time": "21:45",
+      "phase": "Water"
+    },
+    {
+      "title": "Fajr",
+      "start_time": "05:30",
+      "end_time": "05:40",
+      "phase": "Wood"
+    },
+    {
+      "title": "Meditation (Wood Phase)",
+      "start_time": "05:40",
+      "end_time": "05:50",
+      "phase": "Wood"
+    },
+    {
+      "title": "Reading (Wood Phase)",
+      "start_time": "05:50",
+      "end_time": "06:10",
+      "phase": "Wood"
+    },
+    {
+      "title": "Circuit training",
+      "start_time": "06:10",
+      "end_time": "06:50",
+      "phase": "Wood"
+    },
+    {
+      "title": "Ji Jin Jing (Cooling Down)",
+      "start_time": "06:50",
+      "end_time": "07:10",
+      "phase": "Wood"
+    },
+    {
+      "title": "Breakfast & Planning",
+      "start_time": "07:10",
+      "end_time": "07:30",
+      "phase": "Wood"
+    },
+    {
+      "title": "Klussen",
+      "start_time": "08:00",
+      "end_time": "13:00",
+      "phase": "Fire"
+    },
+    {
+      "title": "Zuhr",
+      "start_time": "13:00",
+      "end_time": "13:20",
+      "phase": "Earth"
+    },
+    {
+      "title": "Lunch & Mindful Eating",
+      "start_time": "13:20",
+      "end_time": "13:50",
+      "phase": "Earth"
+    },
+    {
+      "title": "Ba Duan Jin (post-lunch stretch)",
+      "start_time": "13:50",
+      "end_time": "14:00",
+      "phase": "Earth"
+    },
+    {
+      "title": "Hallo language assessment",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "phase": "Metal"
+    },
+    {
+      "title": "Asr",
+      "start_time": "15:00",
+      "end_time": "15:20",
+      "phase": "Metal"
+    },
+    {
+      "title": "Yang Style Tai Chi",
+      "start_time": "15:20",
+      "end_time": "15:30",
+      "phase": "Metal"
+    },
+    {
+      "title": "02. Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)",
+      "start_time": "15:30",
+      "end_time": "18:00",
+      "phase": "Metal"
+    },
+    {
+      "title": "Maghrib",
+      "start_time": "18:00",
+      "end_time": "18:15",
+      "phase": "Water"
+    },
+    {
+      "title": "Do: Chan gong rou quan (endurance)",
+      "start_time": "18:15",
+      "end_time": "18:45",
+      "phase": "Water"
+    },
+    {
+      "title": "Xi Sui Jing",
+      "start_time": "18:45",
+      "end_time": "19:05",
+      "phase": "Water"
+    },
+    {
+      "title": "Reading (Water Phase)",
+      "start_time": "19:05",
+      "end_time": "20:35",
+      "phase": "Water"
+    },
+    {
+      "title": "Isha",
+      "start_time": "21:00",
+      "end_time": "21:20",
+      "phase": "Water"
+    },
+    {
+      "title": "Yoga Nidra",
+      "start_time": "21:20",
+      "end_time": "21:40",
+      "phase": "Water"
+    },
+    {
+      "title": "Journaling",
+      "start_time": "21:40",
+      "end_time": "21:55",
+      "phase": "Water"
+    },
+    {
+      "title": "Final Winddown",
+      "start_time": "21:55",
+      "end_time": "21:59",
       "phase": "Water"
     }
   ]

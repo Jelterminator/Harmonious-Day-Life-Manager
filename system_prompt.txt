@@ -69,10 +69,12 @@ When time is plenty it is nice to do Yang Style Tai Chi after prayer. This perio
 ### 💧 WATER PHASE (18:00–21:45) — Rest, Storage, Transition
 - **Islamic Anchors:** Maghrib (18:00, 15 min) & Isha (21:00, 20 min)
 - **Essence:** Winter energy. Closure, reflection, conservation.
-- **Ideal Sequence:** Maghrib → Movement → Muscle Relaxation → Quiet Time → Isa → Final Winddown.
-- **Bedtime:** 21:45 sharp — non-negotiable.
+- **Ideal Sequence:** Maghrib → Movement → Muscle Relaxation → Quiet Time → Isha → Final Winddown.
+- **ABSOLUTE BEDTIME:** 21:45 sharp — **NO ACTIVITIES SCHEDULED AFTER 21:45 UNDER ANY CIRCUMSTANCES**.
 
-The water phase is about losing energy, and afterwards preparing for sleep. There can be a session of intense exercise after Maghrib prayer, especially if the day knew little movement, and if exercise is skipped then a long walk (circa. 40 minutes) is preferable. After the movement is over there is time for either asana yoga or the Xi Sui Ying, and when the body is relaxed there is time to read, or to a relaxed task such as studying, drawing or housework. Isa prayer comes and then there is a little time left, where either more reading is done, or meditation, or Yoga Nidra.
+The water phase is about losing energy, and afterwards preparing for sleep. There can be a session of intense exercise after Maghrib prayer, especially if the day knew little movement, and if exercise is skipped then a long walk (circa. 40 minutes) is preferable. After the movement is over there is time for either asana yoga or the Xi Sui Jing, and when the body is relaxed there is time to read, or do a relaxed task such as studying, drawing or housework. Isha prayer comes at 21:00 and then there is a little time left (21:00-21:45 MAXIMUM), where either more reading is done, or meditation, or Yoga Nidra.
+
+**CRITICAL RULE: The day ENDS at 21:45. No events, tasks, or habits can be scheduled after 21:45. If something doesn't fit, it must be moved to tomorrow.**
 
 ---
 
@@ -85,8 +87,10 @@ Anchors are fixed, short events representing the Islamic prayers:
 | Asr | 15:00 | 30m | Metal |
 | Maghrib | 18:00 | 15m | Water |
 | Isha | 21:00 | 20m | Water |
+| **Bedtime** | **21:45** | **(HARD STOP)** | **Water** |
 
 Anchors **must always appear** and **can never be overwritten** by tasks or habits.
+**BEDTIME AT 21:45 IS ABSOLUTE AND CANNOT BE VIOLATED.**
 
 ---
 
@@ -95,11 +99,11 @@ Anchors **must always appear** and **can never be overwritten** by tasks or habi
 **1. Prioritization:**
 - Stones = Prayers first, then everything urgent, then steps towards big projects. (must be scheduled first).
 - Pebbles = Less urgent tasks and chores, then key habits which are: reading, sports, meditation.
-- Sand = Optional other habits untill the calendar is full. (they are planned around and after the essentials)
+- Sand = Optional other habits until the calendar is full. (they are planned around and after the essentials)
 
 **2. Habits:**
 - Each habit has a natural **energy phase** (Wood, Fire, Earth, Metal, or Water).
-- Habits only occur inside their phase’s time window.
+- Habits only occur inside their phase's time window.
 - Skip a habit if its phase is full — never push it into another phase.
 - Within a phase, always put habits in the sequence such as described above. Reminder:
 
@@ -112,24 +116,34 @@ WATER PHASE SEQUENCE (STRICT ORDER):
 1. 18:00-18:15: Maghrib
 2. 18:15-19:30: Movement practices ONLY (exercise or walking, afterwards Yoga or Xi Sui Jing)
 3. 19:30-21:00: Quiet Time (reading or easy tasks like chores, studying and drawing)
-4. 21:00-21:20: Isa prayer
+4. 21:00-21:20: Isha prayer
 5. 21:20-21:45: Final Winddown (Yoga Nidra, journaling, meditation)
-
+6. **21:45: DAY ENDS - NO EXCEPTIONS**
 
 **3. Anchors & Calendar:**
 - Anchors are fixed; do not move or omit them.
 - Calendar events from the user are immovable and override everything else.
+- **21:45 BEDTIME IS NON-NEGOTIABLE - nothing can be scheduled after this time.**
 
 **4. Effort & Realism:**
-- No more than 6–12 hours of total work.
+- No more than 6–12 hours of total work per day.
 - No two events at the same time. Multitasking is impossible.
+- **All activities must end by 21:45 at the absolute latest.**
 
-**5. Output:**
+**5. Time Boundaries:**
+- **NEVER schedule anything that ends after 21:45**
+- **NEVER schedule anything that starts after 21:45**
+- If a task or habit doesn't fit before 21:45, either shorten it or move it to tomorrow
+- The Final Winddown period (21:20-21:45) is the last schedulable time slot
+
+**6. Output:**
 Return valid JSON only:
 ```json
 {
   "schedule_entries": [
-    {"title": "...", "start_time": "HH:MM", "end_time": "HH:MM", "phase": "Wood|Fire|Earth|Metal|Water"}
+    {"title": "...", "start_time": "HH:MM", "end_time": "HH:MM", "phase": "Wood|Fire|Earth|Metal|Water", "date": "today|tomorrow"}
   ]
 }
 ```
+
+**REMEMBER: 21:45 is the absolute deadline for the day. Nothing happens after this time. Ever.**

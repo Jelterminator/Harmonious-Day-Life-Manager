@@ -12,15 +12,9 @@ SHEET_ID = "1rdyKSYIT7NsIFtKg6UUeCnPEUUDtceKF3sfoVSwiaDM"
 HABIT_RANGE = "Habits!A1:G100"
 RULES_FILE = Path("config.json")
 
-# --- GLOBAL CONFIGURATION FOR STEP 4 (CALENDAR WRITE) ---
 TARGET_TIMEZONE = 'Europe/Amsterdam'
-# IMPORTANT: This ID is used to uniquely mark and safely DELETE ONLY the events 
-# created by this orchestrator. Do not change it unless you want to lose the ability 
-# to clean up old events.
 GENERATOR_ID = 'AI_Harmonious_Day_Orchestrator_v1' 
 
-
-# --- GOOGLE API HELPER FUNCTIONS ---
 
 def load_rules(file_path):
     """Load Harmonious Day rules from JSON file."""
@@ -64,7 +58,6 @@ def get_calendar_events(service):
             return []
         formatted_events = []
         for event in events:
-            # ONLY keep events that do NOT have the GENERATOR_ID tag
             extended_props = event.get('extendedProperties', {}).get('private', {})
             if extended_props.get('sourceId') != GENERATOR_ID: 
                 formatted_events.append({
@@ -80,7 +73,6 @@ def get_calendar_events(service):
         return []
 
 
-
 def delete_generated_events(calendar_service, date_str):
     """
     Deletes all events previously created by this script for the given date.
@@ -89,12 +81,9 @@ def delete_generated_events(calendar_service, date_str):
     print(f"\n--- CLEANUP: Deleting existing generated events for {date_str} ---")
 
     try:
-        # 1. Prepare time window starting at date_str 00:00:00 (naive)
         start_of_day = datetime.datetime.strptime(date_str, "%Y-%m-%d")
-        # cover the whole of today AND tomorrow by adding 2 days
         end_of_window = start_of_day + datetime.timedelta(days=2)
 
-        # Use ISO format; Google API expects RFC3339. We send naive ISO + 'Z' (floating)
         time_min = start_of_day.isoformat() + 'Z'
         time_max = end_of_window.isoformat() + 'Z'
 
@@ -103,7 +92,6 @@ def delete_generated_events(calendar_service, date_str):
             'timeMin': time_min,
             'timeMax': time_max,
             'singleEvents': True,
-            # Filter by our unique private extended property key/value pair
             'privateExtendedProperty': f'sourceId={GENERATOR_ID}'
         }
 
@@ -144,6 +132,7 @@ def delete_generated_events(calendar_service, date_str):
     except Exception as e:
         print(f"ERROR deleting events: {e}")
 
+
 def get_google_tasks(service):
     """Fetch all open tasks from all task lists (raw data), including parent relationships."""
     print("Fetching tasks from Google Tasks...")
@@ -152,11 +141,9 @@ def get_google_tasks(service):
         task_lists = service.tasklists().list().execute().get('items', [])
         
         for tlist in task_lists:
-            
             tasks = []
             page_token = None
             
-            # Handle pagination
             while True:
                 tasks_result = service.tasks().list(
                     tasklist=tlist['id'],
@@ -180,7 +167,7 @@ def get_google_tasks(service):
                     "parent": task.get('parent'),
                     "due": task.get('due'),
                     "notes": task.get('notes'),
-                    "position": task.get('position', '0'),  # CRITICAL: Add position for ordering
+                    "position": task.get('position', '0'),
                     "updated": task.get('updated')
                 })
 
@@ -209,7 +196,6 @@ def get_habits(service, sheet_id, range_name):
         habits_data = []
         
         for row in values[1:]:
-            # Ensure the row data is mapped correctly, handling short rows
             habit = {headers[i]: (row[i] if i < len(row) else None) for i in range(len(headers))}
             habits_data.append(habit)
             
@@ -219,20 +205,22 @@ def get_habits(service, sheet_id, range_name):
         return []
 
 
-# --- WORLD PROMPT BUILDER ---
-
 def build_world_prompt(rules, calendar_events, tasks, habits):
     """Assemble all data into a World Prompt for AI scheduling based on Harmonious Day philosophy."""
 
     prompt = f"# SCHEDULE GENERATION REQUEST\n"
     prompt += "Create a schedule for the rest of today and all of tomorrow based on the Harmonious Day philosophy.\n\n"
 
-    now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    tomorrow_str = (datetime.date.today() + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
-    prompt += f"The schedule window is from {now_str} until the end of {tomorrow_str} 23:59.\n\n"
-
+    now = datetime.datetime.now()
+    now_str = now.strftime("%Y-%m-%d %H:%M")
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    tomorrow_str = tomorrow.strftime("%Y-%m-%d")
     
-    # Add task statistics for context
+    prompt += f"**CURRENT TIME**: {now_str}\n"
+    prompt += f"**IMPORTANT**: Any events scheduled before {now.strftime('%H:%M')} today should be skipped.\n"
+    prompt += f"The schedule window is from NOW ({now_str}) until the end of tomorrow ({tomorrow_str} 23:59).\n\n"
+    
+    # Add task statistics
     if tasks:
         t1_count = sum(1 for t in tasks if t['priority'] == 'T1')
         t2_count = sum(1 for t in tasks if t['priority'] == 'T2')
@@ -260,12 +248,11 @@ def build_world_prompt(rules, calendar_events, tasks, habits):
     else:
         prompt += "No existing fixed appointments.\n"
 
-    # 4. Tasks - with detailed project context
+    # 4. Tasks
     prompt += "\n## 4. TASKS TO SCHEDULE (Prioritized by Urgency)\n"
     prompt += "**CRITICAL CONTEXT**: For multi-step tasks, priority is calculated based on TOTAL remaining work vs deadline.\n"
     
     if tasks:
-        # Group by priority for clarity
         by_priority = defaultdict(list)
         for task in tasks:
             by_priority[task['priority']].append(task)
@@ -312,16 +299,16 @@ def build_world_prompt(rules, calendar_events, tasks, habits):
         prompt += "No high-priority tasks.\n"
 
     prompt += "Try to plan tasks for more time than their project requires per day, otherwise the deadline will be missed.\n"
-    prompt += "A single caledar input does not need to be the whole task, and if a task is long its pieces may be planned as multiple events over the course of a day. And even if the full task cannot be completed it is good to plan a part: something is better than nothing.\n"
-    prompt += "Remember to change the time of the end of each event, so that the pieces of tasks do not become doubly planned agenda items.\n"
+    prompt += "A single calendar input does not need to be the whole task, and if a task is long its pieces may be planned as multiple events over the course of a day.\n"
+    prompt += "Remember to change the end time of each event properly: no double bookings allowed.\n\n"
 
     # 5. Habits
-    prompt += "\n## 5. HABITS TO SCHEDULE\n"
+    prompt += "## 5. HABITS TO SCHEDULE\n"
     prompt += (
         "Tasks take absolute priority. Only include habits that fit after T1/T2 tasks are scheduled.\n"
-        "Aim for a Task:Habit ratio of 3:1. Just plan tasks first, and see which habits are possible after.\n"
-        "The time habits take is very flexible and can be increased or decreased with up to 50%, if desired."
-        "Reading must happen every day and the minimum time requirement is low: as few as 20 minutes can already be a reading event.\n\n"
+        "Aim for a Task:Habit ratio of 3:1. Plan tasks first, then see which habits are possible.\n"
+        "Habit durations are flexible (±50%).\n"
+        "Reading must happen every day (minimum 20 minutes).\n\n"
     )
     if habits:
         for habit in habits:
@@ -339,17 +326,21 @@ def build_world_prompt(rules, calendar_events, tasks, habits):
     # 6. Output Requirements
     prompt += "\n## 6. OUTPUT REQUIREMENTS\n"
     prompt += "Rules:\n"
-    prompt += "- **T1/T2 PRIORITY**: Schedule all T1 tasks, as many T2 as possible. These are calculated based on total remaining effort vs deadline.\n"
-    prompt += "- Respect anchors and fixed calendar events, and never let events overlap.\n"
-    prompt += "- Match tasks to ideal phases when possible, but urgency overrides phase preference\n"
-    prompt += "- Be realistic: 6-10 hours of focused work max\n"
+    prompt += "- **T1/T2 PRIORITY**: Schedule all T1 tasks, as many T2 as possible.\n"
+    prompt += "- Respect anchors and fixed calendar events. Never overlap events.\n"
+    prompt += "- Match tasks to ideal phases when possible, but urgency overrides phase preference.\n"
+    prompt += "- Be realistic: 6-10 hours of focused work max per day.\n"
+    prompt += f"- **DO NOT schedule anything before {now.strftime('%H:%M')} today - that time has passed!**\n"
+    prompt += "- For events spanning two days, indicate which date in the title (e.g., 'Tomorrow: Task Name').\n\n"
     
     prompt += "Return JSON with this structure:\n"
     prompt += '{\n  "schedule_entries": [\n'
-    prompt += '    {"title": "...", "start_time": "HH:MM", "end_time": "HH:MM", "phase": "Wood|Fire|Earth|Metal|Water"}\n'
+    prompt += '    {"title": "...", "start_time": "HH:MM", "end_time": "HH:MM", "phase": "Wood|Fire|Earth|Metal|Water", "date": "today|tomorrow"}\n'
     prompt += '  ]\n}\n'
+    prompt += '\nThe "date" field should be "today" or "tomorrow" to clarify which day the event belongs to.\n'
 
     return prompt
+
 
 def save_schedule_to_file(schedule_data, filename="generated_schedule.json"):
     """Save schedule JSON to file (UTF-8)."""
@@ -361,27 +352,28 @@ def save_schedule_to_file(schedule_data, filename="generated_schedule.json"):
     except Exception as e:
         print(f"ERROR: Could not save schedule: {e}")
 
-# --- STEP 4: WRITING TO CALENDAR ---
 
 def create_calendar_events(calendar_service, schedule_entries, date_str):
     """
     Writes the generated schedule entries as events to the primary Google Calendar.
-    date_str: 'YYYY-MM-DD' for the start date (today). Entries that cross midnight will
-    be placed on the next day.
+    Uses the 'date' field from AI response to determine correct day.
     """
     print("\n--- STEP 4: WRITING TO GOOGLE CALENDAR ---")
 
-    # Mapping phases to Google Calendar colors (1-11) for visual distinction
     color_map = {
-        'Wood': '2',   # Green
-        'Fire': '11',  # Orange/Red
-        'Earth': '5',  # Yellow/Gold
-        'Metal': '8',  # Light Blue
-        'Water': '10'  # Purple
+        'Wood': '2',
+        'Fire': '11',
+        'Earth': '5',
+        'Metal': '8',
+        'Water': '10'
     }
 
     count = 0
     batch = calendar_service.new_batch_http_request()
+    
+    today = datetime.date.today()
+    tomorrow = today + datetime.timedelta(days=1)
+    now = datetime.datetime.now()
 
     def callback(request_id, response, exception):
         nonlocal count
@@ -392,21 +384,29 @@ def create_calendar_events(calendar_service, schedule_entries, date_str):
 
     for entry in schedule_entries:
         try:
-            # Parse naive datetimes for the provided day
-            # Detect whether the entry is for today or tomorrow
-            entry_date = datetime.date.today()
+            # Determine which date to use
+            date_indicator = entry.get('date', 'today').lower()
+            
+            if date_indicator == 'tomorrow':
+                entry_date = tomorrow
+            else:
+                entry_date = today
+            
+            # Parse times
             start_h, start_m = map(int, entry['start_time'].split(":"))
-            # If AI time wraps around (e.g. "01:00" but after "23:00"), assume tomorrow
-            if start_h < datetime.datetime.now().hour and datetime.datetime.now().hour > 18:
-                entry_date += datetime.timedelta(days=1)
+            end_h, end_m = map(int, entry['end_time'].split(":"))
             
             start_dt = datetime.datetime.combine(entry_date, datetime.time(start_h, start_m))
-            end_h, end_m = map(int, entry['end_time'].split(":"))
             end_dt = datetime.datetime.combine(entry_date, datetime.time(end_h, end_m))
 
-            # If the end is <= start, assume it goes into the next day
+            # Handle overnight events (end time < start time)
             if end_dt <= start_dt:
                 end_dt = end_dt + datetime.timedelta(days=1)
+            
+            # Skip events that are in the past
+            if start_dt < now:
+                print(f"⏭ Skipping past event: {entry['title']} at {start_dt.strftime('%H:%M')}")
+                continue
 
             event = {
                 'summary': entry['title'],
@@ -441,44 +441,61 @@ def create_calendar_events(calendar_service, schedule_entries, date_str):
     print("           THE HARMONIOUS DAY IS SCHEDULED!             ")
     print("="*60)
 
+
 def filter_conflicting_entries(schedule_entries, existing_events):
     """Remove AI entries that overlap fixed calendar events."""
     def parse_iso(dt_str):
         try:
-            return datetime.datetime.fromisoformat(dt_str.replace('Z', '+00:00'))
+            dt = datetime.datetime.fromisoformat(dt_str.replace('Z', '+00:00'))
+            # Convert to local timezone-naive for comparison
+            if dt.tzinfo is not None:
+                # Convert to local time and remove timezone info
+                dt = dt.astimezone().replace(tzinfo=None)
+            return dt
         except Exception:
             return None
 
     filtered = []
+    today = datetime.date.today()
+    tomorrow = today + datetime.timedelta(days=1)
+    
     for entry in schedule_entries:
-        entry_start = datetime.datetime.strptime(entry['start_time'], "%H:%M").time()
-        entry_end = datetime.datetime.strptime(entry['end_time'], "%H:%M").time()
+        date_indicator = entry.get('date', 'today').lower()
+        entry_date = tomorrow if date_indicator == 'tomorrow' else today
+        
+        # Create timezone-naive datetimes for comparison
+        entry_start = datetime.datetime.combine(entry_date, 
+                                                datetime.datetime.strptime(entry['start_time'], "%H:%M").time())
+        entry_end = datetime.datetime.combine(entry_date,
+                                              datetime.datetime.strptime(entry['end_time'], "%H:%M").time())
+        
+        if entry_end <= entry_start:
+            entry_end += datetime.timedelta(days=1)
+        
         has_conflict = False
-
         for evt in existing_events:
             s = parse_iso(evt['start'])
             e = parse_iso(evt['end'])
             if not (s and e):
                 continue
-            # same day overlap
-            if s.time() < entry_end and e.time() > entry_start:
+            
+            # Check for overlap (now both are timezone-naive)
+            if s < entry_end and e > entry_start:
                 has_conflict = True
-                print(f"Skipping '{entry['title']}' due to overlap with '{evt['summary']}'")
+                print(f"⚠ Skipping '{entry['title']}' due to overlap with '{evt['summary']}'")
                 break
+        
         if not has_conflict:
             filtered.append(entry)
+    
     return filtered
 
-
-
-# --- MAIN ORCHESTRATOR EXECUTION ---
 
 if __name__ == "__main__":
     print("="*40)
     print("  AI LIFE ORCHESTRATOR ")
     print("="*40 + "\n")
     
-    # Determine today's date for use in both the prompt and calendar writing
     TODAY_DATE_STR = datetime.date.today().strftime("%Y-%m-%d")
     
     api_key = get_groq_api_key()
@@ -502,25 +519,16 @@ if __name__ == "__main__":
         exit(1)
     print("✓ Config loaded\n")
     
-    # --- CRITICAL CLEANUP STEP ---
-    # This runs BEFORE fetching constraints or generating the schedule.
-    # It removes old AI-generated events to prevent duplicates.
     delete_generated_events(calendar_service, TODAY_DATE_STR)
-    # ---------------------------
     
     print("Gathering data...")
-    # NOTE: get_calendar_events now ignores events created by this script.
     calendar_events = get_calendar_events(calendar_service) 
-    
-    # --- TASK PROCESSING STEP ---
     raw_tasks = get_google_tasks(tasks_service)
     tasks = process_tasks(raw_tasks) 
-
-    # --- HABIT PROCESSING STEP ---    
     raw_habits = get_habits(sheets_service, SHEET_ID, HABIT_RANGE)
     habits = filter_habits(raw_habits)
     
-    print(f"✓ {len(calendar_events)} fixed calendar events (Meetings, etc.)")
+    print(f"✓ {len(calendar_events)} fixed calendar events")
     print(f"✓ {len(tasks)} prioritized tasks ({len(raw_tasks)} total)") 
     print(f"✓ {len(habits)} habits")
     
@@ -535,8 +543,6 @@ if __name__ == "__main__":
     print("Sending to GROQ AI...")
     print("-"*60)
     schedule_data = call_groq_llm(world_prompt, api_key)
-
-    
     
     if schedule_data:
         print("\n✓ Schedule generated!\n")
@@ -544,18 +550,13 @@ if __name__ == "__main__":
         pretty_print_schedule(schedule_data)
         save_schedule_to_file(schedule_data)
         
-        # --- FINAL STEP: WRITE TO CALENDAR ---
-        schedule_entries = schedule_data.get('schedule_entries', []) if isinstance(schedule_data, dict) else schedule_data
-
-        # Filter out any AI events that overlap existing fixed calendar events
+        schedule_entries = schedule_data.get('schedule_entries', [])
         schedule_entries = filter_conflicting_entries(schedule_entries, calendar_events)
         
         if calendar_service and schedule_entries:
-            # This inserts the new, clean schedule.
             create_calendar_events(calendar_service, schedule_entries, TODAY_DATE_STR)
         else:
-            print("ERROR: Final schedule is empty or calendar service is unavailable. Cannot proceed to Step 4.")
-            
+            print("ERROR: Final schedule is empty or calendar service is unavailable.")
     else:
         print("\n❌ Schedule generation failed")
         exit(1)

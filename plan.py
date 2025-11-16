@@ -18,15 +18,15 @@ if __name__ == "__main__":
         orchestrator.run_daily_plan()
         
     except FileNotFoundError as e:
-        print(f"\n❌ ERROR: Missing File")
+        print("\n❌ ERROR: Missing File")
         print(f"Could not find: {e.filename}")
         print("Please make sure config.json and credentials.json exist.")
     except ConnectionError as e:
-        print(f"\n❌ ERROR: Authentication Failed")
+        print("\n❌ ERROR: Authentication Failed")
         print(f"{e}")
         print("Please try running 'init.py' again.")
     except Exception as e:
-        print(f"\n--- A FATAL, UNKNOWN ERROR OCCURRED ---")
+        print("\n❌ UNKNOWN FATAL ERROR: {e}")
         import traceback
         traceback.print_exc()
         

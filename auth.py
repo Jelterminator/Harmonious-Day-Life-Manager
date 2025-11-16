@@ -47,7 +47,7 @@ def create_initial_token():
     Called by 'init.py'.
     """
     if not CREDS_PATH.exists():
-        print(f"ERROR: 'credentials.json' not found.")
+        print("ERROR: 'credentials.json' not found.")
         print("Please download it from Google Cloud Console and place it here.")
         return
         

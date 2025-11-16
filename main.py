@@ -20,7 +20,7 @@ from habit_processor import filter_habits
 
 # --- Constants ---
 SHEET_ID = "1rdyKSYIT7NsIFtKg6UUeCnPEUUDtceKF3sfoVSwiaDM"
-HABIT_RANGE = "Habits!A1:G100"
+HABIT_RANGE = "Habits!A:H"
 RULES_FILE = Path("config.json")
 PROMPT_FILE = Path("last_world_prompt.txt")
 SCHEDULE_FILE = Path("generated_schedule.json")
@@ -79,9 +79,9 @@ class Orchestrator:
         Executes the full daily planning pipeline.
         This is the main public method to call.
         """
-        print("\n" + "="*40)
+        print("\n" + "="*60)
         print("  AI LIFE ORCHESTRATOR - RUNNING DAILY PLAN")
-        print("="*40 + "\n")
+        print("="*60 + "\n")
 
         try:
             # 1. Cleanup
@@ -89,9 +89,11 @@ class Orchestrator:
             
             # 2. Gather Data
             print("\n--- STEP 1: GATHERING DATA ---")
+            
             calendar_events = self._get_calendar_events()
             raw_tasks = self._get_google_tasks()
             raw_habits = self._get_habits()
+            rules = self.rules
 
             # 3. Process Data
             print("\n--- STEP 2: PROCESSING DATA ---")
@@ -99,11 +101,11 @@ class Orchestrator:
             habits = filter_habits(raw_habits)
             print(f"✓ {len(calendar_events)} fixed calendar events")
             print(f"✓ {len(tasks)} prioritized tasks ({len(raw_tasks)} total)") 
-            print(f"✓ {len(habits)} habits for today")
+            print(f"✓ {len(habits)} habits for today ({len(raw_habits)} total)")
 
             # 4. Build Prompt
             print("\n--- STEP 3: BUILDING PROMPT ---")
-            world_prompt = self._build_world_prompt(calendar_events, tasks, habits)
+            world_prompt = self._build_world_prompt(rules, calendar_events, tasks, habits)
             PROMPT_FILE.write_text(world_prompt, encoding="utf-8")
             print(f"✓ Prompt saved to {PROMPT_FILE}")
 
@@ -283,11 +285,15 @@ class Orchestrator:
                 return []
             
             headers = values[0]
+            
             habits_data = []
-            for row in values[1:]:
-                row_padded = row + [None] * (len(headers) - len(row))
+            for i, row in enumerate(values[1:]):
+                # Pad row to match header length
+                row_padded = row + [''] * (len(headers) - len(row))
                 habit = {headers[i]: row_padded[i] for i in range(len(headers))}
                 habits_data.append(habit)
+            
+            print(f"Fetched {len(habits_data)} habits")
             return habits_data
         except Exception as e:
             print(f"Error fetching habits: {e}")
@@ -295,272 +301,102 @@ class Orchestrator:
 
     # --- Prompt & Schedule Processing Methods ---
 
-    def _build_world_prompt(rules, calendar_events, tasks, habits):
-
-        """Assemble all data into a World Prompt for AI scheduling based on Harmonious Day philosophy."""
-    
-        prompt = f"# SCHEDULE GENERATION REQUEST\n"
-        prompt += "Create a schedule for the rest of today and all of tomorrow based on the Harmonious Day philosophy.\n\n"
-    
-    
+    def _build_world_prompt(self, rules, calendar_events, tasks, habits):
+        """Compact world prompt for Harmonious Day scheduling (minimal tokens)."""
     
         now = datetime.datetime.now()
-    
         now_str = now.strftime("%Y-%m-%d %H:%M")
+        today_date = now.date()
+        tomorrow_date = today_date + datetime.timedelta(days=1)
     
-        tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+        # header + window
+        prompt_lines = []
+        prompt_lines.append(f"SCHEDULE REQUEST")
+        prompt_lines.append(f"NOW: {now_str}")
+        prompt_lines.append(f"SCHEDULE_WINDOW: {now_str} -> {tomorrow_date} 23:59")
+        prompt_lines.append(f"SKIP_BEFORE: {now.strftime('%H:%M')}")  # do not schedule earlier today
+        prompt_lines.append("") 
     
-        tomorrow_str = tomorrow.strftime("%Y-%m-%d")
+        # phases one-line
+        phase_parts = []
+        for p in rules.get("phases", []):
+            phase_parts.append(f"{p['name'].replace('🌳 ','').split()[0]}:{p['start']}-{p['end']}")
+        prompt_lines.append("PHASES: " + " | ".join(phase_parts))
     
-        
+        # anchors one-line list
+        anchors = [f"{a['time']}:{a['name']}" for a in rules.get("anchors", [])]
+        prompt_lines.append("ANCHORS: " + " | ".join(anchors) if anchors else "ANCHORS: none")
+        prompt_lines.append("")
     
-        prompt += f"**CURRENT TIME**: {now_str}\n"
-    
-        prompt += f"**IMPORTANT**: Any events scheduled before {now.strftime('%H:%M')} today should be skipped.\n"
-    
-        prompt += f"The schedule window is from NOW ({now_str}) until the end of tomorrow ({tomorrow_str} 23:59).\n\n"
-    
-        
-    
-        # Add task statistics
-    
-        if tasks:
-    
-            t1_count = sum(1 for t in tasks if t['priority'] == 'T1')
-    
-            t2_count = sum(1 for t in tasks if t['priority'] == 'T2')
-    
-            total_effort = sum(t['effort_hours'] for t in tasks)
-    
-            prompt += f"**TASK OVERVIEW**: {len(tasks)} tasks ({t1_count} URGENT T1, {t2_count} HIGH T2) = ~{total_effort:.1f}h total effort\n\n"
-    
-    
-    
-        # 1. Phases
-    
-        prompt += "## 1. HARMONIOUS DAY PHASES\n"
-    
-        for phase in rules.get('phases', []):
-    
-            phase_name = phase['name'].split()[-1]
-    
-            prompt += f"**{phase_name}** ({phase['start']}-{phase['end']})\n"
-    
-            prompt += f"- {phase['qualities']}\n"
-    
-            
-    
-        # 2. Anchors
-    
-        prompt += "## 2. SACRED ANCHOR POINTS (Fixed)\n"
-    
-        for anchor in rules.get('anchors', []):
-    
-            prompt += f"- {anchor['time']}: {anchor['name']}\n"
-    
-    
-    
-        # 3. Calendar Events
-    
-        prompt += "\n## 3. EXISTING CALENDAR EVENTS (Do Not Schedule Over)\n"
-    
-        prompt += "THESE ARE FIXED APPOINTMENTS: THEY CANNOT BE CANCELLED, RESCHEDULED OR MOVED. DO NOT MODIFY OR DELETE THEM.\n"
-    
+        # calendar events (compact lines)
+        prompt_lines.append("CALENDAR_EVENTS: (summary|start|end)")
         if calendar_events:
-    
-            for event in calendar_events:
-    
-                prompt += f"- **{event['summary']}** ({event['start']} to {event['end']})\n"
-    
+            for e in calendar_events:
+                prompt_lines.append(f"{e.get('summary','-')}|{e.get('start')}|{e.get('end')}")
         else:
+            prompt_lines.append("NONE")
+        prompt_lines.append("")
     
-            prompt += "No existing fixed appointments.\n"
-    
-    
-    
-        # 4. Tasks
-    
-        prompt += "\n## 4. TASKS TO SCHEDULE (Prioritized by Urgency)\n"
-    
-        prompt += "**CRITICAL CONTEXT**: For multi-step tasks, priority is calculated based on TOTAL remaining work vs deadline.\n"
-    
-        
-    
+        # tasks: compact pipe entries prioritized by priority
+        prompt_lines.append("TASKS: (priority|title|effort_h|total_remain_h|deadline|days_left|h_per_day|is_subtask|parent|notes)")
         if tasks:
-    
             by_priority = defaultdict(list)
-    
-            for task in tasks:
-    
-                by_priority[task['priority']].append(task)
-    
-            
-    
-            for priority in ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']:
-    
-                if priority in by_priority:
-    
-                    priority_tasks = by_priority[priority]
-    
-                    total_hours = sum(t['effort_hours'] for t in priority_tasks)
-    
+            for t in tasks:
+                by_priority[t['priority']].append(t)
+            for pr in sorted(by_priority.keys()):  # T1, T2, ...
+                for t in by_priority[pr]:
+                    notes = t.get("notes") or ""  # <-- default to empty string
+                    # clean up any problematic characters
+                    notes_clean = notes.replace("\n", " ").replace("|", "/").strip()
+                    title_clean = t.get("title","").replace("|","/").strip()
+                    parent_clean = str(t.get("parent_title") or "").replace("|","/").strip()
                     
-    
-                    if priority == 'T1':
-    
-                        prompt += f"### {priority} - CRITICAL URGENCY - {len(priority_tasks)} tasks, {total_hours:.1f}h\n"
-    
-                        prompt += "These require >8h/day of work to meet deadline, or are past due. MUST schedule today.\n\n"
-    
-                    elif priority == 'T2':
-    
-                        prompt += f"### {priority} - HIGH URGENCY - {len(priority_tasks)} tasks, {total_hours:.1f}h\n"
-    
-                        prompt += "These require 6-8h/day of work to meet deadline. Schedule as much as possible.\n\n"
-    
-                    elif priority == 'T3':
-    
-                        prompt += f"### {priority} - MODERATE - {len(priority_tasks)} tasks, {total_hours:.1f}h\n"
-    
-                    else:
-    
-                        prompt += f"### {priority} - {len(priority_tasks)} tasks, {total_hours:.1f}h\n"
-    
-                    
-    
-                    for task in priority_tasks:
-    
-                        this_task_effort = f"{task['effort_hours']:.1f}h"
-    
-                        total_remaining = f"{task['total_remaining_effort']:.1f}h"
-    
-                        deadline = task.get('deadline_str', 'N/A')
-    
-                        days_left = f"{task.get('days_until_deadline', 0):.1f}"
-    
-                        hours_per_day = f"{task.get('hours_per_day_needed', 0):.1f}"
-    
-                        
-    
-                        if task.get('is_subtask'):
-    
-                            prompt += f"- **{task['title']}** [Step 1 of {task['remaining_subtasks']} in: {task.get('parent_title', 'Unknown')}]\n"
-    
-                            prompt += f"  - THIS task: {this_task_effort} | TOTAL project: {total_remaining} remaining\n"
-    
-                            prompt += f"  - Deadline: {deadline} ({days_left} days) | Need: {hours_per_day}h/day to finish on time\n"
-    
-                        else:
-    
-                            prompt += f"- **{task['title']}**\n"
-    
-                            prompt += f"  - Effort: {this_task_effort}\n"
-    
-                            prompt += f"  - Deadline: {deadline} ({days_left} days) | Need: {hours_per_day}h/day\n"
-    
-                        
-    
-                        if task.get('notes'):
-    
-                            notes_clean = task['notes'].replace('\n', ' ').strip()
-    
-                            if notes_clean and not notes_clean.startswith('[Effort:'):
-    
-                                prompt += f"  - Notes: {notes_clean}\n"
-    
-                        
-    
-                        prompt += "\n"
-    
+                    line = "|".join([
+                        pr,
+                        title_clean,
+                        f"{t.get('effort_hours',0):.1f}",
+                        f"{t.get('total_remaining_effort',0):.1f}",
+                        t.get("deadline_str","N/A"),
+                        f"{t.get('days_until_deadline',0):.1f}",
+                        f"{t.get('hours_per_day_needed',0):.1f}",
+                        "1" if t.get("is_subtask") else "0",
+                        parent_clean,
+                        notes_clean
+                    ])
+                    prompt_lines.append(line)
         else:
+            prompt_lines.append("NONE")
+        prompt_lines.append("")
     
-            prompt += "No high-priority tasks.\n"
-    
-    
-    
-        prompt += "Try to plan tasks for more time than their project requires per day, otherwise the deadline will be missed.\n"
-    
-        prompt += "A single calendar input does not need to be the whole task, and if a task is long its pieces may be planned as multiple events over the course of a day.\n"
-    
-        prompt += "Remember to change the end time of each event properly: no double bookings allowed.\n\n"
-    
-    
-    
-        # 5. Habits
-    
-        prompt += "## 5. HABITS TO SCHEDULE\n"
-    
-        prompt += (
-    
-            "Tasks take absolute priority. Only include habits that fit after T1/T2 tasks are scheduled.\n"
-    
-            "Aim for a Task:Habit ratio of 3:1. Plan tasks first, then see which habits are possible.\n"
-    
-            "Habit durations are flexible (±50%).\n"
-    
-            "Reading must happen every day (minimum 20 minutes).\n\n"
-    
-        )
-    
+        # habits compact
+        prompt_lines.append("HABITS: (title|mins_ideal|frequency|ideal_phase)")
         if habits:
-    
-            for habit in habits:
-    
-                prompt += f"- [ ] **{habit.get('title', 'Unknown')}**"
-    
-                if habit.get('duration_min'):
-    
-                    prompt += f" (Ideal duration: {habit.get('duration_min')} minutes)"
-    
-                if habit.get('frequency'):
-    
-                    prompt += f" (Frequency: {habit.get('frequency')})"
-    
-                if habit.get('ideal_phase'):
-    
-                    prompt += f" (Phase: {habit.get('ideal_phase')})"
-    
-                prompt += "\n"
-    
+            for h in habits:
+                prompt_lines.append("|".join([
+                    h.get("title","").replace("|","/"),
+                    str(h.get("duration_min","")),
+                    str(h.get("frequency","")),
+                    str(h.get("ideal_phase",""))
+                ]))
         else:
+            prompt_lines.append("NONE")
+        prompt_lines.append("")
     
-            prompt += "No habits.\n"
+        # constraints (explicit, short)
+        prompt_lines.append("CONSTRAINTS:")
+        prompt_lines.append("- Anchors fixed.")
+        prompt_lines.append("- Do not schedule after 21:45.")
+        prompt_lines.append("- No overlaps; split interrupted events sequentially.")
+        prompt_lines.append("- Schedule all T1 tasks; then as many T2-T4 as capacity allows.")
+        prompt_lines.append("- Realistic focused work per day: 6-10h.")
+        prompt_lines.append("")
     
+        # output schema required (exact)
+        prompt_lines.append("OUTPUT_JSON: exact format below")
+        prompt_lines.append('{"schedule_entries":[{"title":"...","start_time":"HH:MM","end_time":"HH:MM","phase":"Wood|Fire|Earth|Metal|Water","date":"today|tomorrow"}]}')
     
-    
-        # 6. Output Requirements
-    
-        prompt += "\n## 6. OUTPUT REQUIREMENTS\n"
-    
-        prompt += "Rules:\n"
-    
-        prompt += "- **T1/T2 PRIORITY**: Schedule all T1 tasks, as many T2 as possible.\n"
-    
-        prompt += "- Respect anchors and fixed calendar events. Never overlap events.\n"
-    
-        prompt += "- Match tasks to ideal phases when possible, but urgency overrides phase preference.\n"
-    
-        prompt += "- Be realistic: 6-10 hours of focused work max per day.\n"
-    
-        prompt += f"- **DO NOT schedule anything before {now.strftime('%H:%M')} today - that time has passed!**\n"
-    
-        prompt += "- For events spanning two days, indicate which date in the title (e.g., 'Tomorrow: Task Name').\n\n"
-    
-        
-    
-        prompt += "Return JSON with this structure:\n"
-    
-        prompt += '{\n  "schedule_entries": [\n'
-    
-        prompt += '    {"title": "...", "start_time": "HH:MM", "end_time": "HH:MM", "phase": "Wood|Fire|Earth|Metal|Water", "date": "today|tomorrow"}\n'
-    
-        prompt += '  ]\n}\n'
-    
-        prompt += '\nThe "date" field should be "today" or "tomorrow" to clarify which day the event belongs to.\n'
-    
-    
-    
-        return prompt
+        return "\n".join(prompt_lines)
+
 
     def _save_schedule_to_file(self, schedule_data: Dict[str, Any], filename: Path):
         """Save schedule JSON to file (UTF-8)."""

@@ -1,29 +1,47 @@
-# SCHEDULE GENERATION REQUEST
-**CURRENT TIME**: 2025-11-16 13:01
-The schedule window is from NOW (2025-11-16 13:01) until the end of tomorrow (2025-11-17 23:59).
+SCHEDULE REQUEST
+NOW: 2025-11-16 17:57
+SCHEDULE_WINDOW: 2025-11-16 17:57 -> 2025-11-17 23:59
+SKIP_BEFORE: 17:57
 
+PHASES: WOOD:05:30-09:00 | 🔥:09:00-13:00 | 🟡:13:00-15:00 | 🟤:15:00-18:00 | 💧:18:00-21:45
+ANCHORS: 05:30-05:40:Fajr | 13:00-13:20:Zuhr | 15:00-15:20:Asr | 18:00-18:15:Maghrib | 21:00-21:20:Isha | 21:45:Bedtime
 
-## 3. EXISTING CALENDAR EVENTS (Do Not Schedule Over)
-- **Vaatwas** (2025-11-16T14:00:00+01:00 to 2025-11-16T15:00:00+01:00)
-- **Mails GGZ en sollicitatie** (2025-11-16T17:30:00+01:00 to 2025-11-16T18:00:00+01:00)
-- **Klussen** (2025-11-17T08:00:00+01:00 to 2025-11-17T16:00:00+01:00)
-- **EM Innovation Academy** (2025-11-17T16:00:00+01:00 to 2025-11-17T18:00:00+01:00)
+CALENDAR_EVENTS: (summary|start|end)
+Mails GGZ en sollicitatie|2025-11-16T17:30:00+01:00|2025-11-16T18:00:00+01:00
+Klussen|2025-11-17T08:00:00+01:00|2025-11-17T16:00:00+01:00
+EM Innovation Academy|2025-11-17T16:00:00+01:00|2025-11-17T18:00:00+01:00
 
-## 4. TASKS TO SCHEDULE (Prioritized by Urgency)
-- **02. Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)** (Priority: T4, Effort: 3.0h)
-- **Badkamer** (Priority: T6, Effort: 1.0h)
-- **Stofzuigen** (Priority: T6, Effort: 1.0h)
-- **Vaatwas** (Priority: T6, Effort: 1.0h)
-- **01. Brainstorm merch concepten (2u)** (Priority: T7, Effort: 2.0h)
-- **01. L1-2: Read notes on Einstein model; create summary notes (2u)** (Priority: T7, Effort: 2.0h)
+TASKS: (priority|title|effort_h|total_remain_h|deadline|days_left|h_per_day|is_subtask|parent|notes)
+T4|02. Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)|3.0|240.0|2026-01-24|68.3|3.5|1|Hap. Slik. Weg. geïllustreerd|
+T6|Badkamer|1.0|1.0|N/A|inf|0.0|0||
+T6|Stofzuigen|1.0|1.0|N/A|inf|0.0|0||
+T6|Vaatwas|1.0|1.0|N/A|inf|0.0|0||
+T7|01. Brainstorm merch concepten (2u)|2.0|39.0|2026-01-03|47.3|0.8|1|Merch ontwerpen|
+T7|01. L1-2: Read notes on Einstein model; create summary notes (2u)|2.0|108.0|2026-04-13|147.3|0.7|1|Solid State Physics (TU Delft)|
 
-## 5. HABITS TO SCHEDULE
-No habits.
+HABITS: (title|mins_ideal|frequency|ideal_phase)
+Tummo|15|Daily|WOOD
+Makko Ho|15|Daily|WOOD
+Meditation (Wood Phase)|15|Daily|WOOD
+Reading (Wood Phase)|60|Daily|WOOD
+Stretches|15|Daily|WOOD
+Ji Jin Jing (Cooling Down)|20|Daily|WOOD
+Lunch & Mindful Eating|30|Daily|EARTH
+Ba Duan Jin (post-lunch stretch)|15|Daily|EARTH
+Meditation (Earth Phase)|15|Daily|EARTH
+Yang Style Tai Chi|15|Daily|METAL
+Sketching|30|Daily|METAL
+Weekly Reflection|20|Weekly|METAL
+Reading (Water Phase)|90|Daily|WATER
+Meditation (Water Phase)|30|Daily|WATER
+Journaling|15|Daily|WATER
 
-## 6. OUTPUT REQUIREMENTS
-Return JSON with this structure:
-{
-  "schedule_entries": [
-    {"title": "...", "start_time": "HH:MM", "end_time": "HH:MM", "phase": "...", "date": "today|tomorrow"}
-  ]
-}
+CONSTRAINTS:
+- Anchors fixed.
+- Do not schedule after 21:45.
+- No overlaps; split interrupted events sequentially.
+- Schedule all T1 tasks; then as many T2-T4 as capacity allows.
+- Realistic focused work per day: 6-10h.
+
+OUTPUT_JSON: exact format below
+{"schedule_entries":[{"title":"...","start_time":"HH:MM","end_time":"HH:MM","phase":"Wood|Fire|Earth|Metal|Water","date":"today|tomorrow"}]}

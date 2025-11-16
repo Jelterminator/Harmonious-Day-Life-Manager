@@ -1,65 +1,177 @@
 {
   "schedule_entries": [
     {
-      "title": "02. Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)",
-      "start_time": "13:01",
-      "end_time": "16:01",
-      "phase": "Fire",
-      "date": "today"
-    },
-    {
-      "title": "Vaatwas",
-      "start_time": "14:00",
-      "end_time": "15:00",
-      "phase": "Fire",
-      "date": "today"
-    },
-    {
-      "title": "02. Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)",
-      "start_time": "15:00",
-      "end_time": "16:01",
-      "phase": "Fire",
-      "date": "today"
-    },
-    {
       "title": "Mails GGZ en sollicitatie",
-      "start_time": "17:30",
+      "start_time": "17:57",
       "end_time": "18:00",
       "phase": "Metal",
       "date": "today"
     },
     {
-      "title": "Badkamer",
+      "title": "Maghrib",
       "start_time": "18:00",
-      "end_time": "19:00",
+      "end_time": "18:15",
       "phase": "Water",
       "date": "today"
     },
     {
-      "title": "Stofzuigen",
-      "start_time": "19:00",
-      "end_time": "20:00",
+      "title": "Dinner",
+      "start_time": "18:15",
+      "end_time": "18:45",
       "phase": "Water",
       "date": "today"
     },
     {
-      "title": "01. Brainstorm merch concepten (2u)",
+      "title": "Watery Movement (walk)",
+      "start_time": "18:45",
+      "end_time": "19:30",
+      "phase": "Water",
+      "date": "today"
+    },
+    {
+      "title": "Reading (Water Phase)",
+      "start_time": "19:30",
+      "end_time": "20:15",
+      "phase": "Water",
+      "date": "today"
+    },
+    {
+      "title": "Journaling",
+      "start_time": "20:15",
+      "end_time": "20:30",
+      "phase": "Water",
+      "date": "today"
+    },
+    {
+      "title": "Meditation (Water Phase)",
+      "start_time": "20:30",
+      "end_time": "21:00",
+      "phase": "Water",
+      "date": "today"
+    },
+    {
+      "title": "Isha",
+      "start_time": "21:00",
+      "end_time": "21:20",
+      "phase": "Water",
+      "date": "today"
+    },
+    {
+      "title": "Yoga Nidra / Wind-down",
+      "start_time": "21:20",
+      "end_time": "21:45",
+      "phase": "Water",
+      "date": "today"
+    },
+    {
+      "title": "Fajr",
+      "start_time": "05:30",
+      "end_time": "05:40",
+      "phase": "Wood",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Tummo",
+      "start_time": "05:40",
+      "end_time": "05:55",
+      "phase": "Wood",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Makko Ho",
+      "start_time": "05:55",
+      "end_time": "06:10",
+      "phase": "Wood",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Meditation (Wood Phase)",
+      "start_time": "06:10",
+      "end_time": "06:25",
+      "phase": "Wood",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Reading (Wood Phase)",
+      "start_time": "06:25",
+      "end_time": "07:25",
+      "phase": "Wood",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Stretches",
+      "start_time": "07:25",
+      "end_time": "07:40",
+      "phase": "Wood",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Ji Jin Jing (Cooling Down)",
+      "start_time": "07:40",
+      "end_time": "08:00",
+      "phase": "Wood",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Breakfast & Plan",
       "start_time": "08:00",
-      "end_time": "10:00",
+      "end_time": "08:30",
       "phase": "Wood",
       "date": "tomorrow"
     },
     {
       "title": "Klussen",
-      "start_time": "08:00",
-      "end_time": "16:00",
-      "phase": "Wood, Fire, Earth, Metal",
+      "start_time": "08:30",
+      "end_time": "13:00",
+      "phase": "Fire",
       "date": "tomorrow"
     },
     {
-      "title": "01. L1-2: Read notes on Einstein model; create summary notes (2u)",
-      "start_time": "16:00",
-      "end_time": "18:00",
+      "title": "Zuhr",
+      "start_time": "13:00",
+      "end_time": "13:20",
+      "phase": "Earth",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Lunch & Mindful Eating",
+      "start_time": "13:20",
+      "end_time": "13:50",
+      "phase": "Earth",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Ba Duan Jin (post-lunch stretch)",
+      "start_time": "13:50",
+      "end_time": "14:05",
+      "phase": "Earth",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Meditation (Earth Phase)",
+      "start_time": "14:05",
+      "end_time": "14:20",
+      "phase": "Earth",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Klussen",
+      "start_time": "14:20",
+      "end_time": "15:00",
+      "phase": "Earth",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Asr",
+      "start_time": "15:00",
+      "end_time": "15:20",
+      "phase": "Metal",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Klussen",
+      "start_time": "15:20",
+      "end_time": "16:00",
       "phase": "Metal",
       "date": "tomorrow"
     },
@@ -68,6 +180,62 @@
       "start_time": "16:00",
       "end_time": "18:00",
       "phase": "Metal",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Maghrib",
+      "start_time": "18:00",
+      "end_time": "18:15",
+      "phase": "Water",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Dinner",
+      "start_time": "18:15",
+      "end_time": "18:45",
+      "phase": "Water",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Watery Movement (walk)",
+      "start_time": "18:45",
+      "end_time": "19:30",
+      "phase": "Water",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Reading (Water Phase)",
+      "start_time": "19:30",
+      "end_time": "20:15",
+      "phase": "Water",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Journaling",
+      "start_time": "20:15",
+      "end_time": "20:30",
+      "phase": "Water",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Meditation (Water Phase)",
+      "start_time": "20:30",
+      "end_time": "21:00",
+      "phase": "Water",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Isha",
+      "start_time": "21:00",
+      "end_time": "21:20",
+      "phase": "Water",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Yoga Nidra / Wind-down",
+      "start_time": "21:20",
+      "end_time": "21:45",
+      "phase": "Water",
       "date": "tomorrow"
     }
   ]

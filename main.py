@@ -333,7 +333,7 @@ class Orchestrator:
         today_date = now.date()
         tomorrow_date = today_date + datetime.timedelta(days=1)
     
-        # header + window
+        # 1. HEADER & TIME WINDOW
         prompt_lines = []
         prompt_lines.append(f"SCHEDULE REQUEST")
         prompt_lines.append(f"NOW: {now_str}")
@@ -341,32 +341,42 @@ class Orchestrator:
         prompt_lines.append(f"SKIP_BEFORE: {now.strftime('%H:%M')}")  # do not schedule earlier today
         prompt_lines.append("") 
     
-        # phases one-line
+        # 2. PHASE TIME BLOCKS & CORE ALIGNMENT
         phase_parts = []
         for p in rules.get("phases", []):
             phase_parts.append(f"{p['name'].replace('🌳 ','').split()[0]}:{p['start']}-{p['end']}")
         prompt_lines.append("PHASES: " + " | ".join(phase_parts))
-    
-        # anchors one-line list
-        anchors = [f"{a['time']}:{a['name']}" for a in rules.get("anchors", [])]
-        prompt_lines.append("ANCHORS: " + " | ".join(anchors) if anchors else "ANCHORS: none")
         prompt_lines.append("")
     
-        # calendar events (compact lines)
-        prompt_lines.append("CALENDAR_EVENTS: (summary|start|end)")
+        # 3. STONES: Immovable Blocks (Calendar Events)
+        prompt_lines.append("1. STONES: IMMOVABLE CALENDAR EVENTS (summary|start|end)")
         if calendar_events:
             for e in calendar_events:
                 prompt_lines.append(f"{e.get('summary','-')}|{e.get('start')}|{e.get('end')}")
+            prompt_lines.append("CONSTRAINT: Do not schedule ANY entry (Anchor, Pebble, or Sand) during Stone times.")
         else:
             prompt_lines.append("NONE")
         prompt_lines.append("")
+        
+        # 4. ANCHORS: Spiritual Commitments (Scheduled after Stones)
+        anchors = [f"{a['time']}:{a['name']}" for a in rules.get("anchors", [])]
+        prompt_lines.append("2. ANCHORS: SPIRITUAL PRAYERS (time:name)")
+        prompt_lines.append(" | ".join(anchors) if anchors else "NONE")
+        prompt_lines.append("CONSTRAINT: Schedule Anchors first. Must be skipped if blocked by a STONE.")
+        prompt_lines.append("")
     
-        # tasks: compact pipe entries prioritized by priority
-        prompt_lines.append("TASKS: (title|priority|effort_h|total_remain_h|deadline|days_left|h_per_day|is_subtask|parent|notes)")
+        # 5. PEBBLES: Urgent/Difficult Tasks (Scheduled after Anchors)
+        prompt_lines.append("3. PEBBLES: URGENT/DIFFICULT TASKS (T1-T5) (title|priority|effort_h|total_remain_h|deadline|days_left|h_per_day|is_subtask|parent|notes)")
+        
+        pebbles_present = False
         if tasks:
             by_priority = defaultdict(list)
             for t in tasks:
-                by_priority[t['priority']].append(t)
+                # T1-T5 are Pebbles, T6 are Chores (Sand)
+                if t.get('priority') != 'T6':
+                    by_priority[t['priority']].append(t)
+                    pebbles_present = True
+                
             for pr in sorted(by_priority.keys()):  # T1, T2, ...
                 for t in by_priority[pr]:
                     notes = t.get("notes") or ""  # <-- default to empty string
@@ -388,36 +398,50 @@ class Orchestrator:
                         notes_clean
                     ])
                     prompt_lines.append(line)
-        else:
+        
+        if not pebbles_present:
             prompt_lines.append("NONE")
+        
+        prompt_lines.append("CONSTRAINTS:")
+        prompt_lines.append("Fit as many Pebbles as possible after scheduling the Stones. To achieve this the duration can be reduced by maximally 25%.")
+        prompt_lines.append("Chunking: If effort_h > 2.0, then you may schedule the task in multiple blocks. It is okay to leave half finished tasks for later.")
         prompt_lines.append("")
-    
-        # habits compact
-        prompt_lines.append("HABITS: (title|mins_ideal|frequency|ideal_phase)")
+        
+        # 6. SAND: Chores & Soft Habits (Scheduled last, fill gaps)
+        prompt_lines.append("4. SAND: CHORES (T6) & HABITS (Fill remaining gaps)")
+        
+        # T6 Chores
+        chores = [t for t in tasks if t.get('priority') == 'T6']
+        if chores:
+            prompt_lines.append("CHORES (T6): (title|effort_h|notes)")
+            for c in chores:
+                title_clean = c.get("title","").replace("|","/").strip()
+                notes = t.get("notes") or ""
+                prompt_lines.append(f"{title_clean}|{c.get('effort_hours',0):.1f}|{notes}")
+        
+        # Habits
         if habits:
+            prompt_lines.append("HABITS: (title|mins_ideal|ideal_phase)")
             for h in habits:
                 prompt_lines.append("|".join([
                     h.get("title","").replace("|","/"),
                     str(h.get("duration_min","")),
-                    str(h.get("frequency","")),
                     str(h.get("ideal_phase",""))
                 ]))
-        else:
+        
+        if not chores and not habits:
             prompt_lines.append("NONE")
-        prompt_lines.append("")
     
-        # constraints (explicit, short)
         prompt_lines.append("CONSTRAINTS:")
-        prompt_lines.append("- Keep the time of Calendar Events free, never schedule anything over them, not even the anchors. ")
-        prompt_lines.append("- Schedule as many tasks as capacity allows; only then consider habits.")
-        prompt_lines.append("- Realistic focused work per day: 6-12h. 8 hours of demanding tasks is ideal.")
-        prompt_lines.append("- Habits come last, and skipping a habit is not a problem.")
+        prompt_lines.append("Only plan habits after the calendar is maximally filled with tasks. Getting stuff done is what is most important.")
+        prompt_lines.append("Schedule habits near their correct Phase. Skipping habits is no problem at all. Durations may be changed up to 50%.")
+        prompt_lines.append("When choosing habits you firstly prioritise emotional wellbeing, secondly reading and thirdly physical health.")
         prompt_lines.append("")
-    
-        # output schema required (exact)
-        prompt_lines.append("OUTPUT_JSON: exact format below")
+        
+        # 7. OUTPUT SCHEMA
+        prompt_lines.append("OUTPUT_JSON (EXACT FORMAT REQUIRED):")
         prompt_lines.append('{"schedule_entries":[{"title":"...","start_time":"HH:MM","end_time":"HH:MM","phase":"Wood|Fire|Earth|Metal|Water","date":"today|tomorrow"}]}')
-    
+        
         return "\n".join(prompt_lines)
 
 
@@ -433,79 +457,89 @@ class Orchestrator:
             print(f"ERROR: Could not save schedule: {e}")
 
     def _filter_conflicting_entries(self, schedule_entries: List[Dict[str, Any]], existing_events: List[Dict[str, str]]) -> List[Dict[str, Any]]:
-        """Remove AI entries that overlap fixed calendar events."""
+        """Remove entries that overlap fixed calendar events and log what was filtered."""
         
-        # Helper function for robust ISO parsing of fixed events
         def parse_iso(dt_str: str) -> datetime.datetime | None:
-            """Parses ISO string, handling 'Z' and ensuring conversion to local timezone-aware DT."""
+            """Parses ISO string to timezone-aware datetime."""
             try:
-                # Use TARGET_TIMEZONE constant from the class/module scope
                 local_tz = pytz.timezone(TARGET_TIMEZONE)
                 dt = datetime.datetime.fromisoformat(dt_str.replace('Z', '+00:00'))
-                
-                # Convert DT to the target timezone (handles different TZ formats)
                 if dt.tzinfo is None:
-                    # Assume naive DTs are already in the target timezone
                     dt = local_tz.localize(dt)
                 else:
                     dt = dt.astimezone(local_tz)
-                    
-                # Return the timezone-aware datetime
                 return dt
-            except Exception as e:
-                # print(f"Error parsing date string {dt_str}: {e}") # Optional: Debugging log
+            except Exception:
                 return None
         
         print("Filtering generated schedule against fixed events...")
         filtered = []
+        conflicts_found = []
         
-        # Use instance variables for dates/timezone consistency
         local_tz = pytz.timezone(TARGET_TIMEZONE)
         today = datetime.date.today()
         tomorrow = today + datetime.timedelta(days=1)
         
-        # Pre-process fixed events once to get standardized, timezone-aware datetimes
+        # Pre-process fixed events
         parsed_fixed_events = []
         for evt in existing_events:
             s = parse_iso(evt.get('start', ''))
             e = parse_iso(evt.get('end', ''))
             if s and e:
-                parsed_fixed_events.append({'summary': evt.get('summary', 'Unknown'), 'start': s, 'end': e})
-
+                parsed_fixed_events.append({
+                    'summary': evt.get('summary', 'Unknown'), 
+                    'start': s, 
+                    'end': e
+                })
+    
         for entry in schedule_entries:
             try:
                 date_indicator = entry.get('date', 'today').lower()
                 entry_date = tomorrow if date_indicator == 'tomorrow' else today
                 
-                # 1. Create TIMEZONE-AWARE datetimes for the scheduled entry
+                # Create timezone-aware datetimes
                 start_h, start_m = map(int, entry['start_time'].split(":"))
                 end_h, end_m = map(int, entry['end_time'].split(":"))
                 
-                start_time_naive = datetime.time(start_h, start_m)
-                end_time_naive = datetime.time(end_h, end_m)
+                entry_start = local_tz.localize(datetime.datetime.combine(entry_date, datetime.time(start_h, start_m)))
+                entry_end = local_tz.localize(datetime.datetime.combine(entry_date, datetime.time(end_h, end_m)))
                 
-                entry_start = local_tz.localize(datetime.datetime.combine(entry_date, start_time_naive))
-                entry_end = local_tz.localize(datetime.datetime.combine(entry_date, end_time_naive))
-                
-                # 2. Handle overnight events (end time < start time)
+                # Handle overnight events
                 if entry_end <= entry_start:
                     entry_end += datetime.timedelta(days=1)
                 
                 has_conflict = False
+                conflicting_event = None
+                
                 for evt in parsed_fixed_events:
-                    # Check for overlap: Start1 < End2 AND End1 > Start2
+                    # Check for overlap
                     if evt['start'] < entry_end and evt['end'] > entry_start:
                         has_conflict = True
-                        print(f"⚠ Skipping '{entry['title']}' due to overlap with '{evt['summary']}' ({evt['start'].strftime('%H:%M')} - {evt['end'].strftime('%H:%M')})")
+                        conflicting_event = evt
                         break
                 
-                if not has_conflict:
+                if has_conflict:
+                    conflicts_found.append({
+                        'title': entry['title'],
+                        'time': f"{entry['start_time']}-{entry['end_time']}",
+                        'blocked_by': conflicting_event['summary']
+                    })
+                    print(f"⚠️  Skipping '{entry['title']}' ({entry['start_time']}-{entry['end_time']}) - conflicts with '{conflicting_event['summary']}'")
+                else:
                     filtered.append(entry)
             
             except (ValueError, KeyError) as e:
-                print(f"Skipping entry due to malformed time/date for '{entry.get('title', 'Unknown')}': {e}")
-                
-        print(f"✓ Filtered down to {len(filtered)} non-conflicting entries.")
+                print(f"⚠️  Skipping malformed entry '{entry.get('title', 'Unknown')}': {e}")
+        
+        # Summary of what was filtered
+        if conflicts_found:
+            print(f"\n⚠️  FILTERED OUT {len(conflicts_found)} CONFLICTING ENTRIES:")
+            for conflict in conflicts_found:
+                print(f"   - {conflict['title']} ({conflict['time']}) blocked by {conflict['blocked_by']}")
+            print("\n💡 TIP: These tasks should be rescheduled. Consider running the planner again")
+            print("        after your calendar events, or manually adjust task deadlines.\n")
+        
+        print(f"✓ Final schedule: {len(filtered)} non-conflicting entries")
         return filtered
 
     def _create_calendar_events(self, schedule_entries: List[Dict[str, Any]]):

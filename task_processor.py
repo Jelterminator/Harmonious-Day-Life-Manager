@@ -182,15 +182,17 @@ def process_tasks(raw_tasks):
         priority = project['priority']
 
         if len(subtasks) == 0:
-            # Standalone task → add as single entry
-            effort = parse_effort(project['parent_task'])
+            # For standalone tasks:
             expanded_tasks.append({
                 **project['parent_task'],
                 'effort_hours': effort,
                 'priority': priority,
                 'deadline_dt': project['deadline_dt'],
                 'deadline_str': project['deadline_str'],
-                'is_subtask': False
+                'is_subtask': False,
+                'total_remaining_effort': project['total_effort'],
+                'days_until_deadline': project['days_until_deadline'],
+                'hours_per_day_needed': project['hours_per_day_needed']
             })
             continue
 
@@ -214,7 +216,10 @@ def process_tasks(raw_tasks):
                 'deadline_dt': project['deadline_dt'],
                 'deadline_str': project['deadline_str'],
                 'parent_title': project['parent_task'].get('title'),
-                'is_subtask': True
+                'is_subtask': True,
+                'total_remaining_effort': project['total_effort'],
+                'days_until_deadline': project['days_until_deadline'],
+                'hours_per_day_needed': project['hours_per_day_needed']
             })
 
     # --- FINAL LIMIT: ONLY TOP 16 ---

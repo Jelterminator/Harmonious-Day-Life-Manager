@@ -1,64 +1,72 @@
 SCHEDULE REQUEST
-NOW: 2025-11-17 00:27
-SCHEDULE_WINDOW: 2025-11-17 00:27 -> 2025-11-18 23:59
-SKIP_BEFORE: 00:27
+NOW: 2025-11-17 05:32
+SCHEDULE_WINDOW: 2025-11-17 05:32 -> 2025-11-18 23:59
+SKIP_BEFORE: 05:32
 
 PHASES: WOOD:05:30-09:00 | 🔥:09:00-13:00 | 🟡:13:00-15:00 | 🟤:15:00-18:00 | 💧:18:00-21:45
-ANCHORS: 05:30-05:40:Fajr | 13:00-13:20:Zuhr | 15:00-15:20:Asr | 18:00-18:15:Maghrib | 21:00-21:20:Isha | 21:45:Bedtime
 
-CALENDAR_EVENTS: (summary|start|end)
+1. STONES: IMMOVABLE CALENDAR EVENTS (summary|start|end)
 Klussen|2025-11-17T08:00:00+01:00|2025-11-17T16:00:00+01:00
 EM Innovation Academy|2025-11-17T16:00:00+01:00|2025-11-17T18:00:00+01:00
+Complete Hallo language assessment from Invisible|2025-11-18T09:00:00+01:00|2025-11-18T10:00:00+01:00
 EM Innovation Academy|2025-11-18T16:00:00+01:00|2025-11-18T18:00:00+01:00
+CONSTRAINT: Do not schedule ANY entry (Anchor, Pebble, or Sand) during Stone times.
 
-TASKS: (title|priority|effort_h|total_remain_h|deadline|days_left|h_per_day|is_subtask|parent|notes)
-01. Studie: Hume & Logisch Positivisme (2u)|T2|2.0|0.0|2025-12-06|0.0|0.0|1|Schrijf De Aap is gaan staan|
-02. Herschrijf: Tegen willens en wetens (1u)|T2|1.0|0.0|2025-12-06|0.0|0.0|1|Schrijf De Aap is gaan staan|
-03. Herschrijf: Denken als een wiskundige (1u)|T2|1.0|0.0|2025-12-06|0.0|0.0|1|Schrijf De Aap is gaan staan|
-02. Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)|T2|3.0|0.0|2026-01-24|0.0|0.0|1|Hap. Slik. Weg. geïllustreerd|
-03. Illustrate p4-5 Copyright/Dedicatie (5u)|T2|5.0|0.0|2026-01-24|0.0|0.0|1|Hap. Slik. Weg. geïllustreerd|
-04. Illustrate p6-7 Darwin quote/Inhoud start (6u)|T2|6.0|0.0|2026-01-24|0.0|0.0|1|Hap. Slik. Weg. geïllustreerd|
-01. Vertaal: Worm & Vlieg (1u)|T3|1.0|0.0|2025-12-20|0.0|0.0|1|Chomp. Gulp. Gone.|
-02. Vertaal: Vlinder & Bidsprinkhaan (1u)|T3|1.0|0.0|2025-12-20|0.0|0.0|1|Chomp. Gulp. Gone.|
-01. L1: Pre-read Chap 1; create notes on Taylor polynomials, 'big O', error types (2u)|T4|2.0|0.0|2026-04-14|0.0|0.0|1|Numerical Methods (TU Delft)|
-02. L1: Do L1 lab session homework; solidify concepts through practice (3u)|T4|3.0|0.0|2026-04-14|0.0|0.0|1|Numerical Methods (TU Delft)|
-01. Brainstorm merch concepten (2u)|T4|2.0|0.0|2026-01-03|0.0|0.0|1|Merch ontwerpen|
-02. Selecteer illustraties Hap.Slik.Weg voor merch (2u)|T4|2.0|0.0|2026-01-03|0.0|0.0|1|Merch ontwerpen|
-01. L1-2: Read notes on Einstein model; create summary notes (2u)|T4|2.0|0.0|2026-04-13|0.0|0.0|1|Solid State Physics (TU Delft)|
-02. L1-2: Do all exercises on Einstein model (2.5u)|T4|2.5|0.0|2026-04-13|0.0|0.0|1|Solid State Physics (TU Delft)|
-01. Design wireframes en sitemap (3u)|T4|3.0|0.0|2026-01-17|0.0|0.0|1|Website jeltesjoerd.com bouwen|
-02. Homepage (4u)|T4|4.0|0.0|2026-01-17|0.0|0.0|1|Website jeltesjoerd.com bouwen|
-01. College 1: Read sections 1.1-1.2 on mass balance; understand key concepts (2u)|T5|2.0|0.0|2026-05-21|0.0|0.0|1|Fysische Transportverschijnselen I (TU Delft)|
-33. College 11: Read sections 3.4-3.5 on micro balance and forced convection (2.5u)|T5|2.5|0.0|2026-06-24|0.0|0.0|1|Fysische Transportverschijnselen II (TU Delft)|
-Keuken|T6|1.0|0.0|N/A|0.0|0.0|0||
-Posters|T6|1.0|0.0|N/A|0.0|0.0|0||
-Oppervlakken|T6|1.0|0.0|N/A|0.0|0.0|0||
-Badkamer|T6|1.0|0.0|N/A|0.0|0.0|0||
-Stofzuigen (0.5u)|T6|0.5|0.0|N/A|0.0|0.0|0||
-Glas weg (0.5u)|T6|0.5|0.0|N/A|0.0|0.0|0||
+2. ANCHORS: SPIRITUAL PRAYERS (time:name)
+05:30-05:40:Fajr | 13:00-13:20:Zuhr | 15:00-15:20:Asr | 18:00-18:15:Maghrib | 21:00-21:20:Isha | 21:45:Bedtime
+CONSTRAINT: Schedule Anchors first. Must be skipped if blocked by a STONE.
 
-HABITS: (title|mins_ideal|frequency|ideal_phase)
-Tummo|15|Daily|WOOD
-Makko Ho|15|Daily|WOOD
-Meditation (Wood Phase)|15|Daily|WOOD
-Reading (Wood Phase)|60|Daily|WOOD
-Morning run (Monday)|30|Weekly|WOOD
-Stretches|15|Daily|WOOD
-Ji Jin Jing (Cooling Down)|20|Daily|WOOD
-Lunch & Mindful Eating|30|Daily|EARTH
-Ba Duan Jin (post-lunch stretch)|15|Daily|EARTH
-Meditation (Earth Phase)|15|Daily|EARTH
-Yang Style Tai Chi|15|Daily|METAL
-Sketching|30|Daily|METAL
-Reading (Water Phase)|90|Daily|WATER
-Meditation (Water Phase)|30|Daily|WATER
-Journaling|15|Daily|WATER
-
+3. PEBBLES: URGENT/DIFFICULT TASKS (T1-T5) (title|priority|effort_h|total_remain_h|deadline|days_left|h_per_day|is_subtask|parent|notes)
+02. Herschrijf: Tegen willens en wetens (1u)|T2|1.0|72.0|2025-12-06|18.8|3.8|1|Schrijf De Aap is gaan staan|
+03. Herschrijf: Denken als een wiskundige (1u)|T2|1.0|72.0|2025-12-06|18.8|3.8|1|Schrijf De Aap is gaan staan|
+04. Herschrijf: Denken als een natuurkundige (1u)|T2|1.0|72.0|2025-12-06|18.8|3.8|1|Schrijf De Aap is gaan staan|
+02. Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)|T2|3.0|240.0|2026-01-24|67.8|3.5|1|Hap. Slik. Weg. geïllustreerd|
+03. Illustrate p4-5 Copyright/Dedicatie (5u)|T2|5.0|240.0|2026-01-24|67.8|3.5|1|Hap. Slik. Weg. geïllustreerd|
+04. Illustrate p6-7 Darwin quote/Inhoud start (6u)|T2|6.0|240.0|2026-01-24|67.8|3.5|1|Hap. Slik. Weg. geïllustreerd|
+01. Vertaal: Worm & Vlieg (1u)|T3|1.0|34.5|2025-12-20|32.8|1.1|1|Chomp. Gulp. Gone.|
+02. Vertaal: Vlinder & Bidsprinkhaan (1u)|T3|1.0|34.5|2025-12-20|32.8|1.1|1|Chomp. Gulp. Gone.|
+01. L1: Pre-read Chap 1; create notes on Taylor polynomials, 'big O', error types (2u)|T4|2.0|134.0|2026-04-14|147.8|0.9|1|Numerical Methods (TU Delft)|
+02. L1: Do L1 lab session homework; solidify concepts through practice (3u)|T4|3.0|134.0|2026-04-14|147.8|0.9|1|Numerical Methods (TU Delft)|
+01. Brainstorm merch concepten (2u)|T4|2.0|39.0|2026-01-03|46.8|0.8|1|Merch ontwerpen|
+02. Selecteer illustraties Hap.Slik.Weg voor merch (2u)|T4|2.0|39.0|2026-01-03|46.8|0.8|1|Merch ontwerpen|
+01. L1-2: Read notes on Einstein model; create summary notes (2u)|T4|2.0|108.0|2026-04-13|146.8|0.7|1|Solid State Physics (TU Delft)|
+02. L1-2: Do all exercises on Einstein model (2.5u)|T4|2.5|108.0|2026-04-13|146.8|0.7|1|Solid State Physics (TU Delft)|
+01. Design wireframes en sitemap (3u)|T4|3.0|42.0|2026-01-17|60.8|0.7|1|Website jeltesjoerd.com bouwen|
+02. Homepage (4u)|T4|4.0|42.0|2026-01-17|60.8|0.7|1|Website jeltesjoerd.com bouwen|
+01. College 1: Read sections 1.1-1.2 on mass balance; understand key concepts (2u)|T5|2.0|83.5|2026-05-21|184.8|0.5|1|Fysische Transportverschijnselen I (TU Delft)|
+33. College 11: Read sections 3.4-3.5 on micro balance and forced convection (2.5u)|T5|2.5|97.5|2026-06-24|218.8|0.4|1|Fysische Transportverschijnselen II (TU Delft)|
 CONSTRAINTS:
-- Keep the time of Calendar Events free, never schedule anything over them, not even the anchors. 
-- Schedule as many tasks as capacity allows; only then consider habits.
-- Realistic focused work per day: 6-12h. 8 hours of demanding tasks is ideal.
-- Habits come last, and skipping a habit is not a problem.
+Fit as many Pebbles as possible after scheduling the Stones. To achieve this the duration can be reduced by maximally 25%.
+Chunking: If effort_h > 2.0, then you may schedule the task in multiple blocks. It is okay to leave half finished tasks for later.
 
-OUTPUT_JSON: exact format below
+4. SAND: CHORES (T6) & HABITS (Fill remaining gaps)
+CHORES (T6): (title|effort_h|notes)
+Keuken|1.0|
+Posters|1.0|
+Oppervlakken|1.0|
+Badkamer|1.0|
+Stofzuigen (0.5u)|1.0|
+Glas weg (0.5u)|1.0|
+HABITS: (title|mins_ideal|ideal_phase)
+Tummo|15|WOOD
+Makko Ho|15|WOOD
+Meditation (Wood Phase)|15|WOOD
+Reading (Wood Phase)|60|WOOD
+Morning run (Monday)|30|WOOD
+Stretches|15|WOOD
+Ji Jin Jing (Cooling Down)|20|WOOD
+Lunch & Mindful Eating|30|EARTH
+Ba Duan Jin (post-lunch stretch)|15|EARTH
+Meditation (Earth Phase)|15|EARTH
+Yang Style Tai Chi|15|METAL
+Sketching|30|METAL
+Reading (Water Phase)|90|WATER
+Meditation (Water Phase)|30|WATER
+Journaling|15|WATER
+CONSTRAINTS:
+Only plan habits after the calendar is maximally filled with tasks. Getting stuff done is what is most important.
+Schedule habits near their correct Phase. Skipping habits is no problem at all. Durations may be changed up to 50%.
+When choosing habits you firstly prioritise emotional wellbeing, secondly reading and thirdly physical health.
+
+OUTPUT_JSON (EXACT FORMAT REQUIRED):
 {"schedule_entries":[{"title":"...","start_time":"HH:MM","end_time":"HH:MM","phase":"Wood|Fire|Earth|Metal|Water","date":"today|tomorrow"}]}

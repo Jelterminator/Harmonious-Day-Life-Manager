@@ -51,45 +51,33 @@ SCHEDULE_SCHEMA = {
                 "properties": {
                     "title": {
                         "type": "string",
-                        "description": "A concise description of the scheduled activity (e.g., 'T3 Study: Hume', 'Reading (Water Phase)', or 'Fajr & Centering')."
+                        "description": "A concise description of the scheduled activity."
                     },
                     "start_time": {
                         "type": "string",
                         "pattern": "^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$",
-                        "description": "The start time in HH:MM 24-hour format.",
-                        "example": "09:00"
+                        "description": "The start time in HH:MM 24-hour format."
                     },
                     "end_time": {
                         "type": "string",
                         "pattern": "^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$",
-                        "description": "The end time in HH:MM 24-hour format. Must not be after 21:45.",
-                        "example": "10:30"
+                        "description": "The end time in HH:MM 24-hour format."
                     },
                     "phase": {
                         "type": "string",
-                        "enum": ["Wood", "Fire", "Earth", "Metal", "Water", "Sleep"],
+                        "enum": ["Wood", "Fire", "Earth", "Metal", "Water",
+                                "wood", "fire", "earth", "metal", "water",
+                                "WOOD", "FIRE", "EARTH", "METAL", "WATER"],
                         "description": "The element phase the entry falls into."
                     },
                     "date": {
                         "type": "string",
-                        "enum": ["today", "tomorrow"],
-                        "description": "Indicates whether the entry is for the current day or the next day."
+                        "enum": ["today", "tomorrow", "Today", "Tomorrow"],
+                        "description": "Whether the entry is for the current day or the next day."
                     }
                 },
                 "required": ["title", "start_time", "end_time", "phase", "date"]
             }
-        },
-        "sleep_entry": {
-            "type": "object",
-            "description": "A single, optional entry to represent the Sleep period (21:45 to 05:30) if it falls within the schedule window. This entry MUST be omitted if the LLM cannot safely schedule it.",
-            "properties": {
-                "title": {"type": "string", "const": "Sleep"},
-                "start_time": {"type": "string", "pattern": "^(21):[4-5][5-9]$", "example": "21:45"},
-                "end_time": {"type": "string", "const": "05:30"},
-                "phase": {"type": "string", "const": "Water"},
-                "date": {"type": "string", "enum": ["today", "tomorrow"]}
-            },
-            "required": ["title", "start_time", "end_time", "phase", "date"]
         }
     },
     "required": ["schedule_entries"]
@@ -120,166 +108,127 @@ def load_system_prompt():
     return SYSTEM_PROMPT_FILE.read_text(encoding="utf-8")
 
 
-def call_groq_llm(
-    world_prompt, 
-    api_key, 
-    system_prompt_path=SYSTEM_PROMPT_FILE, 
-    groq_model=CURRENT_GROQ_MODEL,
-    max_retries=3
-):
-    """
-    Send the world prompt to Groq and return parsed JSON schedule.
+# Helper functions (add before call_groq_llm)
+def _normalize_schedule_data(data):
+    """Normalize phase and date capitalization."""
+    phase_map = {'wood': 'Wood', 'fire': 'Fire', 'earth': 'Earth', 'metal': 'Metal', 'water': 'Water'}
     
-    Args:
-        world_prompt: The user prompt with scheduling data
-        api_key: Groq API key
-        system_prompt_path: Path to system prompt file
-        groq_model: Model to use (default: kimi-k2-instruct-0905)
-        max_retries: Number of retry attempts on failure
-        
-    Returns:
-        dict: Parsed schedule data with all entries in 'schedule_entries', or None on failure.
-    """
+    valid_entries = []
+    for entry in data.get("schedule_entries", []):
+        # Check required fields
+        if not all(k in entry for k in ["title", "start_time", "end_time", "phase", "date"]):
+            continue
+        # Normalize
+        entry["phase"] = phase_map.get(entry["phase"].lower(), entry["phase"])
+        entry["date"] = entry["date"].lower()
+        valid_entries.append(entry)
+    
+    data["schedule_entries"] = valid_entries
+    return data
+
+
+def _extract_json(content):
+    """Extract JSON from markdown blocks if present."""
+    if "```" in content:
+        start = content.find("```json") + 7 if "```json" in content else content.find("```") + 3
+        end = content.find("```", start)
+        return content[start:end].strip() if end != -1 else content
+    return content
+
+
+# Refactored call_groq_llm
+def call_groq_llm(world_prompt, api_key, system_prompt_path=SYSTEM_PROMPT_FILE, 
+                  groq_model=CURRENT_GROQ_MODEL, max_retries=3):
+    """Send world prompt to Groq and return parsed JSON schedule."""
     
     # Load system prompt
     try:
         system_prompt = Path(system_prompt_path).read_text(encoding="utf-8").strip()
     except Exception as e:
-        print(f"❌ ERROR: Could not read system prompt: {e}")
+        print(f"❌ Could not read system prompt: {e}")
         return None
 
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}"
-    }
-
-    # Determine model support for JSON Schema and build payload
+    # Build payload
     supports_schema = groq_model == "moonshotai/kimi-k2-instruct-0905"
-    temp = 0.6 if supports_schema else 0.0 # Kimi K2 vs Llama
-    
     payload = {
         "model": groq_model,
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": world_prompt}
         ],
-        "temperature": temp,
+        "temperature": 0.6 if supports_schema else 0.0,
         "max_tokens": 4096,
         "top_p": 0.95 if supports_schema else 1.0,
+        "response_format": {
+            "type": "json_schema",
+            "json_schema": {"name": "schedule_response", "schema": SCHEDULE_SCHEMA, "strict": True}
+        } if supports_schema else {"type": "json_object"}
     }
 
-    # Apply structured outputs configuration
-    if supports_schema:
-        payload["response_format"] = {
-            "type": "json_schema",
-            "json_schema": {
-                "name": "schedule_response",
-                "schema": SCHEDULE_SCHEMA,
-                "strict": True
-            }
-        }
-    else:
-        payload["response_format"] = {"type": "json_object"}
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
 
-    # Retry logic for robustness
+    # Retry loop
     for attempt in range(max_retries):
         try:
-            mode = "JSON Schema" if supports_schema else "JSON Object"
-            print(f"📡 Calling Groq API (attempt {attempt + 1}/{max_retries})...")
-            print(f"   Model: {groq_model}")
-            print(f"   Mode: {mode}")
+            print(f"📡 Calling Groq API (attempt {attempt + 1}/{max_retries}, model: {groq_model})...")
             
-            response = requests.post(
-                GROQ_API_URL,
-                headers=headers,
-                json=payload,
-                timeout=90
-            )
+            response = requests.post(GROQ_API_URL, headers=headers, json=payload, timeout=90)
             response.raise_for_status()
-
             result = response.json()
             
-            # --- Error Checking and Fallback ---
+            # Handle API errors
             if "error" in result:
-                error_msg = result["error"].get("message", "Unknown error")
-                print(f"❌ API Error: {error_msg}")
+                error_msg = result["error"].get("message", "")
+                error_code = result["error"].get("code", "")
+                print(f"❌ API Error [{error_code}]: {error_msg[:100]}")
                 
-                if "does not support" in error_msg.lower() and attempt == 0:
+                # Switch to fallback on schema errors
+                if error_code == "json_validate_failed" and attempt == 0 and groq_model != FALLBACK_MODEL:
                     print(f"⚠️ Switching to fallback model: {FALLBACK_MODEL}")
-                    return call_groq_llm(
-                        world_prompt, api_key, system_prompt_path, 
-                        FALLBACK_MODEL, max_retries - 1
-                    )
+                    return call_groq_llm(world_prompt, api_key, system_prompt_path, FALLBACK_MODEL, max_retries - 1)
                 continue
-
-            # --- Success and Parsing ---
-            content = result["choices"][0]["message"]["content"]
+            
+            # Parse response
+            content = _extract_json(result["choices"][0]["message"]["content"])
             schedule_data = json.loads(content)
             
-            # --- Handle Sleep Entry and Final Structure ---
+            # Validate and normalize
             if "schedule_entries" not in schedule_data or not isinstance(schedule_data["schedule_entries"], list):
-                print("❌ ERROR: Generated JSON is missing or has incorrect 'schedule_entries' format.")
+                print("❌ Invalid response structure")
                 continue
-
-            # Check for and merge the optional sleep_entry into schedule_entries
-            sleep_entry = schedule_data.pop("sleep_entry", None)
-            if sleep_entry:
-                schedule_data["schedule_entries"].append(sleep_entry)
-
-            # --- Logging and Return ---
+            
+            schedule_data = _normalize_schedule_data(schedule_data)
+            
+            if not schedule_data["schedule_entries"]:
+                print("❌ No valid entries after normalization")
+                continue
+            
+            # Success
             usage = result.get("usage", {})
-            entries_count = len(schedule_data['schedule_entries'])
-            
-            print(f"✅ Success!")
-            print(f"   Entries: {entries_count}")
-            print(f"   Tokens: {usage.get('total_tokens', 'N/A')} "
-                  f"(in: {usage.get('prompt_tokens', 'N/A')}, "
-                  f"out: {usage.get('completion_tokens', 'N/A')})")
-            
+            print(f"✅ Success! {len(schedule_data['schedule_entries'])} entries, "
+                  f"{usage.get('total_tokens', 'N/A')} tokens")
             return schedule_data
 
-        except requests.exceptions.RequestException as e:
-            print(f"❌ Network error (attempt {attempt + 1}): {e}")
-            if hasattr(e, 'response') and e.response is not None:
-                print(f"   Response: {e.response.text[:500]}")
+        except json.JSONDecodeError as e:
+            print(f"❌ JSON parse error: {e}")
             
-            if attempt == max_retries - 1 and groq_model != FALLBACK_MODEL:
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Network error: {e}")
+            # Try fallback on first network error
+            if attempt == 0 and groq_model != FALLBACK_MODEL:
                 print(f"⚠️ Trying fallback model: {FALLBACK_MODEL}")
                 return call_groq_llm(world_prompt, api_key, system_prompt_path, FALLBACK_MODEL, 1)
-            
-            if attempt < max_retries - 1:
-                wait_time = 2 ** attempt
-                print(f"   Waiting {wait_time}s before retry...")
-                time.sleep(wait_time)
-                
-        except json.JSONDecodeError as e:
-            print(f"❌ JSON parsing error: {e}")
-            print(f"   Raw content: {content[:500]}...")
-            
-            # Attempt to recover JSON from markdown block
-            try:
-                if "```json" in content:
-                    json_start = content.find("```json") + 7
-                    json_end = content.find("```", json_start)
-                    content = content[json_start:json_end].strip()
-                    # Re-run the main success logic on recovered content
-                    schedule_data = json.loads(content)
-                    print("✅ Recovered JSON from markdown")
-                    
-                    # Merge sleep entry if present
-                    sleep_entry = schedule_data.pop("sleep_entry", None)
-                    if sleep_entry:
-                        schedule_data["schedule_entries"].append(sleep_entry)
-                        
-                    return schedule_data
-            except Exception as recover_e:
-                print(f"❌ Recovery failed: {recover_e}")
-                pass
-                
+        
         except Exception as e:
             print(f"❌ Unexpected error: {type(e).__name__}: {e}")
-            
-    print("❌ All retry attempts exhausted")
+        
+        # Wait before retry
+        if attempt < max_retries - 1:
+            wait_time = 2 ** attempt
+            print(f"   Retrying in {wait_time}s...")
+            time.sleep(wait_time)
+    
+    print("❌ All retries exhausted")
     return None
 
 

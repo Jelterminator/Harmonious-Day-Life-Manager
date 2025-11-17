@@ -1,12 +1,13 @@
 SCHEDULE REQUEST
-NOW: 2025-11-17 18:25
-SCHEDULE_WINDOW: 2025-11-17 18:25 -> 2025-11-18 23:59
-SKIP_BEFORE: 18:25
+NOW: 2025-11-17 20:29
+SCHEDULE_WINDOW: 2025-11-17 20:29 -> 2025-11-18 23:59
+SKIP_BEFORE: 20:29
 
 PHASES: WOOD:05:30-09:00 | FIRE:09:00-13:00 | EARTH:13:00-15:00 | METAL:15:00-18:00 | WATER:18:00-21:45
 
 1. STONES: IMMOVABLE CALENDAR EVENTS (summary|start|end)
 Complete Hallo language assessment from Invisible|2025-11-18T09:00:00+01:00|2025-11-18T10:00:00+01:00
+Appen|2025-11-18T10:00:00+01:00|2025-11-18T13:00:00+01:00
 EM Innovation Academy|2025-11-18T16:00:00+01:00|2025-11-18T18:00:00+01:00
 CONSTRAINT: Do not schedule ANY entry (Anchor, Pebble, or Sand) during Stone times.
 
@@ -15,27 +16,28 @@ CONSTRAINT: Do not schedule ANY entry (Anchor, Pebble, or Sand) during Stone tim
 CONSTRAINT: Schedule Anchors first. Must be skipped if blocked by a STONE.
 
 3. PEBBLES: URGENT/DIFFICULT TASKS (T1-T5) (title|priority|effort_h|total_remain_h|deadline|days_left|h_per_day|is_subtask|parent|notes)
-02. Herschrijf: Tegen willens en wetens (1u)|T2|1.0|72.0|2025-12-06|18.3|3.9|1|Schrijf De Aap is gaan staan|
-03. Herschrijf: Denken als een wiskundige (1u)|T2|1.0|72.0|2025-12-06|18.3|3.9|1|Schrijf De Aap is gaan staan|
-04. Herschrijf: Denken als een natuurkundige (1u)|T2|1.0|72.0|2025-12-06|18.3|3.9|1|Schrijf De Aap is gaan staan|
-02. Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)|T2|3.0|240.0|2026-01-24|67.3|3.6|1|Hap. Slik. Weg. geïllustreerd|
-03. Illustrate p4-5 Copyright/Dedicatie (5u)|T2|5.0|240.0|2026-01-24|67.3|3.6|1|Hap. Slik. Weg. geïllustreerd|
-04. Illustrate p6-7 Darwin quote/Inhoud start (6u)|T2|6.0|240.0|2026-01-24|67.3|3.6|1|Hap. Slik. Weg. geïllustreerd|
-01. Vertaal: Worm & Vlieg (1u)|T3|1.0|34.5|2025-12-20|32.3|1.1|1|Chomp. Gulp. Gone.|
-02. Vertaal: Vlinder & Bidsprinkhaan (1u)|T3|1.0|34.5|2025-12-20|32.3|1.1|1|Chomp. Gulp. Gone.|
-01. L1: Pre-read Chap 1; create notes on Taylor polynomials, 'big O', error types (2u)|T4|2.0|134.0|2026-04-14|147.3|0.9|1|Numerical Methods (TU Delft)|
-02. L1: Do L1 lab session homework; solidify concepts through practice (3u)|T4|3.0|134.0|2026-04-14|147.3|0.9|1|Numerical Methods (TU Delft)|
-01. Brainstorm merch concepten (2u)|T4|2.0|39.0|2026-01-03|46.3|0.8|1|Merch ontwerpen|
-02. Selecteer illustraties Hap.Slik.Weg voor merch (2u)|T4|2.0|39.0|2026-01-03|46.3|0.8|1|Merch ontwerpen|
-01. L1-2: Read notes on Einstein model; create summary notes (2u)|T4|2.0|108.0|2026-04-13|146.3|0.7|1|Solid State Physics (TU Delft)|
-02. L1-2: Do all exercises on Einstein model (2.5u)|T4|2.5|108.0|2026-04-13|146.3|0.7|1|Solid State Physics (TU Delft)|
-01. Design wireframes en sitemap (3u)|T4|3.0|42.0|2026-01-17|60.3|0.7|1|Website jeltesjoerd.com bouwen|
-02. Homepage (4u)|T4|4.0|42.0|2026-01-17|60.3|0.7|1|Website jeltesjoerd.com bouwen|
-01. College 1: Read sections 1.1-1.2 on mass balance; understand key concepts (2u)|T5|2.0|83.5|2026-05-21|184.3|0.5|1|Fysische Transportverschijnselen I (TU Delft)|
-33. College 11: Read sections 3.4-3.5 on micro balance and forced convection (2.5u)|T5|2.5|97.5|2026-06-24|218.3|0.4|1|Fysische Transportverschijnselen II (TU Delft)|
+02. Herschrijf: Tegen willens en wetens (1u)|T2|1.0|72.0|2025-12-06|18.2|4.0|1|Schrijf De Aap is gaan staan|
+03. Herschrijf: Denken als een wiskundige (1u)|T2|1.0|72.0|2025-12-06|18.2|4.0|1|Schrijf De Aap is gaan staan|
+04. Herschrijf: Denken als een natuurkundige (1u)|T2|1.0|72.0|2025-12-06|18.2|4.0|1|Schrijf De Aap is gaan staan|
+02. Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)|T2|3.0|240.0|2026-01-24|67.2|3.6|1|Hap. Slik. Weg. geïllustreerd|
+03. Illustrate p4-5 Copyright/Dedicatie (5u)|T2|5.0|240.0|2026-01-24|67.2|3.6|1|Hap. Slik. Weg. geïllustreerd|
+04. Illustrate p6-7 Darwin quote/Inhoud start (6u)|T2|6.0|240.0|2026-01-24|67.2|3.6|1|Hap. Slik. Weg. geïllustreerd|
+01. Vertaal: Worm & Vlieg (1u)|T3|1.0|34.5|2025-12-20|32.2|1.1|1|Chomp. Gulp. Gone.|
+02. Vertaal: Vlinder & Bidsprinkhaan (1u)|T3|1.0|34.5|2025-12-20|32.2|1.1|1|Chomp. Gulp. Gone.|
+01. L1: Pre-read Chap 1; create notes on Taylor polynomials, 'big O', error types (2u)|T4|2.0|134.0|2026-04-14|147.2|0.9|1|Numerical Methods (TU Delft)|
+02. L1: Do L1 lab session homework; solidify concepts through practice (3u)|T4|3.0|134.0|2026-04-14|147.2|0.9|1|Numerical Methods (TU Delft)|
+01. Brainstorm merch concepten (2u)|T4|2.0|39.0|2026-01-03|46.2|0.8|1|Merch ontwerpen|
+02. Selecteer illustraties Hap.Slik.Weg voor merch (2u)|T4|2.0|39.0|2026-01-03|46.2|0.8|1|Merch ontwerpen|
+01. L1-2: Read notes on Einstein model; create summary notes (2u)|T4|2.0|108.0|2026-04-13|146.2|0.7|1|Solid State Physics (TU Delft)|
+02. L1-2: Do all exercises on Einstein model (2.5u)|T4|2.5|108.0|2026-04-13|146.2|0.7|1|Solid State Physics (TU Delft)|
+01. Design wireframes en sitemap (3u)|T4|3.0|42.0|2026-01-17|60.2|0.7|1|Website jeltesjoerd.com bouwen|
+02. Homepage (4u)|T4|4.0|42.0|2026-01-17|60.2|0.7|1|Website jeltesjoerd.com bouwen|
+01. College 1: Read sections 1.1-1.2 on mass balance; understand key concepts (2u)|T5|2.0|83.5|2026-05-21|184.2|0.5|1|Fysische Transportverschijnselen I (TU Delft)|
+33. College 11: Read sections 3.4-3.5 on micro balance and forced convection (2.5u)|T5|2.5|97.5|2026-06-24|218.2|0.4|1|Fysische Transportverschijnselen II (TU Delft)|
 CONSTRAINTS:
-Fit as many Pebbles as possible after scheduling the Stones. To achieve this the duration can be reduced by maximally 25%.
-Chunking: If effort_h > 2.0, then you may schedule the task in multiple blocks. It is okay to leave half finished tasks for later.
+Fit in many Pebbles (4-10 hours) after scheduling the Stones. To achieve this the duration can be reduced by maximally 25%.
+Chunking: If effort_h > 2.0, then you may schedule the task in multiple blocks. It is okay to leave half finished tasks for the future.
+When a parent task has numbered subtasks it is necessary to do the subtasks in the order of the numbering.
 
 4. SAND: CHORES (T6) & HABITS (Fill remaining gaps)
 CHORES (T6): (title|effort_h|notes)
@@ -62,7 +64,8 @@ Reading (Water Phase)|90|WATER
 Meditation (Water Phase)|30|WATER
 Journaling|15|WATER
 CONSTRAINTS:
-Only plan habits after the calendar is maximally filled with tasks. Getting stuff done is what is most important.
+Only plan habits after the calendar is already filled with tasks & calendar events.
+Like the sand entering the jar last and filling it to completion, fill all remaining spare time with habits.
 Schedule habits near their correct Phase. Skipping habits is no problem at all. Durations may be changed up to 50%.
 When choosing habits you firstly prioritise emotional wellbeing, secondly reading and thirdly physical health.
 

@@ -1,159 +1,129 @@
 {
   "schedule_entries": [
     {
-      "title": "Herschrijf: Tegen willens en wetens (Task 1)",
-      "start_time": "2025-11-17T18:25:00",
-      "end_time": "2025-11-17T19:00:00",
-      "phase": "WATER",
+      "title": "Reading (Water Phase)",
+      "start_time": "2025-11-17T19:21:00",
+      "end_time": "2025-11-17T20:51:00",
+      "phase": "Water",
       "date": "2025-11-17"
     },
     {
-      "title": "Herschrijf: Tegen willens en wetens (Task 2)",
-      "start_time": "2025-11-17T19:00:00",
-      "end_time": "2025-11-17T19:45:00",
-      "phase": "WATER",
+      "title": "Meditation (Water Phase)",
+      "start_time": "2025-11-17T20:51:00",
+      "end_time": "2025-11-17T21:06:00",
+      "phase": "Water",
       "date": "2025-11-17"
     },
     {
-      "title": "Herschrijf: Tegen willens en wetens (Task 3)",
-      "start_time": "2025-11-17T19:45:00",
-      "end_time": "2025-11-17T20:30:00",
-      "phase": "WATER",
-      "date": "2025-11-17"
-    },
-    {
-      "title": "Isha Prayer",
-      "start_time": "2025-11-17T21:00:00",
-      "end_time": "2025-11-17T21:20:00",
-      "phase": "WATER",
-      "date": "2025-11-17"
-    },
-    {
-      "title": "Bedtime",
-      "start_time": "2025-11-17T21:20:00",
-      "end_time": "2025-11-17T21:45:00",
-      "phase": "WATER",
-      "date": "2025-11-17"
-    },
-    {
-      "title": "Herschrijf: Denken als een wiskundige (Task 1)",
-      "start_time": "2025-11-18T00:00:00",
-      "end_time": "2025-11-18T00:45:00",
-      "phase": "WOOD",
-      "date": "2025-11-18"
-    },
-    {
-      "title": "Herschrijf: Denken als een wiskundige (Task 2)",
-      "start_time": "2025-11-18T00:45:00",
-      "end_time": "2025-11-18T01:30:00",
-      "phase": "WOOD",
-      "date": "2025-11-18"
-    },
-    {
-      "title": "Herschrijf: Denken als een wiskundige (Task 3)",
-      "start_time": "2025-11-18T01:30:00",
-      "end_time": "2025-11-18T02:15:00",
-      "phase": "WOOD",
-      "date": "2025-11-18"
-    },
-    {
-      "title": "Illustrate p2-3 Lege bladzij",
-      "start_time": "2025-11-18T02:15:00",
-      "end_time": "2025-11-18T03:45:00",
-      "phase": "WOOD",
-      "date": "2025-11-18"
-    },
-    {
-      "title": "Illustrate p6-7 Darwin quote",
-      "start_time": "2025-11-18T03:45:00",
-      "end_time": "2025-11-18T05:15:00",
-      "phase": "WOOD",
-      "date": "2025-11-18"
-    },
-    {
-      "title": "Fajr Prayer",
+      "title": "Fajr",
       "start_time": "2025-11-18T05:30:00",
       "end_time": "2025-11-18T05:40:00",
-      "phase": "WOOD",
+      "phase": "Wood",
       "date": "2025-11-18"
     },
     {
-      "title": "Illustrate p4-5 Copyright",
+      "title": "Herschrijf: Tegen willens en wetens",
       "start_time": "2025-11-18T05:40:00",
+      "end_time": "2025-11-18T06:40:00",
+      "phase": "Wood",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Herschrijf: Denken als een wiskundige",
+      "start_time": "2025-11-18T06:40:00",
+      "end_time": "2025-11-18T07:40:00",
+      "phase": "Wood",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Herschrijf: Denken als een natuurkundige",
+      "start_time": "2025-11-18T07:40:00",
+      "end_time": "2025-11-18T08:40:00",
+      "phase": "Wood",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Stretches",
+      "start_time": "2025-11-18T08:40:00",
       "end_time": "2025-11-18T09:00:00",
-      "phase": "WOOD",
+      "phase": "Wood",
       "date": "2025-11-18"
     },
     {
-      "title": "**FIXED**: Complete Hallo language assessment from Invisible",
-      "start_time": "2025-11-18T09:00:00+01:00",
-      "end_time": "2025-11-18T10:00:00+01:00",
-      "phase": "Fire",
-      "date": "tomorrow",
-      "is_fixed": true
-    },
-    {
-      "title": "Illustrate p2-3 Lege bladzij (Remaining)",
+      "title": "Illustrate p2-3 Lege bladzij/Titel+Auteur",
       "start_time": "2025-11-18T10:00:00",
-      "end_time": "2025-11-18T10:45:00",
-      "phase": "FIRE",
+      "end_time": "2025-11-18T12:00:00",
+      "phase": "Fire",
       "date": "2025-11-18"
     },
     {
-      "title": "Illustrate p6-7 Darwin quote (Remaining)",
-      "start_time": "2025-11-18T10:45:00",
-      "end_time": "2025-11-18T13:15:00",
-      "phase": "FIRE",
+      "title": "Zuhr",
+      "start_time": "2025-11-18T13:00:00",
+      "end_time": "2025-11-18T13:20:00",
+      "phase": "Earth",
       "date": "2025-11-18"
     },
     {
-      "title": "T3 Vertaal: Worm & Vlieg",
-      "start_time": "2025-11-18T13:15:00",
-      "end_time": "2025-11-18T13:45:00",
-      "phase": "EARTH",
+      "title": "Translate Worm & Vlieg",
+      "start_time": "2025-11-18T13:20:00",
+      "end_time": "2025-11-18T14:20:00",
+      "phase": "Earth",
       "date": "2025-11-18"
     },
     {
-      "title": "T3 Vertaal: Vlinder & Bidsprinkhaan",
-      "start_time": "2025-11-18T13:45:00",
-      "end_time": "2025-11-18T14:30:00",
-      "phase": "EARTH",
+      "title": "Translate Vlinder & Bidsprinkhaan (1st half)",
+      "start_time": "2025-11-18T14:20:00",
+      "end_time": "2025-11-18T14:50:00",
+      "phase": "Earth",
       "date": "2025-11-18"
     },
     {
-      "title": "**FIXED**: EM Innovation Academy",
-      "start_time": "2025-11-18T16:00:00+01:00",
-      "end_time": "2025-11-18T18:00:00+01:00",
+      "title": "Asr",
+      "start_time": "2025-11-18T15:00:00",
+      "end_time": "2025-11-18T15:20:00",
       "phase": "Metal",
-      "date": "tomorrow",
-      "is_fixed": true
+      "date": "2025-11-18"
     },
     {
-      "title": "L1 Pre-read Chap 1",
+      "title": "Translate Vlinder & Bidsprinkhaan (2nd half)",
+      "start_time": "2025-11-18T15:20:00",
+      "end_time": "2025-11-18T15:50:00",
+      "phase": "Metal",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Maghrib",
+      "start_time": "2025-11-18T18:00:00",
+      "end_time": "2025-11-18T18:15:00",
+      "phase": "Water",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "L1-2: Read notes on Einstein model",
       "start_time": "2025-11-18T18:15:00",
-      "end_time": "2025-11-18T19:45:00",
-      "phase": "WATER",
+      "end_time": "2025-11-18T20:15:00",
+      "phase": "Water",
       "date": "2025-11-18"
     },
     {
-      "title": "Chore Posters",
-      "start_time": "2025-11-18T19:45:00",
+      "title": "Meditation (Water Phase)",
+      "start_time": "2025-11-18T20:15:00",
       "end_time": "2025-11-18T20:45:00",
-      "phase": "WATER",
+      "phase": "Water",
       "date": "2025-11-18"
     },
     {
-      "title": "Isha Prayer",
+      "title": "Journaling",
+      "start_time": "2025-11-18T20:45:00",
+      "end_time": "2025-11-18T21:00:00",
+      "phase": "Water",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Isha",
       "start_time": "2025-11-18T21:00:00",
       "end_time": "2025-11-18T21:20:00",
-      "phase": "WATER",
-      "date": "2025-11-18"
-    },
-    {
-      "title": "Bedtime",
-      "start_time": "2025-11-18T21:20:00",
-      "end_time": "2025-11-18T21:45:00",
-      "phase": "WATER",
+      "phase": "Water",
       "date": "2025-11-18"
     }
   ]

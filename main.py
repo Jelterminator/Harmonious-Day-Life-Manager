@@ -15,7 +15,10 @@ import re
 # --- Local Module Imports ---
 # We keep these as separate files for clean Single Responsibility
 from auth import get_google_services, create_initial_token
-from llm_integration import get_groq_api_key, load_system_prompt, call_groq_llm, pretty_print_schedule
+from llm_integration import (
+    get_groq_api_key, load_system_prompt, call_groq_llm, 
+    pretty_print_schedule, OUTPUT_SCHEMA  
+)
 from task_processor import process_tasks
 from habit_processor import filter_habits
 
@@ -86,7 +89,7 @@ class Orchestrator:
 
         try:
             # 1. Cleanup
-            self._delete_generated_events()
+            #self._delete_generated_events()
             
             # 2. Gather Data
             print("\n--- STEP 1: GATHERING DATA ---")
@@ -114,20 +117,152 @@ class Orchestrator:
 
             # 5. Call AI
             print("\n--- STEP 4: CALLING AI ---")
-            schedule_data = call_groq_llm(system_prompt, world_prompt)
-            if not schedule_data['output']:
-                print("\n Schedule generation failed. AI returned no data.")
-                return
+            #schedule_data = call_groq_llm(system_prompt, world_prompt)
+            #if schedule_data["status"]=="fail":
+                #print("\nSchedule generation failed. AI returned no data.")
+                #return
 
             print("\nSchedule generated!")
-            pretty_print_schedule(schedule_data['output'], calendar_events)
-            self._save_schedule_to_file(schedule_data['output'], SCHEDULE_FILE)
+            #pretty_print_schedule(schedule_data['output'], calendar_events)
+            #self._save_schedule_to_file(schedule_data['output'], SCHEDULE_FILE)
             
             # 6. Post-Process & Write to Calendar
-            print("\n--- STEP 5: WRITING TO CALENDAR ---")
-            schedule_entries = schedule_data['output'].get('schedule_entries', [])
-            final_entries = self._filter_conflicting_entries(schedule_entries, calendar_events)
+            #print("\n--- STEP 5: WRITING TO CALENDAR ---")
+            #schedule_entries = schedule_data['output'].get('schedule_entries', [])
+            #final_entries = self._filter_conflicting_entries(schedule_entries, calendar_events)
             
+            schedule_data={
+  "schedule_entries": [
+    {
+      "title": "Reading (Water Phase)",
+      "start_time": "2025-11-17T19:21:00",
+      "end_time": "2025-11-17T20:51:00",
+      "phase": "Water",
+      "date": "2025-11-17"
+    },
+    {
+      "title": "Meditation (Water Phase)",
+      "start_time": "2025-11-17T20:51:00",
+      "end_time": "2025-11-17T21:06:00",
+      "phase": "Water",
+      "date": "2025-11-17"
+    },
+    {
+      "title": "Fajr",
+      "start_time": "2025-11-18T05:30:00",
+      "end_time": "2025-11-18T05:40:00",
+      "phase": "Wood",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Herschrijf: Tegen willens en wetens",
+      "start_time": "2025-11-18T05:40:00",
+      "end_time": "2025-11-18T06:40:00",
+      "phase": "Wood",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Herschrijf: Denken als een wiskundige",
+      "start_time": "2025-11-18T06:40:00",
+      "end_time": "2025-11-18T07:40:00",
+      "phase": "Wood",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Herschrijf: Denken als een natuurkundige",
+      "start_time": "2025-11-18T07:40:00",
+      "end_time": "2025-11-18T08:40:00",
+      "phase": "Wood",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Stretches",
+      "start_time": "2025-11-18T08:40:00",
+      "end_time": "2025-11-18T09:00:00",
+      "phase": "Wood",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Illustrate p2-3 Lege bladzij/Titel+Auteur",
+      "start_time": "2025-11-18T10:00:00",
+      "end_time": "2025-11-18T12:00:00",
+      "phase": "Fire",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Zuhr",
+      "start_time": "2025-11-18T13:00:00",
+      "end_time": "2025-11-18T13:20:00",
+      "phase": "Earth",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Translate Worm & Vlieg",
+      "start_time": "2025-11-18T13:20:00",
+      "end_time": "2025-11-18T14:20:00",
+      "phase": "Earth",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Translate Vlinder & Bidsprinkhaan (1st half)",
+      "start_time": "2025-11-18T14:20:00",
+      "end_time": "2025-11-18T14:50:00",
+      "phase": "Earth",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Asr",
+      "start_time": "2025-11-18T15:00:00",
+      "end_time": "2025-11-18T15:20:00",
+      "phase": "Metal",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Translate Vlinder & Bidsprinkhaan (2nd half)",
+      "start_time": "2025-11-18T15:20:00",
+      "end_time": "2025-11-18T15:50:00",
+      "phase": "Metal",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Maghrib",
+      "start_time": "2025-11-18T18:00:00",
+      "end_time": "2025-11-18T18:15:00",
+      "phase": "Water",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "L1-2: Read notes on Einstein model",
+      "start_time": "2025-11-18T18:15:00",
+      "end_time": "2025-11-18T20:15:00",
+      "phase": "Water",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Meditation (Water Phase)",
+      "start_time": "2025-11-18T20:15:00",
+      "end_time": "2025-11-18T20:45:00",
+      "phase": "Water",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Journaling",
+      "start_time": "2025-11-18T20:45:00",
+      "end_time": "2025-11-18T21:00:00",
+      "phase": "Water",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Isha",
+      "start_time": "2025-11-18T21:00:00",
+      "end_time": "2025-11-18T21:20:00",
+      "phase": "Water",
+      "date": "2025-11-18"
+    }
+  ]
+}
+            
+            final_entries = schedule_data.get('schedule_entries', [])
             if final_entries:
                 self._create_calendar_events(final_entries)
             else:
@@ -379,7 +514,7 @@ class Orchestrator:
                 if t.get('priority') != 'T6':
                     by_priority[t['priority']].append(t)
                     pebbles_present = True
-                
+                    
             for pr in sorted(by_priority.keys()):  # T1, T2, ...
                 for t in by_priority[pr]:
                     notes = t.get("notes") or ""  # <-- default to empty string
@@ -406,8 +541,9 @@ class Orchestrator:
             prompt_lines.append("NONE")
         
         prompt_lines.append("CONSTRAINTS:")
-        prompt_lines.append("Fit as many Pebbles as possible after scheduling the Stones. To achieve this the duration can be reduced by maximally 25%.")
-        prompt_lines.append("Chunking: If effort_h > 2.0, then you may schedule the task in multiple blocks. It is okay to leave half finished tasks for later.")
+        prompt_lines.append("Fit in many Pebbles (4-10 hours) after scheduling the Stones. To achieve this the duration can be reduced by maximally 25%.")
+        prompt_lines.append("Chunking: If effort_h > 2.0, then you may schedule the task in multiple blocks. It is okay to leave half finished tasks for the future.")
+        prompt_lines.append("When a parent task has numbered subtasks it is necessary to do the subtasks in the order of the numbering.")
         prompt_lines.append("")
         
         # 6. SAND: Chores & Soft Habits (Scheduled last, fill gaps)
@@ -436,7 +572,8 @@ class Orchestrator:
             prompt_lines.append("NONE")
     
         prompt_lines.append("CONSTRAINTS:")
-        prompt_lines.append("Only plan habits after the calendar is maximally filled with tasks. Getting stuff done is what is most important.")
+        prompt_lines.append("Only plan habits after the calendar is already filled with tasks & calendar events.")
+        prompt_lines.append("Like the sand entering the jar last and filling it to completion, fill all remaining spare time with habits.")
         prompt_lines.append("Schedule habits near their correct Phase. Skipping habits is no problem at all. Durations may be changed up to 50%.")
         prompt_lines.append("When choosing habits you firstly prioritise emotional wellbeing, secondly reading and thirdly physical health.")
         prompt_lines.append("")
@@ -446,29 +583,8 @@ class Orchestrator:
             "Return only JSON conforming to the following schema. Do not include reasoning."
         )
         
-        output_schema = {
-            "type": "object",
-            "properties": {
-                "schedule_entries": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "title": {"type": "string"},
-                            "start_time": {"type": "string"},
-                            "end_time": {"type": "string"},
-                            "phase": {"type": "string"},
-                            "date": {"type": "string"}
-                        },
-                        "required": ["title", "start_time", "end_time", "phase", "date"]
-                    }
-                }
-            },
-            "required": ["schedule_entries"]
-        }
-        
-        # Append the JSON schema as pretty-printed text
-        prompt_lines.append(json.dumps(output_schema, indent=2))
+        # Use the imported schema from llm_integration.py
+        prompt_lines.append(json.dumps(OUTPUT_SCHEMA, indent=2))
 
         return "\n".join(prompt_lines)
     
@@ -630,11 +746,6 @@ class Orchestrator:
                 # Handle overnight events (end <= start)
                 if end_dt <= start_dt:
                     end_dt = end_dt + datetime.timedelta(days=1)
-    
-                # Skip past events
-                if start_dt < now:
-                    print(f"Skipping past event: {entry['title']} at {start_dt.strftime('%Y-%m-%d %H:%M %Z')}")
-                    continue
     
                 event = {
                     'summary': entry.get('title', 'No title'),

@@ -12,6 +12,12 @@ from dotenv import load_dotenv
 import time
 import datetime
 import re
+from collections import defaultdict
+import sys
+from pathlib import Path
+
+# Add parent directory to path to import from main
+sys.path.insert(0, str(Path(__file__).parent))
 
 # Load environment variables
 load_dotenv()
@@ -160,14 +166,14 @@ def _extract_json(llm_text: str) -> dict | None:
     except:
         return None
 
-def call_groq_llm(system_prompt, world_prompt, model_config=MODEL_CONFIG, reasoning_effort=REASONING_EFFORT, output_schema=OUTPUT_SCHEMA):
+def call_groq_llm(system_prompt, world_prompt, model_config=MODEL_CONFIG, reasoning_effort=REASONING_EFFORT):
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {os.getenv('GROQ_API_KEY')}",
         "Content-Type": "application/json"
     }
 
-    # Payload as recommended by Groq docs
+    # Enhanced payload with JSON mode
     payload = {
         "model": "openai/gpt-oss-20b",
         "messages": [
@@ -178,13 +184,9 @@ def call_groq_llm(system_prompt, world_prompt, model_config=MODEL_CONFIG, reason
         "max_completion_tokens": 32768,
         "top_p": 1,
         "reasoning_effort": reasoning_effort,
-        "stop": None,
-        # Force JSON Schema
-        #"response_format": "json_schema",
-        #"json_schema": output_schema,  # dict defining your schema
-        #"strict": True                 # enforce strict adherence if supported
+        "response_format": {"type": "json_object"},  # Force JSON mode
+        "stop": None
     }
-
 
     try:
         response = requests.post(url, headers=headers, json=payload)
@@ -210,14 +212,15 @@ def call_groq_llm(system_prompt, world_prompt, model_config=MODEL_CONFIG, reason
         
         print("\n--- DEBUG: Raw candidates ---")
         for i, candidate in enumerate(raw_candidates, 1):
-            print(f"Candidate {i}: {repr(candidate)}")
+            if candidate:
+                preview = str(candidate)[:200] + "..." if len(str(candidate)) > 200 else str(candidate)
+                print(f"Candidate {i} preview: {preview}")
     
         final_output = None
         
         for candidate in raw_candidates:
             if candidate and str(candidate).strip():
                 final_output = str(candidate).strip()
-                print(f"\n--- DEBUG: Selected final_output ---\n{final_output}\n")
                 break
         
         if final_output is None:
@@ -228,15 +231,47 @@ def call_groq_llm(system_prompt, world_prompt, model_config=MODEL_CONFIG, reason
                 "raw": data
             }
         
-        # Parse JSON (guaranteed to work)
+        # STEP 1: Parse JSON
         extracted_json = _extract_json(final_output)
         
-        print("\n--- DEBUG: Extracted JSON ---")
-        print(json.dumps(extracted_json, indent=2))
+        if not extracted_json:
+            print("\n--- DEBUG: Failed to extract valid JSON ---")
+            print(f"Raw output:\n{final_output[:1000]}")
+            return {
+                "status": "fail",
+                "message": "Could not parse JSON from model output",
+                "raw": data
+            }
+        
+        # STEP 2: Normalize and Fix data (timestamps, capitalization, etc.)
+        # This now uses the _normalize_schedule_data and _fix_timestamp helpers
+        
+        # First, fix timestamps and filter bad entries
+        if "schedule_entries" in extracted_json:
+            fixed_entries = []
+            for entry in extracted_json.get("schedule_entries", []):
+                # Validate required fields
+                if not all(k in entry for k in ["title", "start_time", "end_time", "phase", "date"]):
+                    print(f"Warning: Skipping entry missing required fields: {entry.get('title', 'Unknown')}")
+                    continue
+                
+                # Fix malformed timestamps
+                entry["start_time"] = _fix_timestamp(entry["start_time"])
+                entry["end_time"] = _fix_timestamp(entry["end_time"])
+                
+                fixed_entries.append(entry)
+            
+            extracted_json["schedule_entries"] = fixed_entries
+            print(f"\n--- DEBUG: Validated and fixed {len(fixed_entries)} schedule entries ---")
+        
+        # Now, normalize phase/date capitalization
+        # This activates the previously unused _normalize_schedule_data function
+        normalized_data = _normalize_schedule_data(extracted_json)
+        print(f"--- DEBUG: Normalized {len(normalized_data.get('schedule_entries', []))} entries ---")
         
         return {
             "status": "success",
-            "output": extracted_json,
+            "output": normalized_data, # Return the fully cleaned data
             "raw": data
         }
     
@@ -250,122 +285,246 @@ def call_groq_llm(system_prompt, world_prompt, model_config=MODEL_CONFIG, reason
     
     except Exception as e:
         print(f"Unexpected error in call_groq_llm: {e}")
+        import traceback
+        traceback.print_exc()
         return {"status": "error", "message": str(e), "raw": data}
 
 
-
-def get_phase_by_time(dt_obj: datetime.datetime) -> str:
-    """Helper function to determine the Wu Xing phase from a datetime object."""
-    hour = dt_obj.hour * 60 + dt_obj.minute
+def _fix_timestamp(timestamp_str):
+    """
+    Fix malformed timestamps returned by the AI.
+    Converts various formats to ISO format.
+    """
+    import re
     
-    # Define phase boundaries in minutes from midnight (00:00)
+    timestamp_str = str(timestamp_str).strip()
+    
+    # Already in correct ISO format with timezone
+    if re.match(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}', timestamp_str):
+        return timestamp_str
+    
+    # ISO format without timezone: "2025-11-17T18:25:00"
+    if re.match(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}', timestamp_str):
+        return timestamp_str
+    
+    # Simple time format "18:25:00" or "18:25" (no date)
+    if re.match(r'^\d{1,2}:\d{2}(:\d{2})?$', timestamp_str):
+        return timestamp_str
+    
+    # Space-separated: "2025-11-17 18:25:00" or "2025-11-17 18:25" or "2025-11-17 18"
+    match = re.match(r'(\d{4}-\d{2}-\d{2})\s+(\d{1,2})(?::(\d{2}))?(?::(\d{2}))?', timestamp_str)
+    if match:
+        date_part = match.group(1)
+        hour = match.group(2).zfill(2)
+        minute = match.group(3).zfill(2) if match.group(3) else "00"
+        second = match.group(4).zfill(2) if match.group(4) else "00"
+        return f"{date_part}T{hour}:{minute}:{second}"
+    
+    # If we can't parse it, return as-is
+    print(f"Warning: Could not parse timestamp '{timestamp_str}'")
+    return timestamp_str
+
+
+def get_phase_by_time(dt_obj):
+    """
+    Determine the Wu Xing phase from a datetime object.
+    Uses the same logic as defined in config.json and system_prompt.txt
+    """
+    if isinstance(dt_obj, str):
+        import datetime
+        import pytz
+        # Parse string to datetime
+        if 'T' in dt_obj:
+            dt_obj = datetime.datetime.fromisoformat(dt_obj.replace('Z', '+00:00'))
+        else:
+            # Assume it's just time
+            parts = dt_obj.split(':')
+            dt_obj = datetime.datetime.now().replace(
+                hour=int(parts[0]), 
+                minute=int(parts[1]) if len(parts) > 1 else 0
+            )
+    
+    hour = dt_obj.hour
+    minute = dt_obj.minute
+    time_in_minutes = hour * 60 + minute
+    
+    # Phase boundaries (in minutes from midnight)
     # WOOD: 05:30 - 09:00 (330 - 540)
     # FIRE: 09:00 - 13:00 (540 - 780)
     # EARTH: 13:00 - 15:00 (780 - 900)
     # METAL: 15:00 - 18:00 (900 - 1080)
-    # WATER: 18:00 - 21:45 (1080 - 1305)
+    # WATER: 18:00 - 21:45 (1080 - 1305), and also 21:45 - 05:30 (1305+ and 0-330)
     
-    if 330 <= hour < 540:
-        return "Wood"
-    elif 540 <= hour < 780:
-        return "Fire"
-    elif 780 <= hour < 900:
-        return "Earth"
-    elif 900 <= hour < 1080:
-        return "Metal"
-    elif 1080 <= hour < 1305 or hour < 330 or hour >= 1305:
-        return "Water"
-    else:
-        return "Unknown"
+    if 330 <= time_in_minutes < 540:
+        return "WOOD"
+    elif 540 <= time_in_minutes < 780:
+        return "FIRE"
+    elif 780 <= time_in_minutes < 900:
+        return "EARTH"
+    elif 900 <= time_in_minutes < 1080:
+        return "METAL"
+    else:  # WATER phase covers 18:00-21:45 and 21:45-05:30
+        return "WATER"
 
 
 def pretty_print_schedule(schedule_data, calendar_events):
     """
-    Print a readable version of the schedule, integrating fixed calendar events 
-    and generated schedule entries, sorted by time and grouped by phase.
+    Print a readable version of the schedule, showing both generated entries
+    and fixed calendar events, sorted by time and grouped by phase.
     """
     if not schedule_data or "schedule_entries" not in schedule_data:
         print("No schedule data to display.")
         return
 
-    # Use today's date for reference
-    today_date = datetime.date.today()
+    import datetime
+    from collections import defaultdict
     
-    # Convert fixed calendar events into the same format as schedule_entries
-    all_entries = schedule_data["schedule_entries"]
+    # Define today, stripping time information for comparison
+    local_tz = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
+    today_date = datetime.datetime.now(local_tz).date()
+    tomorrow_date = today_date + datetime.timedelta(days=1)
     
-    for event in calendar_events:
+    # Helper to safely convert an ISO string (with or without offset) to a local datetime object
+    def safe_iso_to_datetime(iso_str):
+        if not iso_str:
+            return None
+        # Handle 'Z' and ensure timezone info is present
+        iso_str = iso_str.replace('Z', '+00:00')
         try:
-            # Parse start/end times from ISO format
-            start_dt = datetime.datetime.fromisoformat(event["start"].replace('Z', '+00:00'))
-            
-            # Determine date key ('today' or 'tomorrow')
-            event_date = start_dt.date()
-            if event_date == today_date:
-                date_key = "today"
-            elif event_date == today_date + datetime.timedelta(days=1):
-                date_key = "tomorrow"
-            else:
-                continue
-                
-            # Determine phase
-            phase_name = get_phase_by_time(start_dt)
-            
-            all_entries.append({
-                "title": f"**FIXED**: {event['summary']}",
-                "start_time": start_dt.isoformat(),
-                "end_time": datetime.datetime.fromisoformat(
-                    event["end"].replace('Z', '+00:00')
-                ).isoformat(),
-                "phase": phase_name,
-                "date": date_key,
-                "is_fixed": True
-            })
-        except Exception as e:
-            print(f"Skipping calendar event: {event.get('summary', 'Unknown')}. Error: {e}")
+            dt = datetime.datetime.fromisoformat(iso_str)
+            if dt.tzinfo is None:
+                # Assume local if no timezone provided (common for LLM output)
+                return dt.replace(tzinfo=local_tz)
+            # Convert to local timezone for consistent comparison
+            return dt.astimezone(local_tz)
+        except ValueError:
+            return None
 
-    # Sort all entries
-    def sort_key(e):
-        date_index = 0 if e["date"] == "today" else 1
-        return (date_index, e["start_time"])
+    # Helper to convert various time formats to HH:MM
+    def format_time(time_str):
+        dt = safe_iso_to_datetime(time_str)
+        if dt:
+            return dt.strftime('%H:%M')
+        try:
+            # Fallback for time-only strings like "18:44"
+            parts = time_str.split(':')
+            if len(parts) >= 2:
+                return f"{parts[0].zfill(2)}:{parts[1].zfill(2)}"
+        except:
+            pass
+        return time_str
 
-    all_entries.sort(key=sort_key)
+    # Build a combined list of all entries
+    all_entries = []
     
-    # Print
-    print("\n" + "="*60)
-    print("        GENERATED HARMONIOUS DAY SCHEDULE")
-    print("="*60)
+    # 1. Process Generated Entries
+    for entry in schedule_data.get("schedule_entries", []):
+        start_dt = safe_iso_to_datetime(entry.get("start_time"))
+        
+        if not start_dt:
+            print(f"Warning: Skipping generated entry due to bad start time: {entry.get('title')}")
+            continue
 
-    today_combined = [e for e in all_entries if e["date"] == "today"]
-    tomorrow_combined = [e for e in all_entries if e["date"] == "tomorrow"]
+        entry_date = start_dt.date()
+
+        if entry_date == today_date:
+            date_key = "today"
+        elif entry_date == tomorrow_date:
+            date_key = "tomorrow"
+        else:
+            # Skip if it's not today or tomorrow
+            continue
+
+        all_entries.append({
+            "title": entry.get("title", "Unknown"),
+            "start_time": entry.get("start_time", ""),
+            "end_time": entry.get("end_time", ""),
+            "phase": entry.get("phase", "Unknown"),
+            "date_key": date_key, # Use this for grouping
+            "is_fixed": False,
+            "sort_dt": start_dt # Use datetime object for sorting
+        })
     
-    phase_order = ["Wood", "Fire", "Earth", "Metal", "Water"]
-
-    def print_schedule_block(entries, day_label):
-        if not entries:
-            return
-
+    # 2. Process Fixed Calendar Events
+    for event in calendar_events:
+        start_str = event.get("start", "")
+        
+        start_dt = safe_iso_to_datetime(start_str)
+        if not start_dt:
+            print(f"Warning: Could not process fixed event date for '{event.get('summary', 'Unknown')}'")
+            continue
+            
+        event_date = start_dt.date()
+        
+        if event_date == today_date:
+            date_key = "today"
+        elif event_date == tomorrow_date:
+            date_key = "tomorrow"
+        else:
+            continue
+            
+        # Determine phase from time (assuming get_phase_by_time accepts a datetime object)
+        try:
+            # NOTE: Assuming 'get_phase_by_time' is defined elsewhere and works with datetime
+            phase = get_phase_by_time(start_dt) 
+        except NameError:
+            phase = "Unknown"
+        
+        all_entries.append({
+            "title": f"**FIXED**: {event.get('summary', 'Unknown')}",
+            "start_time": start_str,
+            "end_time": event.get("end", ""),
+            "phase": phase,
+            "date_key": date_key, # Use this for grouping
+            "is_fixed": True,
+            "sort_dt": start_dt # Use datetime object for sorting
+        })
+            
+    # Sort entries by date then time using the datetime object
+    all_entries.sort(key=lambda e: (0 if e["date_key"] == "today" else 1, e["sort_dt"]))
+    
+    # Group by today/tomorrow
+    today_entries = [e for e in all_entries if e["date_key"] == "today"]
+    tomorrow_entries = [e for e in all_entries if e["date_key"] == "tomorrow"]
+    
+    # Print function
+    def print_day_schedule(entries, day_label):
         print(f"\n {day_label}:")
         print("-" * 60)
         
-        day_phases = {}
+        if not entries:
+            print("  No entries scheduled")
+            return
+            
+        # Group by phase
+        phase_groups = defaultdict(list)
         for entry in entries:
-            phase = entry.get("phase", "Unknown")
-            day_phases.setdefault(phase, []).append(entry)
+            phase = entry["phase"].upper()
+            phase_groups[phase].append(entry)
         
+        # Print in phase order
+        phase_order = ["WOOD", "FIRE", "EARTH", "METAL", "WATER"]
         for phase in phase_order:
-            if phase in day_phases:
-                print(f"\n{phase.upper()} PHASE:")
-                for e in day_phases[phase]:
-                    print(f"  {e['start_time']} - {e['end_time']}: {e['title']}")
+            if phase in phase_groups:
+                print(f"\n{phase} PHASE:")
+                for entry in phase_groups[phase]:
+                    start_fmt = format_time(entry["start_time"])
+                    end_fmt = format_time(entry["end_time"])
+                    title = entry["title"]
+                    marker = " [FIXED]" if entry["is_fixed"] else ""
+                    print(f"  {start_fmt} - {end_fmt}: {title}{marker}")
 
-    print_schedule_block(today_combined, "TODAY")
-    print_schedule_block(tomorrow_combined, "TOMORROW")
-    
-    total_generated = len(schedule_data["schedule_entries"])
-    total_fixed = len(calendar_events)
-    
+    # Print header
     print("\n" + "="*60)
-    print(f"Total Entries: {len(today_combined) + len(tomorrow_combined)}")
-    print(f"Generated: {total_generated} | Fixed Calendar Events: {total_fixed}")
+    print("      GENERATED HARMONIOUS DAY SCHEDULE")
+    print("="*60)
+    
+    # Print schedules
+    print_day_schedule(today_entries, "TODAY")
+    print_day_schedule(tomorrow_entries, "TOMORROW")
+    
+    # Print summary
+    print("\n" + "="*60)
+    print(f"Total Entries: {len(all_entries)}")
+    print(f"Generated: {len(schedule_data.get('schedule_entries', []))} | Fixed Calendar Events: {len(calendar_events)}")
     print("="*60 + "\n")

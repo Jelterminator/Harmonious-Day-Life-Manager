@@ -10,11 +10,12 @@ from typing import List, Dict, Any
 from pathlib import Path
 from collections import defaultdict
 import pytz
+import re
 
 # --- Local Module Imports ---
 # We keep these as separate files for clean Single Responsibility
 from auth import get_google_services, create_initial_token
-from llm_integration import get_groq_api_key, call_groq_llm, pretty_print_schedule
+from llm_integration import get_groq_api_key, load_system_prompt, call_groq_llm, pretty_print_schedule
 from task_processor import process_tasks
 from habit_processor import filter_habits
 
@@ -47,13 +48,13 @@ class Orchestrator:
         self.api_key = get_groq_api_key()
         if not self.api_key:
             raise ValueError("Groq API Key not found. Set GROQ_API_KEY env var.")
-        print("✓ Groq API Key loaded")
+        print("Groq API Key loaded")
 
         # 2. Load Static Rules
         self.rules = self._load_rules(RULES_FILE)
         if not self.rules:
             raise FileNotFoundError(f"Config file not found or invalid: {RULES_FILE}")
-        print("✓ Config loaded")
+        print("Config loaded")
         
         # 3. Authenticate with Google (fast, using token.json)
         print("Authenticating with Google...")
@@ -66,7 +67,7 @@ class Orchestrator:
             "sheets": services[1],
             "tasks": services[2]
         }
-        print("✓ Google Services Authenticated\n")
+        print("Google Services Authenticated\n")
         
         self.today_date_str = datetime.date.today().strftime("%Y-%m-%d")
 
@@ -99,30 +100,32 @@ class Orchestrator:
             print("\n--- STEP 2: PROCESSING DATA ---")
             tasks = process_tasks(raw_tasks) 
             habits = filter_habits(raw_habits)
-            print(f"✓ {len(calendar_events)} fixed calendar events")
-            print(f"✓ {len(tasks)} prioritized tasks ({len(raw_tasks)} total)") 
-            print(f"✓ {len(habits)} habits for today ({len(raw_habits)} total)")
+            print(f"{len(calendar_events)} fixed calendar events")
+            print(f"{len(tasks)} prioritized tasks ({len(raw_tasks)} total)") 
+            print(f"{len(habits)} habits for today ({len(raw_habits)} total)")
 
             # 4. Build Prompt
             print("\n--- STEP 3: BUILDING PROMPT ---")
             world_prompt = self._build_world_prompt(rules, calendar_events, tasks, habits)
             PROMPT_FILE.write_text(world_prompt, encoding="utf-8")
-            print(f"✓ Prompt saved to {PROMPT_FILE}")
+            system_prompt = load_system_prompt()
+            print(f"System prompt loaded")
+            print(f"World prompt saved to {PROMPT_FILE}")
 
             # 5. Call AI
             print("\n--- STEP 4: CALLING AI ---")
-            schedule_data = call_groq_llm(world_prompt, self.api_key)
-            if not schedule_data:
-                print("\n❌ Schedule generation failed. AI returned no data.")
+            schedule_data = call_groq_llm(system_prompt, world_prompt)
+            if not schedule_data['output']:
+                print("\n Schedule generation failed. AI returned no data.")
                 return
 
-            print("\n✓ Schedule generated!")
-            pretty_print_schedule(schedule_data, calendar_events)
-            self._save_schedule_to_file(schedule_data, SCHEDULE_FILE)
+            print("\nSchedule generated!")
+            pretty_print_schedule(schedule_data['output'], calendar_events)
+            self._save_schedule_to_file(schedule_data['output'], SCHEDULE_FILE)
             
             # 6. Post-Process & Write to Calendar
             print("\n--- STEP 5: WRITING TO CALENDAR ---")
-            schedule_entries = schedule_data.get('schedule_entries', [])
+            schedule_entries = schedule_data['output'].get('schedule_entries', [])
             final_entries = self._filter_conflicting_entries(schedule_entries, calendar_events)
             
             if final_entries:
@@ -152,7 +155,7 @@ class Orchestrator:
         print("--- Starting One-Time Google Authentication ---")
         print("A browser window will open. Please log in.")
         create_initial_token() # This function is now in auth.py
-        print("\n✅ SUCCESS: 'token.json' created!")
+        print("\n SUCCESS: 'token.json' created!")
         print("You can now run 'plan.py' anytime.")
 
     # --------------------------------------------------------------------------
@@ -243,7 +246,7 @@ class Orchestrator:
                     callback=callback
                 )
             batch.execute()
-            print(f"✓ SUCCESSFULLY DELETED {deleted_count} PREVIOUSLY GENERATED EVENTS.")
+            print(f"SUCCESSFULLY DELETED {deleted_count} PREVIOUSLY GENERATED EVENTS.")
         except Exception as e:
             print(f"ERROR deleting events: {e}")
     
@@ -344,7 +347,7 @@ class Orchestrator:
         # 2. PHASE TIME BLOCKS & CORE ALIGNMENT
         phase_parts = []
         for p in rules.get("phases", []):
-            phase_parts.append(f"{p['name'].replace('🌳 ','').split()[0]}:{p['start']}-{p['end']}")
+            phase_parts.append(f"{p['name'].split()[0]}:{p['start']}-{p['end']}")
         prompt_lines.append("PHASES: " + " | ".join(phase_parts))
         prompt_lines.append("")
     
@@ -437,13 +440,60 @@ class Orchestrator:
         prompt_lines.append("Schedule habits near their correct Phase. Skipping habits is no problem at all. Durations may be changed up to 50%.")
         prompt_lines.append("When choosing habits you firstly prioritise emotional wellbeing, secondly reading and thirdly physical health.")
         prompt_lines.append("")
-        
-        # 7. OUTPUT SCHEMA
-        prompt_lines.append("OUTPUT_JSON (EXACT FORMAT REQUIRED):")
-        prompt_lines.append('{"schedule_entries":[{"title":"...","start_time":"HH:MM","end_time":"HH:MM","phase":"Wood|Fire|Earth|Metal|Water","date":"today|tomorrow"}]}')
-        
-        return "\n".join(prompt_lines)
 
+        # 7. OUTPUT SCHEMA
+        prompt_lines.append(
+            "Return only JSON conforming to the following schema. Do not include reasoning."
+        )
+        
+        output_schema = {
+            "type": "object",
+            "properties": {
+                "schedule_entries": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "title": {"type": "string"},
+                            "start_time": {"type": "string"},
+                            "end_time": {"type": "string"},
+                            "phase": {"type": "string"},
+                            "date": {"type": "string"}
+                        },
+                        "required": ["title", "start_time", "end_time", "phase", "date"]
+                    }
+                }
+            },
+            "required": ["schedule_entries"]
+        }
+        
+        # Append the JSON schema as pretty-printed text
+        prompt_lines.append(json.dumps(output_schema, indent=2))
+
+        return "\n".join(prompt_lines)
+    
+    def parse_iso_to_local(self, s: str, date_hint: datetime.date | None = None, tz_name: str = TARGET_TIMEZONE) -> datetime.datetime:
+        local_tz = pytz.timezone(tz_name)
+    
+        # Only time provided (e.g., "08:00")
+        if re.match(r'^\d{1,2}:\d{2}(:\d{2})?$', s):
+            if date_hint is None:
+                date_hint = datetime.date.today()
+            parts = list(map(int, s.split(':')))
+            hour = parts[0]
+            minute = parts[1]
+            second = parts[2] if len(parts) > 2 else 0
+            dt = datetime.datetime(date_hint.year, date_hint.month, date_hint.day, hour, minute, second)
+            dt = local_tz.localize(dt)
+            return dt
+    
+        # Full ISO string
+        dt = datetime.datetime.fromisoformat(s.replace('Z', '+00:00'))
+        if dt.tzinfo is None:
+            dt = local_tz.localize(dt)
+        else:
+            dt = dt.astimezone(local_tz)
+        return dt
 
     def _save_schedule_to_file(self, schedule_data: Dict[str, Any], filename: Path):
         """Save schedule JSON to file (UTF-8)."""
@@ -451,157 +501,143 @@ class Orchestrator:
             # Added a safety check for non-ASCII characters if not using ensure_ascii=False
             with open(filename, 'w', encoding="utf-8") as f:
                 json.dump(schedule_data, f, indent=2, ensure_ascii=False)
-            print(f"✓ Schedule saved to {filename}")
+            print(f"Schedule saved to {filename}")
         except Exception as e:
             # Using specific print for consistency
             print(f"ERROR: Could not save schedule: {e}")
 
     def _filter_conflicting_entries(self, schedule_entries: List[Dict[str, Any]], existing_events: List[Dict[str, str]]) -> List[Dict[str, Any]]:
         """Remove entries that overlap fixed calendar events and log what was filtered."""
-        
-        def parse_iso(dt_str: str) -> datetime.datetime | None:
-            """Parses ISO string to timezone-aware datetime."""
-            try:
-                local_tz = pytz.timezone(TARGET_TIMEZONE)
-                dt = datetime.datetime.fromisoformat(dt_str.replace('Z', '+00:00'))
-                if dt.tzinfo is None:
-                    dt = local_tz.localize(dt)
-                else:
-                    dt = dt.astimezone(local_tz)
-                return dt
-            except Exception:
-                return None
-        
         print("Filtering generated schedule against fixed events...")
         filtered = []
         conflicts_found = []
-        
+    
         local_tz = pytz.timezone(TARGET_TIMEZONE)
         today = datetime.date.today()
         tomorrow = today + datetime.timedelta(days=1)
-        
-        # Pre-process fixed events
+    
+        # Pre-process fixed events into timezone-aware datetimes
         parsed_fixed_events = []
         for evt in existing_events:
-            s = parse_iso(evt.get('start', ''))
-            e = parse_iso(evt.get('end', ''))
-            if s and e:
-                parsed_fixed_events.append({
-                    'summary': evt.get('summary', 'Unknown'), 
-                    'start': s, 
-                    'end': e
-                })
+            try:
+                s_raw = evt.get('start', '')
+                e_raw = evt.get('end', '')
+                # Use the robust parser for fixed events (these should be full ISO)
+                s = self.parse_iso_to_local(s_raw)
+                e = self.parse_iso_to_local(e_raw)
+                if s and e:
+                    parsed_fixed_events.append({
+                        'summary': evt.get('summary', 'Unknown'),
+                        'start': s,
+                        'end': e
+                    })
+            except Exception as ex:
+                # Skip malformed fixed events but log for debugging
+                print(f" Skipping fixed calendar event '{evt.get('summary', 'Unknown')}' due to parse error: {ex}")
     
         for entry in schedule_entries:
             try:
                 date_indicator = entry.get('date', 'today').lower()
                 entry_date = tomorrow if date_indicator == 'tomorrow' else today
-                
-                # Create timezone-aware datetimes
-                start_h, start_m = map(int, entry['start_time'].split(":"))
-                end_h, end_m = map(int, entry['end_time'].split(":"))
-                
-                entry_start = local_tz.localize(datetime.datetime.combine(entry_date, datetime.time(start_h, start_m)))
-                entry_end = local_tz.localize(datetime.datetime.combine(entry_date, datetime.time(end_h, end_m)))
-                
-                # Handle overnight events
+    
+                # Parse entry times using the entry_date as a hint so "08:00" becomes that day's 08:00
+                entry_start = self.parse_iso_to_local(entry['start_time'], date_hint=entry_date)
+                entry_end = self.parse_iso_to_local(entry['end_time'], date_hint=entry_date)
+    
+                # Handle overnight events where end is earlier or equal to start
                 if entry_end <= entry_start:
-                    entry_end += datetime.timedelta(days=1)
-                
+                    entry_end = entry_end + datetime.timedelta(days=1)
+    
+                # Check overlap with any fixed event
                 has_conflict = False
                 conflicting_event = None
-                
                 for evt in parsed_fixed_events:
-                    # Check for overlap
+                    # Overlap if evt.start < entry_end and evt.end > entry_start
                     if evt['start'] < entry_end and evt['end'] > entry_start:
                         has_conflict = True
                         conflicting_event = evt
                         break
-                
+    
                 if has_conflict:
                     conflicts_found.append({
-                        'title': entry['title'],
+                        'title': entry.get('title', 'Unknown'),
                         'time': f"{entry['start_time']}-{entry['end_time']}",
                         'blocked_by': conflicting_event['summary']
                     })
-                    print(f"⚠️  Skipping '{entry['title']}' ({entry['start_time']}-{entry['end_time']}) - conflicts with '{conflicting_event['summary']}'")
+                    print(f"  Skipping '{entry.get('title','Unknown')}' ({entry['start_time']}-{entry['end_time']}) - conflicts with '{conflicting_event['summary']}'")
                 else:
+                    # Attach parsed datetimes so downstream code can reuse them if desired
+                    entry['_parsed_start'] = entry_start
+                    entry['_parsed_end'] = entry_end
                     filtered.append(entry)
-            
-            except (ValueError, KeyError) as e:
-                print(f"⚠️  Skipping malformed entry '{entry.get('title', 'Unknown')}': {e}")
-        
-        # Summary of what was filtered
+    
+            except (ValueError, KeyError, TypeError) as e:
+                print(f"  Skipping malformed entry '{entry.get('title', 'Unknown')}': {e}")
+    
+        # Summary of conflicts
         if conflicts_found:
-            print(f"\n⚠️  FILTERED OUT {len(conflicts_found)} CONFLICTING ENTRIES:")
+            print(f"\n  FILTERED OUT {len(conflicts_found)} CONFLICTING ENTRIES:")
             for conflict in conflicts_found:
                 print(f"   - {conflict['title']} ({conflict['time']}) blocked by {conflict['blocked_by']}")
-            print("\n💡 TIP: These tasks should be rescheduled. Consider running the planner again")
+            print("\n TIP: These tasks should be rescheduled. Consider running the planner again")
             print("        after your calendar events, or manually adjust task deadlines.\n")
-        
-        print(f"✓ Final schedule: {len(filtered)} non-conflicting entries")
+    
+        print(f"Final schedule: {len(filtered)} non-conflicting entries")
         return filtered
+
 
     def _create_calendar_events(self, schedule_entries: List[Dict[str, Any]]):
         """Writes the generated schedule entries as events to the primary Google Calendar."""
-        
-        # Ensure we are using instance variables (self.services) and constants
         calendar_service = self.services["calendar"]
-        date_str = self.today_date_str # Use the date str stored in __init__
+        date_str = self.today_date_str
         local_tz = pytz.timezone(TARGET_TIMEZONE)
-        now = datetime.datetime.now(local_tz) # Now is timezone-aware
-        
-        # Use a dictionary lookup for calendar color IDs
+        now = datetime.datetime.now(local_tz)
+    
         color_map = {
             'WOOD': '10', 'FIRE': '11', 'EARTH': '5',
             'METAL': '8', 'WATER': '9'
         }
-        
+    
         count = 0
         batch = calendar_service.new_batch_http_request()
-        
+    
         today_date = datetime.date.today()
         tomorrow_date = today_date + datetime.timedelta(days=1)
-
+    
         def callback(request_id, response, exception):
             nonlocal count
             if exception is not None:
-                # Log detailed error for debugging
                 print(f"Error inserting event (ID: {request_id}): {exception}")
             else:
                 count += 1
-        
+    
         print(f"Writing {len(schedule_entries)} events to Google Calendar...")
-
+    
         for entry in schedule_entries:
             try:
-                # 1. Determine date
                 date_indicator = entry.get('date', 'today').lower()
                 entry_date = tomorrow_date if date_indicator == 'tomorrow' else today_date
-                
-                # 2. Parse times
-                start_h, start_m = map(int, entry['start_time'].split(":"))
-                end_h, end_m = map(int, entry['end_time'].split(":"))
-                
-                # 3. Combine date and time, and localize to TARGET_TIMEZONE
-                start_time_naive = datetime.time(start_h, start_m)
-                end_time_naive = datetime.time(end_h, end_m)
-                
-                start_dt = local_tz.localize(datetime.datetime.combine(entry_date, start_time_naive))
-                end_dt = local_tz.localize(datetime.datetime.combine(entry_date, end_time_naive))
-                
-                # 4. Handle overnight events (end time < start time)
+    
+                # Prefer pre-parsed datetimes from filter step
+                if entry.get('_parsed_start') and entry.get('_parsed_end'):
+                    start_dt = entry['_parsed_start']
+                    end_dt = entry['_parsed_end']
+                else:
+                    # Parse with date hint
+                    start_dt = self.parse_iso_to_local(entry['start_time'], date_hint=entry_date)
+                    end_dt = self.parse_iso_to_local(entry['end_time'], date_hint=entry_date)
+    
+                # Handle overnight events (end <= start)
                 if end_dt <= start_dt:
                     end_dt = end_dt + datetime.timedelta(days=1)
-                
-                # 5. Skip events that are in the past (using localized 'now')
+    
+                # Skip past events
                 if start_dt < now:
-                    print(f"⏭ Skipping past event: {entry['title']} at {start_dt.strftime('%H:%M')}")
+                    print(f"Skipping past event: {entry['title']} at {start_dt.strftime('%Y-%m-%d %H:%M %Z')}")
                     continue
-                
-                # 6. Build event body
+    
                 event = {
-                    'summary': entry['title'],
+                    'summary': entry.get('title', 'No title'),
                     'description': f"Phase: {entry.get('phase', 'N/A')}",
                     'start': {
                         'dateTime': start_dt.isoformat(),
@@ -611,8 +647,7 @@ class Orchestrator:
                         'dateTime': end_dt.isoformat(),
                         'timeZone': TARGET_TIMEZONE,
                     },
-                    # Ensure phase name is capitalized for lookup
-                    'colorId': color_map.get(entry.get('phase', '').upper(), '1'), 
+                    'colorId': color_map.get(entry.get('phase', '').upper(), '1'),
                     'extendedProperties': {
                         'private': {
                             'harmoniousDayGenerated': date_str,
@@ -620,23 +655,27 @@ class Orchestrator:
                         }
                     },
                 }
-                
-                # 7. Add to batch
+    
+                # Add to batch
                 batch.add(
                     calendar_service.events().insert(calendarId='primary', body=event),
                     callback=callback
                 )
-            
+    
             except (ValueError, KeyError, TypeError) as e:
                 print(f"Skipping entry due to formatting error for '{entry.get('title', 'Unknown')}': {e}")
-        
-        # Execute batch request
-        if batch._requests: # Check if the batch has any requests added
-             batch.execute()
+    
+        # Execute batch if requests exist
+        if getattr(batch, "_requests", None):
+            try:
+                batch.execute()
+            except Exception as e:
+                print(f"Batch execution failed: {e}")
         else:
             print("INFO: No events were scheduled after filtering out past events.")
-            
-        print(f"\n✓ SUCCESSFULLY WROTE {count} EVENTS TO YOUR GOOGLE CALENDAR!")
+    
+        print(f"\n SUCCESSFULLY WROTE {count} EVENTS TO YOUR GOOGLE CALENDAR!")
+
     
     
     

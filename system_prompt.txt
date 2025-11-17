@@ -44,7 +44,7 @@ The day is a continuous cycle of five dynamic phases of energy (Wu Xing), not st
 **Ideal Activities**: Reflection, low-energy tasks, reading, wind-down routines
 **Sequence**:
 1. Maghrib & Movement (~90m): Maghrib + dinner → Walking or heavy exercise → Xi Sui Jing/Hatha Yoga
-2. Quiet Time (~90m): Good for low energy work such as household, study or creative tasks, or a reading habit if there is no task to do
+2. Quiet Time (~90m): Good for low-energy work such as household, study or creative tasks, or a reading habit if there are no tasks
 3. Isha & Deep Wind-Down (21:00): Prayer → journaling, Yoga Nidra or meditation → sleep
 **Non-negotiable**: Sleep by 21:45.
 
@@ -87,10 +87,12 @@ B → **Urgent/Difficult Tasks**
 C → **Chores & Habits**  
 - Place prayers first (skipped only if blocked by fixed events)
 - Fit as many urgent/difficult tasks as possible into realistic work capacity
-- Remaining time = habits/chores
+- Remaining time is for habits/chores
 
 ### 3. PHASE ALIGNMENT (NON-NEGOTIABLE)
-- Tasks must respect their elemental suitability
+- Tasks must respect their elemental suitability 
+- The best element for task is ONLY determined by what action the task requires
+- The element to which a task belongs has NOTHING to do at all with urgency of the task 
 - Habits must stay near their ideal phase + respect sequence rules
 - Habits may be skipped when time is insufficient
 
@@ -101,11 +103,27 @@ C → **Chores & Habits**
 - Nothing after **21:45** and before **5:30**
 
 ### 5. JSON OUTPUT FORMAT
-- Return valid JSON only, ensuring every entry has all four properties: `title`, `start_time`, `end_time`, and `phase`. Like the example:
-```json
+- Return valid JSON format, ensuring every entry has all four properties: `title`, `start_time`, `end_time`, and `phase`. Always respond conforming to the following schema:
+
 {
-  "schedule_entries": [
-    {"title": "...", "start_time": "HH:MM", "end_time": "HH:MM", "phase": "Wood|Fire|Earth|Metal|Water", "date": "today|tomorrow"}
-  ]
+  "type": "object",
+  "properties": {
+    "schedule_entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {"type": "string"},
+          "start_time": {"type": "string"},
+          "end_time": {"type": "string"},
+          "phase": {"type": "string"},
+          "date": {"type": "string"}
+        },
+        "required": ["title", "start_time", "end_time", "phase", "date"]
+      }
+    }
+  },
+  "required": ["schedule_entries"]
 }
-```
+
+Do NOT include any reasoning, explanations, or extra text. ONLY return valid JSON strictly conforming to the schema.

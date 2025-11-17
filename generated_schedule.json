@@ -1,169 +1,160 @@
 {
   "schedule_entries": [
     {
-      "title": "Fajr",
-      "start_time": "05:30",
-      "end_time": "05:40",
-      "phase": "Wood",
-      "date": "today"
+      "title": "Herschrijf: Tegen willens en wetens (Task 1)",
+      "start_time": "2025-11-17T18:25:00",
+      "end_time": "2025-11-17T19:00:00",
+      "phase": "WATER",
+      "date": "2025-11-17"
     },
     {
-      "title": "Tummo",
-      "start_time": "05:40",
-      "end_time": "05:55",
-      "phase": "Wood",
-      "date": "today"
+      "title": "Herschrijf: Tegen willens en wetens (Task 2)",
+      "start_time": "2025-11-17T19:00:00",
+      "end_time": "2025-11-17T19:45:00",
+      "phase": "WATER",
+      "date": "2025-11-17"
     },
     {
-      "title": "Makko Ho",
-      "start_time": "05:55",
-      "end_time": "06:10",
-      "phase": "Wood",
-      "date": "today"
+      "title": "Herschrijf: Tegen willens en wetens (Task 3)",
+      "start_time": "2025-11-17T19:45:00",
+      "end_time": "2025-11-17T20:30:00",
+      "phase": "WATER",
+      "date": "2025-11-17"
     },
     {
-      "title": "Morning run (Monday)",
-      "start_time": "06:10",
-      "end_time": "06:40",
-      "phase": "Wood",
-      "date": "today"
-    },
-    {
-      "title": "Stretches",
-      "start_time": "06:40",
-      "end_time": "06:55",
-      "phase": "Wood",
-      "date": "today"
-    },
-    {
-      "title": "Ji Jin Jing (Cooling Down)",
-      "start_time": "06:55",
-      "end_time": "07:15",
-      "phase": "Wood",
-      "date": "today"
-    },
-    {
-      "title": "Breakfast & Planning",
-      "start_time": "07:15",
-      "end_time": "07:45",
-      "phase": "Wood",
-      "date": "today"
-    },
-    {
-      "title": "Reading (Wood Phase)",
-      "start_time": "07:45",
-      "end_time": "08:00",
-      "phase": "Wood",
-      "date": "today"
-    },
-    {
-      "title": "Klussen",
-      "start_time": "08:00",
-      "end_time": "16:00",
-      "phase": "Fire",
-      "date": "today"
-    },
-    {
-      "title": "**FIXED**: Klussen",
-      "start_time": "08:00",
-      "end_time": "16:00",
-      "phase": "Wood",
-      "date": "today",
-      "is_fixed": true
-    },
-    {
-      "title": "EM Innovation Academy",
-      "start_time": "16:00",
-      "end_time": "18:00",
-      "phase": "Metal",
-      "date": "today"
-    },
-    {
-      "title": "**FIXED**: EM Innovation Academy",
-      "start_time": "16:00",
-      "end_time": "18:00",
-      "phase": "Metal",
-      "date": "today",
-      "is_fixed": true
-    },
-    {
-      "title": "Maghrib",
-      "start_time": "18:00",
-      "end_time": "18:15",
-      "phase": "Water",
-      "date": "today"
-    },
-    {
-      "title": "Dinner",
-      "start_time": "18:15",
-      "end_time": "18:45",
-      "phase": "Water",
-      "date": "today"
-    },
-    {
-      "title": "Walk",
-      "start_time": "18:45",
-      "end_time": "19:15",
-      "phase": "Water",
-      "date": "today"
-    },
-    {
-      "title": "Reading (Water Phase)",
-      "start_time": "19:15",
-      "end_time": "20:00",
-      "phase": "Water",
-      "date": "today"
-    },
-    {
-      "title": "Isha",
-      "start_time": "21:00",
-      "end_time": "21:20",
-      "phase": "Water",
-      "date": "today"
-    },
-    {
-      "title": "Journaling",
-      "start_time": "21:20",
-      "end_time": "21:35",
-      "phase": "Water",
-      "date": "today"
+      "title": "Isha Prayer",
+      "start_time": "2025-11-17T21:00:00",
+      "end_time": "2025-11-17T21:20:00",
+      "phase": "WATER",
+      "date": "2025-11-17"
     },
     {
       "title": "Bedtime",
-      "start_time": "21:45",
-      "end_time": "21:45",
-      "phase": "Water",
-      "date": "today"
+      "start_time": "2025-11-17T21:20:00",
+      "end_time": "2025-11-17T21:45:00",
+      "phase": "WATER",
+      "date": "2025-11-17"
     },
     {
-      "title": "Complete Hallo language assessment from Invisible",
-      "start_time": "09:00",
-      "end_time": "10:00",
-      "phase": "Fire",
-      "date": "tomorrow"
+      "title": "Herschrijf: Denken als een wiskundige (Task 1)",
+      "start_time": "2025-11-18T00:00:00",
+      "end_time": "2025-11-18T00:45:00",
+      "phase": "WOOD",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Herschrijf: Denken als een wiskundige (Task 2)",
+      "start_time": "2025-11-18T00:45:00",
+      "end_time": "2025-11-18T01:30:00",
+      "phase": "WOOD",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Herschrijf: Denken als een wiskundige (Task 3)",
+      "start_time": "2025-11-18T01:30:00",
+      "end_time": "2025-11-18T02:15:00",
+      "phase": "WOOD",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Illustrate p2-3 Lege bladzij",
+      "start_time": "2025-11-18T02:15:00",
+      "end_time": "2025-11-18T03:45:00",
+      "phase": "WOOD",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Illustrate p6-7 Darwin quote",
+      "start_time": "2025-11-18T03:45:00",
+      "end_time": "2025-11-18T05:15:00",
+      "phase": "WOOD",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Fajr Prayer",
+      "start_time": "2025-11-18T05:30:00",
+      "end_time": "2025-11-18T05:40:00",
+      "phase": "WOOD",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Illustrate p4-5 Copyright",
+      "start_time": "2025-11-18T05:40:00",
+      "end_time": "2025-11-18T09:00:00",
+      "phase": "WOOD",
+      "date": "2025-11-18"
     },
     {
       "title": "**FIXED**: Complete Hallo language assessment from Invisible",
-      "start_time": "09:00",
-      "end_time": "10:00",
+      "start_time": "2025-11-18T09:00:00+01:00",
+      "end_time": "2025-11-18T10:00:00+01:00",
       "phase": "Fire",
       "date": "tomorrow",
       "is_fixed": true
     },
     {
-      "title": "EM Innovation Academy",
-      "start_time": "16:00",
-      "end_time": "18:00",
-      "phase": "Metal",
-      "date": "tomorrow"
+      "title": "Illustrate p2-3 Lege bladzij (Remaining)",
+      "start_time": "2025-11-18T10:00:00",
+      "end_time": "2025-11-18T10:45:00",
+      "phase": "FIRE",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Illustrate p6-7 Darwin quote (Remaining)",
+      "start_time": "2025-11-18T10:45:00",
+      "end_time": "2025-11-18T13:15:00",
+      "phase": "FIRE",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "T3 Vertaal: Worm & Vlieg",
+      "start_time": "2025-11-18T13:15:00",
+      "end_time": "2025-11-18T13:45:00",
+      "phase": "EARTH",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "T3 Vertaal: Vlinder & Bidsprinkhaan",
+      "start_time": "2025-11-18T13:45:00",
+      "end_time": "2025-11-18T14:30:00",
+      "phase": "EARTH",
+      "date": "2025-11-18"
     },
     {
       "title": "**FIXED**: EM Innovation Academy",
-      "start_time": "16:00",
-      "end_time": "18:00",
+      "start_time": "2025-11-18T16:00:00+01:00",
+      "end_time": "2025-11-18T18:00:00+01:00",
       "phase": "Metal",
       "date": "tomorrow",
       "is_fixed": true
+    },
+    {
+      "title": "L1 Pre-read Chap 1",
+      "start_time": "2025-11-18T18:15:00",
+      "end_time": "2025-11-18T19:45:00",
+      "phase": "WATER",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Chore Posters",
+      "start_time": "2025-11-18T19:45:00",
+      "end_time": "2025-11-18T20:45:00",
+      "phase": "WATER",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Isha Prayer",
+      "start_time": "2025-11-18T21:00:00",
+      "end_time": "2025-11-18T21:20:00",
+      "phase": "WATER",
+      "date": "2025-11-18"
+    },
+    {
+      "title": "Bedtime",
+      "start_time": "2025-11-18T21:20:00",
+      "end_time": "2025-11-18T21:45:00",
+      "phase": "WATER",
+      "date": "2025-11-18"
     }
   ]
 }

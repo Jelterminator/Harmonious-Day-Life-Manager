@@ -1,13 +1,11 @@
 SCHEDULE REQUEST
-NOW: 2025-11-17 05:32
-SCHEDULE_WINDOW: 2025-11-17 05:32 -> 2025-11-18 23:59
-SKIP_BEFORE: 05:32
+NOW: 2025-11-17 18:25
+SCHEDULE_WINDOW: 2025-11-17 18:25 -> 2025-11-18 23:59
+SKIP_BEFORE: 18:25
 
-PHASES: WOOD:05:30-09:00 | 🔥:09:00-13:00 | 🟡:13:00-15:00 | 🟤:15:00-18:00 | 💧:18:00-21:45
+PHASES: WOOD:05:30-09:00 | FIRE:09:00-13:00 | EARTH:13:00-15:00 | METAL:15:00-18:00 | WATER:18:00-21:45
 
 1. STONES: IMMOVABLE CALENDAR EVENTS (summary|start|end)
-Klussen|2025-11-17T08:00:00+01:00|2025-11-17T16:00:00+01:00
-EM Innovation Academy|2025-11-17T16:00:00+01:00|2025-11-17T18:00:00+01:00
 Complete Hallo language assessment from Invisible|2025-11-18T09:00:00+01:00|2025-11-18T10:00:00+01:00
 EM Innovation Academy|2025-11-18T16:00:00+01:00|2025-11-18T18:00:00+01:00
 CONSTRAINT: Do not schedule ANY entry (Anchor, Pebble, or Sand) during Stone times.
@@ -17,24 +15,24 @@ CONSTRAINT: Do not schedule ANY entry (Anchor, Pebble, or Sand) during Stone tim
 CONSTRAINT: Schedule Anchors first. Must be skipped if blocked by a STONE.
 
 3. PEBBLES: URGENT/DIFFICULT TASKS (T1-T5) (title|priority|effort_h|total_remain_h|deadline|days_left|h_per_day|is_subtask|parent|notes)
-02. Herschrijf: Tegen willens en wetens (1u)|T2|1.0|72.0|2025-12-06|18.8|3.8|1|Schrijf De Aap is gaan staan|
-03. Herschrijf: Denken als een wiskundige (1u)|T2|1.0|72.0|2025-12-06|18.8|3.8|1|Schrijf De Aap is gaan staan|
-04. Herschrijf: Denken als een natuurkundige (1u)|T2|1.0|72.0|2025-12-06|18.8|3.8|1|Schrijf De Aap is gaan staan|
-02. Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)|T2|3.0|240.0|2026-01-24|67.8|3.5|1|Hap. Slik. Weg. geïllustreerd|
-03. Illustrate p4-5 Copyright/Dedicatie (5u)|T2|5.0|240.0|2026-01-24|67.8|3.5|1|Hap. Slik. Weg. geïllustreerd|
-04. Illustrate p6-7 Darwin quote/Inhoud start (6u)|T2|6.0|240.0|2026-01-24|67.8|3.5|1|Hap. Slik. Weg. geïllustreerd|
-01. Vertaal: Worm & Vlieg (1u)|T3|1.0|34.5|2025-12-20|32.8|1.1|1|Chomp. Gulp. Gone.|
-02. Vertaal: Vlinder & Bidsprinkhaan (1u)|T3|1.0|34.5|2025-12-20|32.8|1.1|1|Chomp. Gulp. Gone.|
-01. L1: Pre-read Chap 1; create notes on Taylor polynomials, 'big O', error types (2u)|T4|2.0|134.0|2026-04-14|147.8|0.9|1|Numerical Methods (TU Delft)|
-02. L1: Do L1 lab session homework; solidify concepts through practice (3u)|T4|3.0|134.0|2026-04-14|147.8|0.9|1|Numerical Methods (TU Delft)|
-01. Brainstorm merch concepten (2u)|T4|2.0|39.0|2026-01-03|46.8|0.8|1|Merch ontwerpen|
-02. Selecteer illustraties Hap.Slik.Weg voor merch (2u)|T4|2.0|39.0|2026-01-03|46.8|0.8|1|Merch ontwerpen|
-01. L1-2: Read notes on Einstein model; create summary notes (2u)|T4|2.0|108.0|2026-04-13|146.8|0.7|1|Solid State Physics (TU Delft)|
-02. L1-2: Do all exercises on Einstein model (2.5u)|T4|2.5|108.0|2026-04-13|146.8|0.7|1|Solid State Physics (TU Delft)|
-01. Design wireframes en sitemap (3u)|T4|3.0|42.0|2026-01-17|60.8|0.7|1|Website jeltesjoerd.com bouwen|
-02. Homepage (4u)|T4|4.0|42.0|2026-01-17|60.8|0.7|1|Website jeltesjoerd.com bouwen|
-01. College 1: Read sections 1.1-1.2 on mass balance; understand key concepts (2u)|T5|2.0|83.5|2026-05-21|184.8|0.5|1|Fysische Transportverschijnselen I (TU Delft)|
-33. College 11: Read sections 3.4-3.5 on micro balance and forced convection (2.5u)|T5|2.5|97.5|2026-06-24|218.8|0.4|1|Fysische Transportverschijnselen II (TU Delft)|
+02. Herschrijf: Tegen willens en wetens (1u)|T2|1.0|72.0|2025-12-06|18.3|3.9|1|Schrijf De Aap is gaan staan|
+03. Herschrijf: Denken als een wiskundige (1u)|T2|1.0|72.0|2025-12-06|18.3|3.9|1|Schrijf De Aap is gaan staan|
+04. Herschrijf: Denken als een natuurkundige (1u)|T2|1.0|72.0|2025-12-06|18.3|3.9|1|Schrijf De Aap is gaan staan|
+02. Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)|T2|3.0|240.0|2026-01-24|67.3|3.6|1|Hap. Slik. Weg. geïllustreerd|
+03. Illustrate p4-5 Copyright/Dedicatie (5u)|T2|5.0|240.0|2026-01-24|67.3|3.6|1|Hap. Slik. Weg. geïllustreerd|
+04. Illustrate p6-7 Darwin quote/Inhoud start (6u)|T2|6.0|240.0|2026-01-24|67.3|3.6|1|Hap. Slik. Weg. geïllustreerd|
+01. Vertaal: Worm & Vlieg (1u)|T3|1.0|34.5|2025-12-20|32.3|1.1|1|Chomp. Gulp. Gone.|
+02. Vertaal: Vlinder & Bidsprinkhaan (1u)|T3|1.0|34.5|2025-12-20|32.3|1.1|1|Chomp. Gulp. Gone.|
+01. L1: Pre-read Chap 1; create notes on Taylor polynomials, 'big O', error types (2u)|T4|2.0|134.0|2026-04-14|147.3|0.9|1|Numerical Methods (TU Delft)|
+02. L1: Do L1 lab session homework; solidify concepts through practice (3u)|T4|3.0|134.0|2026-04-14|147.3|0.9|1|Numerical Methods (TU Delft)|
+01. Brainstorm merch concepten (2u)|T4|2.0|39.0|2026-01-03|46.3|0.8|1|Merch ontwerpen|
+02. Selecteer illustraties Hap.Slik.Weg voor merch (2u)|T4|2.0|39.0|2026-01-03|46.3|0.8|1|Merch ontwerpen|
+01. L1-2: Read notes on Einstein model; create summary notes (2u)|T4|2.0|108.0|2026-04-13|146.3|0.7|1|Solid State Physics (TU Delft)|
+02. L1-2: Do all exercises on Einstein model (2.5u)|T4|2.5|108.0|2026-04-13|146.3|0.7|1|Solid State Physics (TU Delft)|
+01. Design wireframes en sitemap (3u)|T4|3.0|42.0|2026-01-17|60.3|0.7|1|Website jeltesjoerd.com bouwen|
+02. Homepage (4u)|T4|4.0|42.0|2026-01-17|60.3|0.7|1|Website jeltesjoerd.com bouwen|
+01. College 1: Read sections 1.1-1.2 on mass balance; understand key concepts (2u)|T5|2.0|83.5|2026-05-21|184.3|0.5|1|Fysische Transportverschijnselen I (TU Delft)|
+33. College 11: Read sections 3.4-3.5 on micro balance and forced convection (2.5u)|T5|2.5|97.5|2026-06-24|218.3|0.4|1|Fysische Transportverschijnselen II (TU Delft)|
 CONSTRAINTS:
 Fit as many Pebbles as possible after scheduling the Stones. To achieve this the duration can be reduced by maximally 25%.
 Chunking: If effort_h > 2.0, then you may schedule the task in multiple blocks. It is okay to leave half finished tasks for later.
@@ -68,5 +66,42 @@ Only plan habits after the calendar is maximally filled with tasks. Getting stuf
 Schedule habits near their correct Phase. Skipping habits is no problem at all. Durations may be changed up to 50%.
 When choosing habits you firstly prioritise emotional wellbeing, secondly reading and thirdly physical health.
 
-OUTPUT_JSON (EXACT FORMAT REQUIRED):
-{"schedule_entries":[{"title":"...","start_time":"HH:MM","end_time":"HH:MM","phase":"Wood|Fire|Earth|Metal|Water","date":"today|tomorrow"}]}
+Return only JSON conforming to the following schema. Do not include reasoning.
+{
+  "type": "object",
+  "properties": {
+    "schedule_entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "end_time": {
+            "type": "string"
+          },
+          "phase": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "start_time",
+          "end_time",
+          "phase",
+          "date"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schedule_entries"
+  ]
+}

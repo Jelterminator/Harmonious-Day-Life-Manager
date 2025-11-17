@@ -1,14 +1,93 @@
 {
   "schedule_entries": [
     {
-      "title": "Mails GGZ en sollicitatie",
-      "start_time": "17:57",
+      "title": "Sleep",
+      "start_time": "00:27",
+      "end_time": "05:30",
+      "phase": "Water",
+      "date": "today"
+    },
+    {
+      "title": "Fajr & Centering",
+      "start_time": "05:30",
+      "end_time": "05:40",
+      "phase": "Wood",
+      "date": "today"
+    },
+    {
+      "title": "Tummo",
+      "start_time": "05:40",
+      "end_time": "05:55",
+      "phase": "Wood",
+      "date": "today"
+    },
+    {
+      "title": "Makko Ho",
+      "start_time": "05:55",
+      "end_time": "06:10",
+      "phase": "Wood",
+      "date": "today"
+    },
+    {
+      "title": "Meditation (Wood Phase)",
+      "start_time": "06:10",
+      "end_time": "06:25",
+      "phase": "Wood",
+      "date": "today"
+    },
+    {
+      "title": "Ji Jin Jing (Cooling Down)",
+      "start_time": "06:25",
+      "end_time": "06:45",
+      "phase": "Wood",
+      "date": "today"
+    },
+    {
+      "title": "Reading (Wood Phase)",
+      "start_time": "06:45",
+      "end_time": "07:45",
+      "phase": "Wood",
+      "date": "today"
+    },
+    {
+      "title": "Breakfast & Planning",
+      "start_time": "07:45",
+      "end_time": "08:00",
+      "phase": "Wood",
+      "date": "today"
+    },
+    {
+      "title": "Klussen",
+      "start_time": "08:00",
+      "end_time": "16:00",
+      "phase": "Fire",
+      "date": "today"
+    },
+    {
+      "title": "**FIXED**: Klussen",
+      "start_time": "08:00",
+      "end_time": "16:00",
+      "phase": "Wood",
+      "date": "today",
+      "is_fixed": true
+    },
+    {
+      "title": "EM Innovation Academy",
+      "start_time": "16:00",
       "end_time": "18:00",
       "phase": "Metal",
       "date": "today"
     },
     {
-      "title": "Maghrib",
+      "title": "**FIXED**: EM Innovation Academy",
+      "start_time": "16:00",
+      "end_time": "18:00",
+      "phase": "Metal",
+      "date": "today",
+      "is_fixed": true
+    },
+    {
+      "title": "Maghrib & Movement",
       "start_time": "18:00",
       "end_time": "18:15",
       "phase": "Water",
@@ -22,49 +101,28 @@
       "date": "today"
     },
     {
-      "title": "Watery Movement (walk)",
+      "title": "Quiet Task Time: T2 Study Hume & Logisch Positivisme",
       "start_time": "18:45",
-      "end_time": "19:30",
-      "phase": "Water",
-      "date": "today"
-    },
-    {
-      "title": "Reading (Water Phase)",
-      "start_time": "19:30",
       "end_time": "20:15",
       "phase": "Water",
       "date": "today"
     },
     {
-      "title": "Journaling",
-      "start_time": "20:15",
-      "end_time": "20:30",
-      "phase": "Water",
-      "date": "today"
-    },
-    {
-      "title": "Meditation (Water Phase)",
-      "start_time": "20:30",
-      "end_time": "21:00",
-      "phase": "Water",
-      "date": "today"
-    },
-    {
-      "title": "Isha",
+      "title": "Isha & Wind-Down",
       "start_time": "21:00",
       "end_time": "21:20",
       "phase": "Water",
       "date": "today"
     },
     {
-      "title": "Yoga Nidra / Wind-down",
+      "title": "Journaling",
       "start_time": "21:20",
-      "end_time": "21:45",
+      "end_time": "21:35",
       "phase": "Water",
       "date": "today"
     },
     {
-      "title": "Fajr",
+      "title": "Fajr & Centering",
       "start_time": "05:30",
       "end_time": "05:40",
       "phase": "Wood",
@@ -92,42 +150,56 @@
       "date": "tomorrow"
     },
     {
-      "title": "Reading (Wood Phase)",
-      "start_time": "06:25",
-      "end_time": "07:25",
-      "phase": "Wood",
-      "date": "tomorrow"
-    },
-    {
-      "title": "Stretches",
-      "start_time": "07:25",
-      "end_time": "07:40",
-      "phase": "Wood",
-      "date": "tomorrow"
-    },
-    {
       "title": "Ji Jin Jing (Cooling Down)",
-      "start_time": "07:40",
+      "start_time": "06:25",
+      "end_time": "06:45",
+      "phase": "Wood",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Reading (Wood Phase)",
+      "start_time": "06:45",
+      "end_time": "07:45",
+      "phase": "Wood",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Breakfast & Planning",
+      "start_time": "07:45",
       "end_time": "08:00",
       "phase": "Wood",
       "date": "tomorrow"
     },
     {
-      "title": "Breakfast & Plan",
-      "start_time": "08:00",
-      "end_time": "08:30",
-      "phase": "Wood",
+      "title": "Fire Focus: T2 Herschrijf Tegen willens en wetens",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "phase": "Fire",
       "date": "tomorrow"
     },
     {
-      "title": "Klussen",
-      "start_time": "08:30",
+      "title": "Fire Focus: T2 Herschrijf Denken als een wiskundige",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "phase": "Fire",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Fire Focus: T3 Vertaal Worm & Vlieg",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "phase": "Fire",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Fire Focus: T3 Vertaal Vlinder & Bidsprinkhaan",
+      "start_time": "12:00",
       "end_time": "13:00",
       "phase": "Fire",
       "date": "tomorrow"
     },
     {
-      "title": "Zuhr",
+      "title": "Zuhr & Lunch",
       "start_time": "13:00",
       "end_time": "13:20",
       "phase": "Earth",
@@ -155,13 +227,6 @@
       "date": "tomorrow"
     },
     {
-      "title": "Klussen",
-      "start_time": "14:20",
-      "end_time": "15:00",
-      "phase": "Earth",
-      "date": "tomorrow"
-    },
-    {
       "title": "Asr",
       "start_time": "15:00",
       "end_time": "15:20",
@@ -169,8 +234,15 @@
       "date": "tomorrow"
     },
     {
-      "title": "Klussen",
+      "title": "Yang Style Tai Chi",
       "start_time": "15:20",
+      "end_time": "15:35",
+      "phase": "Metal",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Sketching",
+      "start_time": "15:35",
       "end_time": "16:00",
       "phase": "Metal",
       "date": "tomorrow"
@@ -183,7 +255,15 @@
       "date": "tomorrow"
     },
     {
-      "title": "Maghrib",
+      "title": "**FIXED**: EM Innovation Academy",
+      "start_time": "16:00",
+      "end_time": "18:00",
+      "phase": "Metal",
+      "date": "tomorrow",
+      "is_fixed": true
+    },
+    {
+      "title": "Maghrib & Movement",
       "start_time": "18:00",
       "end_time": "18:15",
       "phase": "Water",
@@ -197,44 +277,30 @@
       "date": "tomorrow"
     },
     {
-      "title": "Watery Movement (walk)",
+      "title": "Quiet Task Time: T4 L1 Pre-read Chap 1 Numerical Methods",
       "start_time": "18:45",
-      "end_time": "19:30",
-      "phase": "Water",
-      "date": "tomorrow"
-    },
-    {
-      "title": "Reading (Water Phase)",
-      "start_time": "19:30",
       "end_time": "20:15",
       "phase": "Water",
       "date": "tomorrow"
     },
     {
-      "title": "Journaling",
-      "start_time": "20:15",
-      "end_time": "20:30",
-      "phase": "Water",
-      "date": "tomorrow"
-    },
-    {
-      "title": "Meditation (Water Phase)",
-      "start_time": "20:30",
-      "end_time": "21:00",
-      "phase": "Water",
-      "date": "tomorrow"
-    },
-    {
-      "title": "Isha",
+      "title": "Isha & Wind-Down",
       "start_time": "21:00",
       "end_time": "21:20",
       "phase": "Water",
       "date": "tomorrow"
     },
     {
-      "title": "Yoga Nidra / Wind-down",
+      "title": "Journaling",
       "start_time": "21:20",
-      "end_time": "21:45",
+      "end_time": "21:35",
+      "phase": "Water",
+      "date": "tomorrow"
+    },
+    {
+      "title": "Sleep",
+      "start_time": "21:45",
+      "end_time": "05:30",
       "phase": "Water",
       "date": "tomorrow"
     }

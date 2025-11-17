@@ -1,29 +1,48 @@
 SCHEDULE REQUEST
-NOW: 2025-11-16 17:57
-SCHEDULE_WINDOW: 2025-11-16 17:57 -> 2025-11-17 23:59
-SKIP_BEFORE: 17:57
+NOW: 2025-11-17 00:27
+SCHEDULE_WINDOW: 2025-11-17 00:27 -> 2025-11-18 23:59
+SKIP_BEFORE: 00:27
 
 PHASES: WOOD:05:30-09:00 | 🔥:09:00-13:00 | 🟡:13:00-15:00 | 🟤:15:00-18:00 | 💧:18:00-21:45
 ANCHORS: 05:30-05:40:Fajr | 13:00-13:20:Zuhr | 15:00-15:20:Asr | 18:00-18:15:Maghrib | 21:00-21:20:Isha | 21:45:Bedtime
 
 CALENDAR_EVENTS: (summary|start|end)
-Mails GGZ en sollicitatie|2025-11-16T17:30:00+01:00|2025-11-16T18:00:00+01:00
 Klussen|2025-11-17T08:00:00+01:00|2025-11-17T16:00:00+01:00
 EM Innovation Academy|2025-11-17T16:00:00+01:00|2025-11-17T18:00:00+01:00
+EM Innovation Academy|2025-11-18T16:00:00+01:00|2025-11-18T18:00:00+01:00
 
-TASKS: (priority|title|effort_h|total_remain_h|deadline|days_left|h_per_day|is_subtask|parent|notes)
-T4|02. Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)|3.0|240.0|2026-01-24|68.3|3.5|1|Hap. Slik. Weg. geïllustreerd|
-T6|Badkamer|1.0|1.0|N/A|inf|0.0|0||
-T6|Stofzuigen|1.0|1.0|N/A|inf|0.0|0||
-T6|Vaatwas|1.0|1.0|N/A|inf|0.0|0||
-T7|01. Brainstorm merch concepten (2u)|2.0|39.0|2026-01-03|47.3|0.8|1|Merch ontwerpen|
-T7|01. L1-2: Read notes on Einstein model; create summary notes (2u)|2.0|108.0|2026-04-13|147.3|0.7|1|Solid State Physics (TU Delft)|
+TASKS: (title|priority|effort_h|total_remain_h|deadline|days_left|h_per_day|is_subtask|parent|notes)
+01. Studie: Hume & Logisch Positivisme (2u)|T2|2.0|0.0|2025-12-06|0.0|0.0|1|Schrijf De Aap is gaan staan|
+02. Herschrijf: Tegen willens en wetens (1u)|T2|1.0|0.0|2025-12-06|0.0|0.0|1|Schrijf De Aap is gaan staan|
+03. Herschrijf: Denken als een wiskundige (1u)|T2|1.0|0.0|2025-12-06|0.0|0.0|1|Schrijf De Aap is gaan staan|
+02. Illustrate p2-3 Lege bladzij/Titel+Auteur (3u)|T2|3.0|0.0|2026-01-24|0.0|0.0|1|Hap. Slik. Weg. geïllustreerd|
+03. Illustrate p4-5 Copyright/Dedicatie (5u)|T2|5.0|0.0|2026-01-24|0.0|0.0|1|Hap. Slik. Weg. geïllustreerd|
+04. Illustrate p6-7 Darwin quote/Inhoud start (6u)|T2|6.0|0.0|2026-01-24|0.0|0.0|1|Hap. Slik. Weg. geïllustreerd|
+01. Vertaal: Worm & Vlieg (1u)|T3|1.0|0.0|2025-12-20|0.0|0.0|1|Chomp. Gulp. Gone.|
+02. Vertaal: Vlinder & Bidsprinkhaan (1u)|T3|1.0|0.0|2025-12-20|0.0|0.0|1|Chomp. Gulp. Gone.|
+01. L1: Pre-read Chap 1; create notes on Taylor polynomials, 'big O', error types (2u)|T4|2.0|0.0|2026-04-14|0.0|0.0|1|Numerical Methods (TU Delft)|
+02. L1: Do L1 lab session homework; solidify concepts through practice (3u)|T4|3.0|0.0|2026-04-14|0.0|0.0|1|Numerical Methods (TU Delft)|
+01. Brainstorm merch concepten (2u)|T4|2.0|0.0|2026-01-03|0.0|0.0|1|Merch ontwerpen|
+02. Selecteer illustraties Hap.Slik.Weg voor merch (2u)|T4|2.0|0.0|2026-01-03|0.0|0.0|1|Merch ontwerpen|
+01. L1-2: Read notes on Einstein model; create summary notes (2u)|T4|2.0|0.0|2026-04-13|0.0|0.0|1|Solid State Physics (TU Delft)|
+02. L1-2: Do all exercises on Einstein model (2.5u)|T4|2.5|0.0|2026-04-13|0.0|0.0|1|Solid State Physics (TU Delft)|
+01. Design wireframes en sitemap (3u)|T4|3.0|0.0|2026-01-17|0.0|0.0|1|Website jeltesjoerd.com bouwen|
+02. Homepage (4u)|T4|4.0|0.0|2026-01-17|0.0|0.0|1|Website jeltesjoerd.com bouwen|
+01. College 1: Read sections 1.1-1.2 on mass balance; understand key concepts (2u)|T5|2.0|0.0|2026-05-21|0.0|0.0|1|Fysische Transportverschijnselen I (TU Delft)|
+33. College 11: Read sections 3.4-3.5 on micro balance and forced convection (2.5u)|T5|2.5|0.0|2026-06-24|0.0|0.0|1|Fysische Transportverschijnselen II (TU Delft)|
+Keuken|T6|1.0|0.0|N/A|0.0|0.0|0||
+Posters|T6|1.0|0.0|N/A|0.0|0.0|0||
+Oppervlakken|T6|1.0|0.0|N/A|0.0|0.0|0||
+Badkamer|T6|1.0|0.0|N/A|0.0|0.0|0||
+Stofzuigen (0.5u)|T6|0.5|0.0|N/A|0.0|0.0|0||
+Glas weg (0.5u)|T6|0.5|0.0|N/A|0.0|0.0|0||
 
 HABITS: (title|mins_ideal|frequency|ideal_phase)
 Tummo|15|Daily|WOOD
 Makko Ho|15|Daily|WOOD
 Meditation (Wood Phase)|15|Daily|WOOD
 Reading (Wood Phase)|60|Daily|WOOD
+Morning run (Monday)|30|Weekly|WOOD
 Stretches|15|Daily|WOOD
 Ji Jin Jing (Cooling Down)|20|Daily|WOOD
 Lunch & Mindful Eating|30|Daily|EARTH
@@ -31,17 +50,15 @@ Ba Duan Jin (post-lunch stretch)|15|Daily|EARTH
 Meditation (Earth Phase)|15|Daily|EARTH
 Yang Style Tai Chi|15|Daily|METAL
 Sketching|30|Daily|METAL
-Weekly Reflection|20|Weekly|METAL
 Reading (Water Phase)|90|Daily|WATER
 Meditation (Water Phase)|30|Daily|WATER
 Journaling|15|Daily|WATER
 
 CONSTRAINTS:
-- Anchors fixed.
-- Do not schedule after 21:45.
-- No overlaps; split interrupted events sequentially.
-- Schedule all T1 tasks; then as many T2-T4 as capacity allows.
-- Realistic focused work per day: 6-10h.
+- Keep the time of Calendar Events free, never schedule anything over them, not even the anchors. 
+- Schedule as many tasks as capacity allows; only then consider habits.
+- Realistic focused work per day: 6-12h. 8 hours of demanding tasks is ideal.
+- Habits come last, and skipping a habit is not a problem.
 
 OUTPUT_JSON: exact format below
 {"schedule_entries":[{"title":"...","start_time":"HH:MM","end_time":"HH:MM","phase":"Wood|Fire|Earth|Metal|Water","date":"today|tomorrow"}]}

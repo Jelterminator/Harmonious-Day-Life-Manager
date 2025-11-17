@@ -117,7 +117,7 @@ class Orchestrator:
                 return
 
             print("\n✓ Schedule generated!")
-            pretty_print_schedule(schedule_data)
+            pretty_print_schedule(schedule_data, calendar_events)
             self._save_schedule_to_file(schedule_data, SCHEDULE_FILE)
             
             # 6. Post-Process & Write to Calendar
@@ -246,31 +246,55 @@ class Orchestrator:
             print(f"✓ SUCCESSFULLY DELETED {deleted_count} PREVIOUSLY GENERATED EVENTS.")
         except Exception as e:
             print(f"ERROR deleting events: {e}")
-
+    
     def _get_google_tasks(self) -> List[Dict[str, Any]]:
-        """Fetch all open tasks from all task lists."""
-        print("Fetching tasks from Google Tasks...")
         all_tasks = []
+        print("Fetching tasks from Google Tasks...")
+    
         try:
-            task_lists = self.services["tasks"].tasklists().list().execute().get('items', [])
+            task_lists = self.services["tasks"].tasklists().list().execute().get("items", [])
+    
             for tlist in task_lists:
-                tasks_result = self.services["tasks"].tasks().list(
-                    tasklist=tlist['id'],
-                    showCompleted=False,
-                    maxResults=100
-                ).execute()
-                
-                for task in tasks_result.get('items', []):
-                    all_tasks.append({
-                        "title": task.get('title', 'No Title'),
-                        "list": tlist['title'], "id": task['id'],
-                        "parent": task.get('parent'), "due": task.get('due'),
-                        "notes": task.get('notes'),
-                    })
+                page_token = None
+    
+                while True:
+                    kwargs = {
+                        "tasklist": tlist["id"],
+                        "showCompleted": False,
+                        "maxResults": 100,  # Google's real max
+                    }
+                    if page_token:
+                        kwargs["pageToken"] = page_token
+    
+                    response = self.services["tasks"].tasks().list(**kwargs).execute()
+    
+                    for task in response.get("items", []):
+                        # Only include open tasks
+                        if task.get("status") != "needsAction":
+                            continue
+    
+                        all_tasks.append({
+                            "title": task.get("title", "No Title"),
+                            "list": tlist["title"],
+                            "id": task["id"],
+                            "parent": task.get("parent"),
+                            "due": task.get("due"),
+                            "notes": task.get("notes"),
+                        })
+    
+                    # Get next page
+                    page_token = response.get("nextPageToken")
+                    if not page_token:
+                        break
+    
             return all_tasks
+    
         except Exception as e:
             print(f"Error fetching tasks: {e}")
             return []
+
+
+
 
     def _get_habits(self) -> List[Dict[str, Any]]:
         """Fetch habits from Google Sheets."""
@@ -338,7 +362,7 @@ class Orchestrator:
         prompt_lines.append("")
     
         # tasks: compact pipe entries prioritized by priority
-        prompt_lines.append("TASKS: (priority|title|effort_h|total_remain_h|deadline|days_left|h_per_day|is_subtask|parent|notes)")
+        prompt_lines.append("TASKS: (title|priority|effort_h|total_remain_h|deadline|days_left|h_per_day|is_subtask|parent|notes)")
         if tasks:
             by_priority = defaultdict(list)
             for t in tasks:
@@ -352,8 +376,8 @@ class Orchestrator:
                     parent_clean = str(t.get("parent_title") or "").replace("|","/").strip()
                     
                     line = "|".join([
-                        pr,
                         title_clean,
+                        pr,
                         f"{t.get('effort_hours',0):.1f}",
                         f"{t.get('total_remaining_effort',0):.1f}",
                         t.get("deadline_str","N/A"),
@@ -384,11 +408,10 @@ class Orchestrator:
     
         # constraints (explicit, short)
         prompt_lines.append("CONSTRAINTS:")
-        prompt_lines.append("- Anchors fixed.")
-        prompt_lines.append("- Do not schedule after 21:45.")
-        prompt_lines.append("- No overlaps; split interrupted events sequentially.")
-        prompt_lines.append("- Schedule all T1 tasks; then as many T2-T4 as capacity allows.")
-        prompt_lines.append("- Realistic focused work per day: 6-10h.")
+        prompt_lines.append("- Keep the time of Calendar Events free, never schedule anything over them, not even the anchors. ")
+        prompt_lines.append("- Schedule as many tasks as capacity allows; only then consider habits.")
+        prompt_lines.append("- Realistic focused work per day: 6-12h. 8 hours of demanding tasks is ideal.")
+        prompt_lines.append("- Habits come last, and skipping a habit is not a problem.")
         prompt_lines.append("")
     
         # output schema required (exact)

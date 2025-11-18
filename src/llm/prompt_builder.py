@@ -212,7 +212,7 @@ class PromptBuilder:
                     t.priority.value, # Use .value
                     f"{t.effort_hours:.1f}",
                     f"{t.total_remaining_effort:.1f}",
-                    t.deadline_str,
+                    f"{t.deadline:.1f}"",
                     f"{t.days_until_deadline:.1f}",
                     f"{t.hours_per_day_needed:.1f}",
                     "1" if t.is_subtask else "0",

@@ -2,6 +2,7 @@
 
 from typing import List, Dict, Any
 from googleapiclient.discovery import Resource
+import re
 
 from src.core.config_manager import Config
 from src.utils.logger import setup_logger
@@ -20,6 +21,13 @@ class GoogleTasksService:
         """
         self.service = tasks_service
     
+    def _extract_effort_from_title(self, title: str) -> float:
+        """Extract effort hours from title like 'Task name (2u)' """
+        match = re.search(r'\((\d+(?:\.\d+)?)u\)', title)
+        if match:
+            return float(match.group(1))
+        return 1.0  # Default effort
+
     def get_all_tasks(self) -> List[Dict[str, Any]]:
         """
         Fetch all open tasks from all task lists.
@@ -62,12 +70,13 @@ class GoogleTasksService:
                         # Map raw API response fields to the dictionary keys expected by task_from_dict
                         all_tasks.append({
                             "title": task.get("title", "No Title"),
-                            "list_name": tlist["title"],  # Corresponds to list_name in Task model
+                            "list_name": tlist["title"],
                             "id": task["id"],
-                            "parent_id": task.get("parent"), # Corresponds to parent_id in Task model
-                            "deadline": task.get("due"),    # Corresponds to deadline in Task model
+                            "parent_id": task.get("parent"),
+                            "deadline": task.get("due"),
                             "notes": task.get("notes"),
-                            "position": task.get("position", "0")
+                            "position": task.get("position", "0"),
+                            "effort_hours": self._extract_effort_from_title(task.get("title", ""))  # ← ADD THIS
                         })
                         
                     page_token = response.get("nextPageToken")

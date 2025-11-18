@@ -8,8 +8,11 @@ import os
 import re
 import json
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, List
 from dotenv import load_dotenv
+
+# Import the new type models
+from src.models.models import PriorityTier, Phase
 
 # Load environment variables
 load_dotenv()
@@ -60,16 +63,17 @@ class Config:
     REASONING_EFFORT = "medium"
     MAX_COMPLETION_TOKENS = 32768
     
-    # Priority Tiers
-    PRIORITY_TIERS = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
+    # Priority Tiers (Derived from Enum)
+    # Storing as string values for compatibility with other parts of the app
+    PRIORITY_TIERS: List[str] = [p.value for p in PriorityTier]
     
-    # Phase Color Mapping
-    PHASE_COLORS = {
-        'WOOD': '10',
-        'FIRE': '11',
-        'EARTH': '5',
-        'METAL': '8',
-        'WATER': '9'
+    # Phase Color Mapping (Uses Enum values as keys)
+    PHASE_COLORS: Dict[str, str] = {
+        Phase.WOOD.value: '10',
+        Phase.FIRE.value: '11',
+        Phase.EARTH.value: '5',
+        Phase.METAL.value: '8',
+        Phase.WATER.value: '9'
     }
     
     DATE_PATTERNS = [

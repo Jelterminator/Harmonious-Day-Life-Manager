@@ -1,7 +1,6 @@
 # File: src/services/sheets_service.py
 
-import datetime
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any
 from googleapiclient.discovery import Resource
 
 from src.core.config_manager import Config
@@ -29,14 +28,17 @@ class GoogleSheetsService:
         """
         Fetch habits from Google Sheets.
         
+        NOTE: This method returns raw data (List[Dict]) and relies on DataCollector
+        to convert it to the typed Habit model.
+        
         Args:
             sheet_id: Spreadsheet ID
             range_name: Range to fetch (e.g., "Habits!A:H")
         
         Returns:
-            List of habit dictionaries
+            List of habit dictionaries (raw sheet data)
         """
-        logger.info(f"Fetching habits from Google Sheets: {sheet_id}")
+        logger.info(f"Fetching habits from Google Sheets: {sheet_id} - {range_name}")
         
         try:
             result = self.service.spreadsheets().values().get(
@@ -47,21 +49,22 @@ class GoogleSheetsService:
             values = result.get('values', [])
             
             if not values or len(values) < 2:
-                logger.warning("No habit data found in sheet")
+                logger.warning("No header or data rows found in habit sheet")
                 return []
             
             headers = values[0]
             habits_data = []
             
-            for i, row in enumerate(values[1:]):
-                # Pad row to match header length
+            for row in values[1:]:
+                # Ensure the row has enough elements to match the header, filling with empty strings
                 row_padded = row + [''] * (len(headers) - len(row))
+                # Create a dictionary mapping header names (keys) to cell values
                 habit = {headers[j]: row_padded[j] for j in range(len(headers))}
                 habits_data.append(habit)
             
-            logger.info(f"Fetched {len(habits_data)} habits")
+            logger.info(f"Fetched {len(habits_data)} raw habit rows")
             return habits_data
             
         except Exception as e:
-            logger.error(f"Error fetching habits: {e}", exc_info=True)
+            logger.error(f"Error fetching habits from sheets: {e}", exc_info=True)
             return []

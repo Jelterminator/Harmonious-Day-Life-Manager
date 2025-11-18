@@ -1,11 +1,13 @@
 # File: src/services/calendar_service.py
 
 import datetime
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Optional
 from googleapiclient.discovery import Resource
 
+# Import necessary models and helper functions
 from src.core.config_manager import Config
 from src.utils.logger import setup_logger
+from src.models.models import CalendarEvent, ScheduleEntry
 
 logger = setup_logger(__name__)
 
@@ -26,20 +28,21 @@ class GoogleCalendarService:
     def get_upcoming_events(
         self, 
         days_ahead: int = 2
-    ) -> List[Dict[str, str]]:
+    ) -> List[CalendarEvent]:
         """
-        Fetch upcoming calendar events.
+        Fetch upcoming fixed calendar events and convert them to CalendarEvent objects.
         
         Args:
             days_ahead: Number of days to look ahead
         
         Returns:
-            List of event dictionaries with summary, start, and end times
+            List of CalendarEvent objects (excluding AI-generated ones)
         """
         logger.info(f"Fetching calendar events for next {days_ahead} days")
         
         try:
             now = datetime.datetime.now(datetime.timezone.utc)
+            # Fetch events up until the start of the day after the window
             end_time = (
                 datetime.datetime.combine(
                     datetime.date.today() + datetime.timedelta(days=days_ahead),
@@ -56,24 +59,55 @@ class GoogleCalendarService:
             ).execute()
             
             events = events_result.get('items', [])
+            typed_events = []
             
-            # Filter out AI-generated events
-            formatted_events = []
             for event in events:
                 extended_props = event.get('extendedProperties', {}).get('private', {})
+                
+                # Filter out AI-generated events using the sourceId
                 if extended_props.get('sourceId') != self.generator_id:
-                    formatted_events.append({
-                        "summary": event['summary'],
-                        "start": event['start'].get('dateTime', event['start'].get('date')),
-                        "end": event['end'].get('dateTime', event['end'].get('date'))
-                    })
-            
-            logger.info(f"Found {len(formatted_events)} fixed calendar events")
-            return formatted_events
+                    try:
+                        # Extract start/end, preferring dateTime (full timestamp) over date (all-day)
+                        start_time_raw = event['start'].get('dateTime', event['start'].get('date'))
+                        end_time_raw = event['end'].get('dateTime', event['end'].get('date'))
+                        
+                        start_dt = self._parse_gc_time(start_time_raw)
+                        end_dt = self._parse_gc_time(end_time_raw)
+
+                        if start_dt and end_dt:
+                            typed_events.append(CalendarEvent(
+                                event_id=event.get('id'),
+                                summary=event.get('summary', 'No Title'),
+                                start=start_dt,
+                                end=end_dt,
+                                is_generated=False
+                            ))
+                    except Exception as e:
+                        logger.warning(f"Could not parse event data for {event.get('summary')}: {e}")
+
+            logger.info(f"Found {len(typed_events)} fixed calendar events")
+            return typed_events
             
         except Exception as e:
             logger.error(f"Error fetching calendar events: {e}", exc_info=True)
             return []
+
+    def _parse_gc_time(self, time_str: str) -> Optional[datetime.datetime]:
+        """Helper to safely parse Google Calendar date/dateTime strings."""
+        if not time_str:
+            return None
+        try:
+            # Full ISO format with time and timezone
+            return datetime.datetime.fromisoformat(time_str)
+        except ValueError:
+            try:
+                # Date-only format (for all-day events, treat as midnight UTC)
+                date_obj = datetime.datetime.strptime(time_str, "%Y-%m-%d").date()
+                return datetime.datetime.combine(date_obj, datetime.time.min).replace(
+                    tzinfo=datetime.timezone.utc
+                )
+            except ValueError:
+                return None
     
     def delete_generated_events(self, date_str: str) -> int:
         """
@@ -85,14 +119,20 @@ class GoogleCalendarService:
         Returns:
             Number of events deleted
         """
-        logger.info(f"Deleting generated events for {date_str}")
+        logger.info(f"Deleting generated events for window starting at {date_str}")
         
         try:
-            start_of_day = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+            # Ensure date_str is just the date part if it accidentally includes time
+            if 'T' in date_str:
+                date_str = date_str.split('T')[0]
+
+            start_of_day = datetime.datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
+            # Search a 2-day window from the start of the specified day
             end_of_window = start_of_day + datetime.timedelta(days=2)
-            time_min = start_of_day.isoformat() + 'Z'
-            time_max = end_of_window.isoformat() + 'Z'
+            time_min = start_of_day.isoformat()
+            time_max = end_of_window.isoformat()
             
+            # Use privateExtendedProperty filter for efficiency
             events_result = self.service.events().list(
                 calendarId='primary',
                 timeMin=time_min,
@@ -137,14 +177,14 @@ class GoogleCalendarService:
     
     def create_events(
         self, 
-        schedule_entries: List[Dict[str, Any]],
+        schedule_entries: List[ScheduleEntry], 
         date_str: str
     ) -> int:
         """
         Create calendar events from schedule entries.
         
         Args:
-            schedule_entries: List of schedule entry dictionaries
+            schedule_entries: List of ScheduleEntry objects
             date_str: Date string for extended properties
         
         Returns:
@@ -152,6 +192,9 @@ class GoogleCalendarService:
         """
         logger.info(f"Creating {len(schedule_entries)} calendar events")
         
+        if not schedule_entries:
+            return 0
+
         batch = self.service.new_batch_http_request()
         created_count = 0
         
@@ -164,33 +207,33 @@ class GoogleCalendarService:
         
         for entry in schedule_entries:
             try:
-                # Use pre-parsed datetime objects if available
-                start_dt = entry.get('_parsed_start')
-                end_dt = entry.get('_parsed_end')
+                # Use the start_time and end_time attributes directly
+                start_dt = entry.start_time
+                end_dt = entry.end_time
                 
-                if not (start_dt and end_dt):
-                    logger.warning(f"Skipping entry without parsed times: {entry.get('title')}")
-                    continue
-                
+                # Map phase string to config color ID if available
+                color_id = '1' # Default lavender
+                if entry.phase:
+                    # Entry phase is an Enum, get its value for lookup
+                    color_id = Config.PHASE_COLORS.get(entry.phase.value, '1')
+
                 event = {
-                    'summary': entry.get('title', 'No title'),
-                    'description': f"Phase: {entry.get('phase', 'N/A')}",
+                    'summary': entry.title,
+                    'description': f"Phase: {entry.phase.value if entry.phase else 'N/A'}",
                     'start': {
                         'dateTime': start_dt.isoformat(),
-                        'timeZone': Config.TARGET_TIMEZONE,
+                        'timeZone': Config.TARGET_TIMEZONE, 
                     },
                     'end': {
                         'dateTime': end_dt.isoformat(),
                         'timeZone': Config.TARGET_TIMEZONE,
                     },
-                    'colorId': Config.PHASE_COLORS.get(
-                        entry.get('phase', '').upper(), 
-                        '1'
-                    ),
+                    'colorId': color_id,
                     'extendedProperties': {
                         'private': {
                             'harmoniousDayGenerated': date_str,
-                            'sourceId': self.generator_id
+                            'sourceId': self.generator_id,
+                            'isFixed': 'false'
                         }
                     },
                 }
@@ -205,11 +248,12 @@ class GoogleCalendarService:
                 
             except Exception as e:
                 logger.error(
-                    f"Error preparing event {entry.get('title')}: {e}",
+                    f"Error preparing event {entry.title}: {e}",
                     exc_info=True
                 )
         
-        if getattr(batch, "_requests", None):
+        # Check if the batch has requests before executing
+        if hasattr(batch, "_requests") and batch._requests:
             try:
                 batch.execute()
             except Exception as e:

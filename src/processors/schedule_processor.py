@@ -1,18 +1,20 @@
 # File: src/processors/schedule_processor.py
 """
 Schedule processing module.
-Handles datetime parsing, conflict detection, and schedule validation.
+Handles datetime parsing, conflict detection, and schedule validation using typed models.
 """
 
 import datetime
 import json
 import re
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from pathlib import Path
 import pytz
 
 from src.core.config_manager import Config
 from src.utils.logger import setup_logger
+# Import the typed models and factory function
+from src.models.models import ScheduleEntry, CalendarEvent, Phase, schedule_entry_from_dict 
 
 logger = setup_logger(__name__)
 
@@ -29,148 +31,63 @@ class ScheduleProcessor:
         """
         self.timezone = pytz.timezone(timezone)
         self.logger = setup_logger(__name__)
+
+    # NOTE: The public parse_iso_to_local is removed. Datetime parsing is now handled
+    # by schedule_entry_from_dict or the CalendarEvent objects themselves.
+    # The conflict filter will now use the datetime objects inside the models.
     
-    def parse_iso_to_local(
-        self, 
-        s: str, 
-        date_hint: Optional[datetime.date] = None
-    ) -> datetime.datetime:
+    def filter_conflicting_entries(self,
+        schedule_entries: List[ScheduleEntry],
+        existing_events: List[CalendarEvent]) -> List[ScheduleEntry]:
         """
-        Parse various timestamp formats to local timezone datetime.
-        
-        Args:
-            s: Timestamp string in various formats
-            date_hint: Date to use for time-only strings
-        
-        Returns:
-            Timezone-aware datetime object
-        
-        Examples:
-            >>> processor = ScheduleProcessor()
-            >>> dt = processor.parse_iso_to_local("08:00", date_hint=date(2025,11,18))
-            >>> dt.hour
-            8
-        """
-        # Only time provided (e.g., "08:00")
-        if re.match(r'^\d{1,2}:\d{2}(:\d{2})?$', s):
-            if date_hint is None:
-                date_hint = datetime.date.today()
-            parts = list(map(int, s.split(':')))
-            hour = parts[0]
-            minute = parts[1]
-            second = parts[2] if len(parts) > 2 else 0
-            dt = datetime.datetime(
-                date_hint.year, date_hint.month, date_hint.day,
-                hour, minute, second
-            )
-            dt = self.timezone.localize(dt)
-            return dt
-        
-        # Full ISO string
-        dt = datetime.datetime.fromisoformat(s.replace('Z', '+00:00'))
-        if dt.tzinfo is None:
-            dt = self.timezone.localize(dt)
-        else:
-            dt = dt.astimezone(self.timezone)
-        return dt
-    
-    def filter_conflicting_entries(
-        self,
-        schedule_entries: List[Dict[str, Any]],
-        existing_events: List[Dict[str, str]]
-    ) -> List[Dict[str, Any]]:
-        """
-        Remove entries that overlap with fixed calendar events.
-        
-        Args:
-            schedule_entries: Generated schedule entries
-            existing_events: Fixed calendar events
-        
-        Returns:
-            Filtered list of non-conflicting entries
+        Remove generated schedule entries that overlap with fixed calendar events.
         """
         self.logger.info("Filtering generated schedule against fixed events")
         
-        filtered = []
+        filtered: List[ScheduleEntry] = []
         conflicts_found = []
         
-        today = datetime.date.today()
-        tomorrow = today + datetime.timedelta(days=1)
-        
-        # Pre-process fixed events
-        parsed_fixed_events = []
-        for evt in existing_events:
-            try:
-                s_raw = evt.get('start', '')
-                e_raw = evt.get('end', '')
-                s = self.parse_iso_to_local(s_raw)
-                e = self.parse_iso_to_local(e_raw)
-                if s and e:
-                    parsed_fixed_events.append({
-                        'summary': evt.get('summary', 'Unknown'),
-                        'start': s,
-                        'end': e
-                    })
-            except Exception as ex:
-                self.logger.warning(
-                    f"Skipping fixed event '{evt.get('summary', 'Unknown')}' "
-                    f"due to parse error: {ex}"
-                )
-        
-        # Check each entry for conflicts
         for entry in schedule_entries:
-            try:
-                date_indicator = entry.get('date', 'today').lower()
-                entry_date = tomorrow if date_indicator == 'tomorrow' else today
-                
-                # Parse entry times
-                entry_start = self.parse_iso_to_local(
-                    entry['start_time'], 
-                    date_hint=entry_date
-                )
-                entry_end = self.parse_iso_to_local(
-                    entry['end_time'], 
-                    date_hint=entry_date
-                )
-                
-                # Handle overnight events
-                if entry_end <= entry_start:
-                    entry_end = entry_end + datetime.timedelta(days=1)
-                
-                # Check for overlaps
-                has_conflict = False
-                conflicting_event = None
-                
-                for evt in parsed_fixed_events:
-                    # Overlap: evt.start < entry_end AND evt.end > entry_start
-                    if evt['start'] < entry_end and evt['end'] > entry_start:
-                        has_conflict = True
-                        conflicting_event = evt
-                        break
-                
-                if has_conflict:
-                    conflicts_found.append({
-                        'title': entry.get('title', 'Unknown'),
-                        'time': f"{entry['start_time']}-{entry['end_time']}",
-                        'blocked_by': conflicting_event['summary']
-                    })
-                    self.logger.debug(
-                        f"Skipping '{entry.get('title', 'Unknown')}' "
-                        f"({entry['start_time']}-{entry['end_time']}) - "
-                        f"conflicts with '{conflicting_event['summary']}'"
-                    )
-                else:
-                    # Attach parsed datetimes for later use
-                    entry['_parsed_start'] = entry_start
-                    entry['_parsed_end'] = entry_end
-                    filtered.append(entry)
+            if entry.end_time <= entry.start_time:
+                self.logger.warning(f"Skipping entry with invalid duration: {entry.title}")
+                continue
+    
+            has_conflict = False
+            conflicting_event_summary = None
             
-            except (ValueError, KeyError, TypeError) as e:
-                self.logger.warning(
-                    f"Skipping malformed entry '{entry.get('title', 'Unknown')}': {e}"
+            # Create a temporary CalendarEvent from the ScheduleEntry to use the overlaps_with method
+            temp_entry_event = CalendarEvent(
+                summary=entry.title,
+                start=entry.start_time,
+                end=entry.end_time
+            )
+            
+            for fixed_event in existing_events:
+                try:
+                    if fixed_event.overlaps_with(temp_entry_event):
+                        has_conflict = True
+                        conflicting_event_summary = fixed_event.summary
+                        break
+                except TypeError as e:
+                    # If there's still a timezone comparison issue, log and skip
+                    self.logger.warning(f"Timezone comparison error for {entry.title}: {e}")
+                    continue
+            
+            if has_conflict:
+                conflicts_found.append({
+                    'title': entry.title,
+                    'time': f"{entry.start_time.strftime('%H:%M')}-{entry.end_time.strftime('%H:%M')}",
+                    'blocked_by': conflicting_event_summary
+                })
+                self.logger.debug(
+                    f"Skipping '{entry.title}' "
+                    f"({entry.start_time.time()}-{entry.end_time.time()}) - "
+                    f"conflicts with '{conflicting_event_summary}'"
                 )
-        
-        # Log conflict summary
+            else:
+                filtered.append(entry)
+                
+        # Log conflict summary (same as before)
         if conflicts_found:
             self.logger.warning(f"Filtered out {len(conflicts_found)} conflicting entries:")
             for conflict in conflicts_found:
@@ -178,11 +95,7 @@ class ScheduleProcessor:
                     f"  - {conflict['title']} ({conflict['time']}) "
                     f"blocked by {conflict['blocked_by']}"
                 )
-            self.logger.info(
-                "TIP: These tasks should be rescheduled. "
-                "Consider running the planner again after your calendar events."
-            )
-        
+            
         self.logger.info(
             f"Final schedule: {len(filtered)} non-conflicting entries "
             f"(removed {len(conflicts_found)} conflicts)"
@@ -190,145 +103,93 @@ class ScheduleProcessor:
         
         return filtered
     
+    # --- Renamed and adapted to handle typed ScheduleEntry objects ---
+    
     def save_schedule(
         self, 
-        schedule_data: Dict[str, Any], 
+        schedule_entries: List[ScheduleEntry],  # Accepts typed ScheduleEntry objects
         filepath: Path = Config.SCHEDULE_OUTPUT_FILE
     ) -> bool:
         """
         Save schedule JSON to file.
         
         Args:
-            schedule_data: Schedule dictionary to save
+            schedule_entries: List of ScheduleEntry objects to save
             filepath: Output file path
         
         Returns:
             True if successful, False otherwise
         """
         try:
+            # Prepare data for JSON serialization, converting ScheduleEntry objects to dicts
+            data_to_save = {
+                "schedule_entries": [
+                    entry.to_dict() if hasattr(entry, 'to_dict') else entry.__dict__
+                    for entry in schedule_entries
+                ],
+                "generated_at": datetime.datetime.now().isoformat()
+            }
+            
             with open(filepath, 'w', encoding="utf-8") as f:
-                json.dump(schedule_data, f, indent=2, ensure_ascii=False)
+                # Need a custom encoder for datetime and Enum objects if they are not converted to dicts/strings
+                # Assuming ScheduleEntry has a .to_dict() or a custom JSONEncoder is used elsewhere
+                json.dump(data_to_save, f, indent=2, default=str, ensure_ascii=False)
+                
             self.logger.info(f"Schedule saved to {filepath}")
             return True
         except Exception as e:
             self.logger.error(f"Could not save schedule: {e}", exc_info=True)
             return False
-    
-    @staticmethod   
-    def _parse_date_to_iso(date_str: str) -> str | None:
-        """Try to parse a date string into ISO YYYY-MM-DD. Return None if cannot parse."""
-        s = date_str.strip()
-        # today / tomorrow
-        if s.lower() == "today":
-            return datetime.date.today().isoformat()
-        if s.lower() == "tomorrow":
-            return (datetime.date.today() + datetime.timedelta(days=1)).isoformat()
-    
-        # Try isoformat first (handles YYYY-MM-DD reliably)
-        try:
-            d = datetime.date.fromisoformat(s)
-            return d.isoformat()
-        except Exception:
-            pass
-    
-        # Try other known patterns
-        for fmt, pattern in Config.DATE_PATTERNS:
-            if pattern.match(s):
-                try:
-                    d = datetime.datetime.strptime(s, fmt).date()
-                    return d.isoformat()
-                except Exception:
-                    continue
-    
-        # As a last attempt, be forgiving: try parsing common separators
-        try:
-            s2 = re.sub(r"[^\d]", "-", s)  # convert separators to '-'
-            parts = s2.split("-")
-            if len(parts) == 3:
-                # attempt day-first if it looks like dd-mm-yyyy
-                if len(parts[0]) == 2 and len(parts[2]) == 4:
-                    d = datetime.datetime.strptime(s2, "%d-%m-%Y").date()
-                else:
-                    d = datetime.datetime.strptime(s2, "%Y-%m-%d").date()
-                return d.isoformat()
-        except Exception:
-            pass
-    
-        return None
-    
-    
-    def validate_schedule_entries(self, entries: List[Dict[str, Any]]
-                                  ) -> Tuple[List[Dict[str, Any]], List[str]]:
+            
+    # --- The date parsing logic is now integrated into the ScheduleEntry factory, 
+    #     but we will keep a simplified validation helper for the raw input phase. ---
+
+    def validate_schedule_entries(
+        self, 
+        raw_entries: List[ScheduleEntry] # <-- Corrected type hint to expect typed objects
+    ) -> Tuple[List[ScheduleEntry], List[str]]:
         """
-        Validate schedule entries and return valid ones with error messages.
-    
-        - Accepts 'today', 'tomorrow' and concrete dates.
-        - Normalizes `entry['date']` to ISO YYYY-MM-DD on success.
+        Validate raw schedule entries (now expected to be typed ScheduleEntry objects)
+        and return valid ones, along with a list of error messages.
+        
+        We now rely on attribute access and assume upstream components are creating 
+        these objects from the LLM output.
         """
-        valid_entries: List[Dict[str, Any]] = []
+        valid_entries: List[ScheduleEntry] = []
         errors: List[str] = []
-    
-        required_fields = ['title', 'start_time', 'end_time', 'phase', 'date']
-        valid_phases = ['WOOD', 'FIRE', 'EARTH', 'METAL', 'WATER']
-    
-        today = datetime.date.today()
-    
-        for i, entry in enumerate(entries):
-            # Check required fields
-            missing_fields = [f for f in required_fields if f not in entry]
-            if missing_fields:
-                error = (
-                    f"Entry {i+1} ('{entry.get('title', 'Unknown')}') "
-                    f"missing fields: {', '.join(missing_fields)}"
-                )
-                errors.append(error)
-                self.logger.warning(error)
-                continue
-    
-            # Validate phase
-            phase_value = str(entry.get('phase', '')).upper()
-            if phase_value not in valid_phases:
-                error = (
-                    f"Entry {i+1} ('{entry['title']}') "
-                    f"has invalid phase: {entry.get('phase')}"
-                )
-                errors.append(error)
-                self.logger.warning(error)
-                continue
-            # normalize phase
-            entry['phase'] = phase_value
-    
-            # Validate and normalize date
-            raw_date = str(entry.get('date', '')).strip()
-            parsed_iso = self._parse_date_to_iso(raw_date)
-            if not parsed_iso:
-                error = (
-                    f"Entry {i+1} ('{entry['title']}') "
-                    f"has invalid date: {entry.get('date')}"
-                )
-                errors.append(error)
-                self.logger.warning(error)
-                continue
-    
-            # Optional: warn if date is in the past
+        
+        self.logger.info(f"Validating {len(raw_entries)} raw schedule entries.")
+        
+        for i, entry in enumerate(raw_entries):
+            # Access attributes directly, assuming `entry` is a ScheduleEntry or similar object
+            # Use getattr for robustness to handle potentially malformed objects missing attributes
+            title = getattr(entry, 'title', f'Entry {i+1}')
+            
             try:
-                parsed_date = datetime.date.fromisoformat(parsed_iso)
-                if parsed_date < today:
-                    self.logger.warning(
-                        f"Entry {i+1} ('{entry['title']}') has a past date: {parsed_iso}"
-                    )
-            except Exception:
-                # shouldn't happen because parsed_iso came from fromisoformat
-                pass
-    
-            # set normalized date string
-            entry['date'] = parsed_iso
-    
-            # optionally validate time formats here (skipped to keep parity with original)
-    
-            valid_entries.append(entry)
-    
+                # We no longer call schedule_entry_from_dict(raw_entry) as the input is 
+                # expected to be a typed object, not a dictionary.
+                
+                # Check 1: Explicitly check for valid datetime objects
+                if not isinstance(entry.start_time, datetime.datetime) or not isinstance(entry.end_time, datetime.datetime):
+                    raise TypeError("Start or end time is not a valid datetime object.")
+                
+                # Check 2: Time span validation (now relying on the logic inside ScheduleEntry.__post_init__).
+                # If the validation in __post_init__ was skipped during creation, we can manually 
+                # check the core business logic conflict here:
+                
+                if entry.end_time <= entry.start_time and not (entry.end_time.date() > entry.start_time.date()):
+                    raise ValueError("End time must be strictly after start time on the same day.")
+
+                valid_entries.append(entry)
+                
+            except (AttributeError, ValueError, TypeError) as e:
+                # Catch errors related to missing attributes or failed validation
+                error_msg = f"Skipping invalid entry '{title}': {e}"
+                errors.append(error_msg)
+                self.logger.warning(error_msg)
+        
         self.logger.info(
-            f"Validated {len(valid_entries)}/{len(entries)} entries ({len(errors)} errors)"
+            f"Validation complete: {len(valid_entries)} valid entries "
+            f"({len(errors)} errors)"
         )
         return valid_entries, errors

@@ -1,4 +1,4 @@
-# File: src/core/orchestrator.py (Refactored)
+# File: src/core/orchestrator.py
 """
 Main orchestrator module for Harmonious Day.
 Coordinates all components to generate daily schedules.
@@ -8,7 +8,7 @@ specific tasks to focused service classes.
 """
 
 import datetime
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from src.core.config_manager import Config
 from src.utils.logger import setup_logger
@@ -25,6 +25,8 @@ from src.llm.client import (
     call_groq_llm,
     pretty_print_schedule
 )
+# New imports for type safety
+from src.models.models import ScheduleEntry, CalendarEvent, Task, Habit, task_from_dict
 
 logger = setup_logger(__name__)
 
@@ -108,14 +110,16 @@ class Orchestrator:
             # Step 1: Gather Data
             logger.info("STEP 1: Gathering Data")
             data = self.data_collector.collect_all_data()
-            calendar_events = data['calendar_events']
-            raw_tasks = data['raw_tasks']
-            raw_habits = data['raw_habits']
+            
+            # Assume DataCollector now returns typed model lists
+            calendar_events: List[CalendarEvent] = data['calendar_events']
+            raw_tasks = data['tasks']
+            raw_habits = data['habits']
             
             # Step 2: Process Data
             logger.info("STEP 2: Processing Data")
-            tasks = self.task_processor.process_tasks(raw_tasks)
-            habits = filter_habits(raw_habits)
+            tasks: List[Task] = self.task_processor.process_tasks(raw_tasks)
+            habits: List[Habit] = filter_habits(raw_habits)
             
             logger.info(
                 f"Processed: {len(calendar_events)} calendar events, "
@@ -141,24 +145,24 @@ class Orchestrator:
                 logger.error(f"AI generation failed: {result.get('message')}")
                 return False
             
-            schedule_data = result['output']
-            logger.info("Schedule generated successfully")
+            # The LLM client now returns a List[ScheduleEntry] directly in 'output'
+            generated_entries: List[ScheduleEntry] = result['output']
+            logger.info(f"Schedule generated successfully with {len(generated_entries)} initial entries")
             
             # Step 5: Post-Process
             logger.info("STEP 5: Post-Processing Schedule")
             
-            # Validate entries
-            entries = schedule_data.get('schedule_entries', [])
+            # Validate entries (valid_entries is List[ScheduleEntry])
             valid_entries, validation_errors = \
-                self.schedule_processor.validate_schedule_entries(entries)
+                self.schedule_processor.validate_schedule_entries(generated_entries)
             
             if validation_errors:
                 logger.warning(f"Found {len(validation_errors)} validation errors")
                 for error in validation_errors:
                     logger.warning(f"  - {error}")
             
-            # Filter conflicts
-            final_entries = self.schedule_processor.filter_conflicting_entries(
+            # Filter conflicts (final_entries is List[ScheduleEntry])
+            final_entries: List[ScheduleEntry] = self.schedule_processor.filter_conflicting_entries(
                 valid_entries, calendar_events
             )
             
@@ -166,17 +170,15 @@ class Orchestrator:
                 logger.error("No valid entries after filtering")
                 return False
             
-            # Update schedule data with final entries
-            schedule_data['schedule_entries'] = final_entries
+            # Save to file (passing List[ScheduleEntry] directly)
+            self.schedule_processor.save_schedule(final_entries)
             
-            # Save to file
-            self.schedule_processor.save_schedule(schedule_data)
+            # Pretty print (passing List[ScheduleEntry] and List[CalendarEvent])
+            pretty_print_schedule(final_entries, calendar_events)
             
-            # Pretty print
-            pretty_print_schedule(schedule_data, calendar_events)
-            
-            # Step 7: Write to Calendar
+            # Step 6: Write to Calendar
             logger.info("STEP 6: Writing to Calendar")
+            # calendar_service.create_events will need to be updated to accept List[ScheduleEntry]
             created_count = self.calendar_service.create_events(
                 final_entries,
                 self.today_date_str
@@ -214,6 +216,7 @@ class Orchestrator:
         """
         logger.info("Starting one-time Google authentication")
         
+        # Assuming 'auth' is importable from the project root or relevant path
         from auth import create_initial_token
         success = create_initial_token()
         

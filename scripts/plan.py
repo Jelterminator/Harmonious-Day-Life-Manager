@@ -1,4 +1,3 @@
-# File: scripts/plan.py
 """
 Daily schedule planner entry point.
 Run this file every day to generate your schedule.
@@ -63,7 +62,7 @@ def main() -> int:
             logger.error(f"Plan generation failed after {elapsed:.2f} seconds")
             logger.error("="*60)
             return 1
-        
+            
     except FileNotFoundError as e:
         logger.error("Missing required file", exc_info=True)
         logger.error(f"Could not find: {e.filename}")

@@ -1,4 +1,3 @@
-# File: scripts/setup.py
 """
 One-time setup wizard for Harmonious Day.
 Guides users through dependency installation, API key configuration,
@@ -58,6 +57,7 @@ def setup_groq_api() -> bool:
     Returns:
         True if successful, False otherwise
     """
+    # Import inside function to ensure Config is available after initial dependency check
     from src.core.config_manager import Config
     
     print("Groq API Key Setup")
@@ -80,7 +80,10 @@ def setup_groq_api() -> bool:
         return False
     
     try:
-        Config.ENV_FILE.write_text(f"GROQ_API_KEY={key}\n")
+        # Check if .env exists, if so, append, otherwise write new
+        current_content = Config.ENV_FILE.read_text() if Config.ENV_FILE.exists() else ""
+        new_content = current_content.strip() + f"\nGROQ_API_KEY={key}\n"
+        Config.ENV_FILE.write_text(new_content)
         print("Groq API key saved.")
         return True
     except Exception as e:
@@ -90,11 +93,14 @@ def setup_groq_api() -> bool:
 
 def find_existing_habits_sheet(drive_service, title: str):
     """
-    Searches the user's Google Drive for a spreadsheet with given title.
+    Searches the user's Google Drive for a spreadsheet with given title, 
+    excluding trashed files.
+    
     Returns:
-        (spreadsheet_id, sheet_id) or (None, None)
+        (spreadsheet_id) or (None)
     """
-    query = f"name = '{title}' and mimeType = 'application/vnd.google-apps.spreadsheet'"
+    # Added 'and trashed = false' for robustness
+    query = f"name = '{title}' and mimeType = 'application/vnd.google-apps.spreadsheet' and trashed = false"
     
     try:
         results = drive_service.files().list(
@@ -123,6 +129,7 @@ def create_default_habits_sheet(sheets_service) -> str:
     Returns:
         Sheet ID if successful, None otherwise
     """
+    # NOTE: The default habits must align with the src/models/models.py `Phase` enum
     headers = ['id', 'title', 'duration_min', 'frequency', 'ideal_phase', 
                'task_type', 'due_day', 'active']
     
@@ -197,7 +204,7 @@ def create_default_habits_sheet(sheets_service) -> str:
             }
         ).execute()
 
-        print(f"Habit sheet created.")
+        print(f"Habit sheet created. Spreadsheet ID: {spreadsheet_id}")
         return spreadsheet_id
 
     except Exception as e:
@@ -215,6 +222,7 @@ def update_env_with_sheet_id(sheet_id: str) -> bool:
     Returns:
         True if successful, False otherwise
     """
+    # Import inside function to ensure Config is available after initial dependency check
     from src.core.config_manager import Config
     
     try:
@@ -233,7 +241,8 @@ def update_env_with_sheet_id(sheet_id: str) -> bool:
             )
         else:
             # Append new
-            env_content += f"\nSHEET_ID={sheet_id}\n"
+            # Ensure it's on a new line if content exists
+            env_content = env_content.strip() + f"\nSHEET_ID={sheet_id}\n"
         
         Config.ENV_FILE.write_text(env_content)
         print("Sheet ID saved to .env")
@@ -286,29 +295,32 @@ def main() -> None:
     else:
         print("Existing token.json found")
 
-    # Step 4: Setting up sheets    
-    print("\nStep 4: Setting Up Google Sheets")
+    # Step 4: Setting up Habit Sheet (Database)
+    print("\nStep 4: Setting Up Google Sheets (Habit Database)")
+    # Get services with drive access to search for existing sheets
     calendar_service, sheets_service, tasks_service, drive_service = get_google_services(include_drive=True)
+    
+    final_sheet_id = None
     
     # Check if sheet already exists
     existing_sheet = find_existing_habits_sheet(drive_service, DEFAULT_SHEET_TITLE)
     
     if existing_sheet:
-        print(f"Existing Habit Database detected. Using it: {existing_sheet}")
-        update_env_with_sheet_id(existing_sheet)
-        sheet_id = existing_sheet
+        print(f"Existing Habit Database detected. Using ID: {existing_sheet}")
+        final_sheet_id = existing_sheet
     else:
         print("No existing Habit Database found. Creating a new one...")
-        sheet_id = create_default_habits_sheet(sheets_service)
-        if sheet_id:
-            update_env_with_sheet_id(sheet_id)
+        new_sheet_id = create_default_habits_sheet(sheets_service)
+        if new_sheet_id:
+            final_sheet_id = new_sheet_id
+        else:
+            print("Habit sheet creation failed.")
     
-    # Step 5: Create Habit Sheet
-    sheet_id = create_default_habits_sheet(sheets_service)
-    if sheet_id:
-        update_env_with_sheet_id(sheet_id)
+    if final_sheet_id:
+        # Save the confirmed sheet ID to the environment file
+        update_env_with_sheet_id(final_sheet_id)
     else:
-        print("Habit sheet creation failed, but you can create it manually later")
+        print("WARNING: Could not determine the Habit Database ID. Please check Google Sheets setup.")
     
     # Final verification
     print("\nStep 5: Verification")

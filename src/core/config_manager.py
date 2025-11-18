@@ -14,9 +14,6 @@ from dotenv import load_dotenv
 # Import the new type models
 from src.models.models import PriorityTier, Phase
 
-# Load environment variables
-load_dotenv()
-
 class Config:
     """Application configuration singleton."""
     
@@ -37,6 +34,9 @@ class Config:
     TOKEN_FILE = BASE_DIR / "token.json"
     CREDENTIALS_FILE = BASE_DIR / "credentials.json"
     ENV_FILE = BASE_DIR / ".env"
+    
+    # Load environment variables
+    load_dotenv(dotenv_path=ENV_FILE, override=True)
     
     # API Keys
     GROQ_API_KEY = os.getenv("GROQ_API_KEY")

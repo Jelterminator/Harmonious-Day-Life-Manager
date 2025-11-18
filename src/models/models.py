@@ -97,13 +97,18 @@ class Task:
             try:
                 self.priority = PriorityTier(self.priority)
             except ValueError:
-                # Fallback logic or re-raise depending on strictness
-                pass 
+                # Fallback to default priority
+                self.priority = PriorityTier.T4
 
-        # Auto-convert deadline string to datetime if passed incorrectly
-        if isinstance(self.deadline, str):
-             # Use the helper logic defined above or standard fromisoformat
-             self.deadline = datetime.fromisoformat(self.deadline.replace('Z', '+00:00'))
+        # FIX: Only convert deadline if it's a string AND not None
+        if self.deadline and isinstance(self.deadline, str):
+            try:
+                # Use the helper function from your models
+                from src.models.models import parse_iso_datetime
+                self.deadline = parse_iso_datetime(self.deadline)
+            except (ValueError, AttributeError):
+                # If parsing fails, set to None
+                self.deadline = None
     
     @property
     def deadline_str(self) -> str:
@@ -120,7 +125,9 @@ class Task:
         """Check if task is overdue."""
         if not self.deadline:
             return False
-        return datetime.now(self.deadline.tzinfo) > self.deadline
+        # FIX: Handle timezone-aware comparison
+        now = datetime.now(self.deadline.tzinfo) if self.deadline.tzinfo else datetime.now()
+        return now > self.deadline
     
     def to_dict(self) -> dict:
         """Convert to dictionary for backwards compatibility."""
@@ -139,7 +146,6 @@ class Task:
             'hours_per_day_needed': self.hours_per_day_needed,
             'total_remaining_effort': self.total_remaining_effort,
         }
-
 
 @dataclass
 class TaskProject:

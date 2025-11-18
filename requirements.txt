@@ -1,14 +1,23 @@
-
 # Google API dependencies
-google-auth>=2.0.0
+google-auth>=2.20.0
 google-auth-oauthlib>=1.0.0
-google-api-python-client>=2.0.0
+google-api-python-client>=2.70.0
 
 # HTTP and API requests
-requests==2.31.0
+requests>=2.31.0
 
 # Environment variable management
-python-dotenv==1.0.0
+python-dotenv>=1.0.0
 
 # Timezone support
-pytz==2023.3
+pytz>=2023.3
+
+# Testing (optional, for development)
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Type checking (optional, for development)
+mypy>=1.5.0
+
+# Code formatting (optional, for development)
+black>=23.7.0

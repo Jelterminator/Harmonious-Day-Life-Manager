@@ -1,10 +1,45 @@
-# Google API Credentials
+# Credentials
 credentials.json
 token.json
 
-# Environment variables (if you start using them)
+# Environment
 .env
 
-# Python artifacts
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+
+# Logs
+logs/
+*.log
+
+# Output
+output/
+generated_schedule.json
+last_world_prompt.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Type checking
+.mypy_cache/
+.dmypy.json

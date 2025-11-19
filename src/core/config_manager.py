@@ -55,7 +55,7 @@ class Config:
     # Application Settings
     TARGET_TIMEZONE = os.getenv("TIMEZONE", "Europe/Amsterdam")
     GENERATOR_ID = "AI_Harmonious_Day_Orchestrator_v1"
-    MAX_OUTPUT_TASKS = 18
+    MAX_OUTPUT_TASKS = 24
     
     # LLM Settings
     GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"

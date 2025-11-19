@@ -114,13 +114,14 @@ class PromptBuilder:
         
         prompt_lines.append("CONSTRAINTS:")
         prompt_lines.append(
-            "Schedule urgent tasks first: all deadlines must be met."
+            "Schedule urgent tasks first: all deadlines must be met. "
             "Fit in many Pebbles (2-8 hours) after scheduling the Stones. "
-            "To achieve this the duration can be reduced by maximally 25%."
+            "To achieve this their duration can be reduced by maximally 20%."
         )
         prompt_lines.append(
-            "Chunking: If effort_h > 2.0, then you may schedule the task in "
-            "multiple blocks. It is okay to leave half finished tasks for the future."
+            "Chunking: If effort_h >= 3.0, then you may schedule the task in "
+            "multiple blocks with breaks added in bewteen. It is also okay to "
+            "leave half-finished tasks for the future."
         )
         prompt_lines.append(
             "When a parent task has numbered subtasks it is necessary to do "
@@ -136,16 +137,12 @@ class PromptBuilder:
         
         prompt_lines.append("CONSTRAINTS:")
         prompt_lines.append(
-            "Only plan habits after the calendar is already filled with "
-            "tasks & calendar events."
-        )
-        prompt_lines.append(
             "Like the sand entering the jar last and filling it to completion, "
             "fill all remaining spare time with habits."
         )
         prompt_lines.append(
-            "Schedule habits near their correct Phase. Skipping habits is no problem "
-            "at all. Durations may be changed up to 50%."
+            "Schedule habits near their correct Phase. Skipping habits is no "
+            "problem at all. Durations may be changed up to 50%."
         )
         prompt_lines.append(
             "When choosing habits you firstly prioritise emotional wellbeing, "
@@ -155,8 +152,8 @@ class PromptBuilder:
         
         # 7. OUTPUT SCHEMA
         prompt_lines.append(
-            "Return only JSON conforming to the following schema. "
             "Do not include reasoning. Keep titles long enough to be intelligible."
+            "\nReturn only JSON conforming to the following schema." 
         )
         
         # NOTE: Keeping the import inside the method as in the original file, 
@@ -190,6 +187,9 @@ class PromptBuilder:
         Add pebble tasks (T1-T5) to prompt.
         """
         pebbles_present = False
+        
+        # Task by id dictionary, will be useful later
+        task_by_id = {t.id: t for t in tasks}
         
         # Group by priority
         by_priority = defaultdict(list)

@@ -81,11 +81,11 @@ class TaskProcessor:
         if days_until <= 0: return PriorityTier.T1, 0.0, total_effort_hours
         hours_needed = total_effort_hours / max(1.0, days_until)
         
-        if hours_needed > 8 or days_until <= 1: tier = PriorityTier.T1
+        if hours_needed > 12 or days_until <= 1: tier = PriorityTier.T1
         elif hours_needed > 6: tier = PriorityTier.T2
-        elif hours_needed > 4: tier = PriorityTier.T3
-        elif hours_needed > 2: tier = PriorityTier.T4
-        elif hours_needed > 1: tier = PriorityTier.T5
+        elif hours_needed > 3: tier = PriorityTier.T3
+        elif hours_needed > 1.5: tier = PriorityTier.T4
+        elif hours_needed > 0.75: tier = PriorityTier.T5
         else: tier = PriorityTier.T7
         
         return tier, days_until, hours_needed
@@ -125,18 +125,21 @@ class TaskProcessor:
             subtasks: List[Task] = getattr(parent_task, 'subtasks', [])
             
             # Standalone task (no subtasks): Add it to the schedule ONLY if it's not a subtask
-            if not subtasks and not getattr(parent_task, 'is_subtask', False):
+            if not subtasks and not getattr(parent_task, 'is_subtask', False) and subtask.priority.value != PriorityTier.T7.value:
                 expanded_tasks.append(parent_task)
                 continue
             
+            
             # If we get here, it's a parent task with subtasks - only process subtasks
             priority_value = parent_task.priority.value if parent_task.priority else PriorityTier.T7.value
-            subtask_counts = {'T1': 4, 'T2': 3, 'T3': 2, 'T4': 1}
+                        
+            subtask_counts = {'T1': 4, 'T2': 3, 'T3': 2, 'T4': 1, 'T5': 1, 'T6': 1, 'T7': 0}
             count = subtask_counts.get(priority_value, 1)
             
             selected_subtasks = subtasks[:count]
             
             for sub in selected_subtasks:
+                sub.deadline = parent_task.deadline
                 sub.priority = parent_task.priority
                 sub.days_until_deadline = parent_task.days_until_deadline
                 sub.hours_per_day_needed = parent_task.hours_per_day_needed

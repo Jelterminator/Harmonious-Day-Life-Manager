@@ -7,7 +7,6 @@ The day is a continuous cycle of five dynamic phases of energy (Wu Xing), not st
 
 ### WOOD PHASE (05:30-09:00)
 **Element**: Growth, Planning, Vitality - Spring energy, new beginnings  
-**Islamic Anchor**: Fajr - divine start, remembrance, intention
 **Core Quality & Purpose**: Planning, new beginnings, vitality
 **Ideal Activities**: Setting intentions, dynamic movement, strategic planning
 **Sequence**:
@@ -23,7 +22,6 @@ The day is a continuous cycle of five dynamic phases of energy (Wu Xing), not st
 
 ### EARTH PHASE (13:00-15:00)
 **Element**: Integration - Late Summer pivot point  
-**Islamic Anchor**: Zuhr - grounding
 **Core Quality & Purpose**: Stability, nourishment, grounding
 **Ideal Activities**: Meals, administrative tasks, processing information
 **Sequence**:
@@ -33,13 +31,11 @@ The day is a continuous cycle of five dynamic phases of energy (Wu Xing), not st
 
 ### METAL PHASE (15:00-18:00)
 **Element**: Letting Go - Autumn refinement
-**Islamic Anchor**: Asr - reflection
 **Core Quality & Purpose**: Precision, organization, completion
 **Ideal Activities**: Structuring, refining, emails, study, letting go of the non-essential
 
 ### WATER PHASE (18:00-21:45)
-**Element**: Rest - Winter introspection  
-**Islamic Anchors**: Maghrib - gratitude & Isha - completion
+**Element**: Rest - Winter introspection
 **Core Quality & Purpose**: Storage, wisdom, restoration
 **Ideal Activities**: Reflection, low-energy tasks, reading, wind-down routines
 **Sequence**:
@@ -51,13 +47,10 @@ The day is a continuous cycle of five dynamic phases of energy (Wu Xing), not st
 ## Wu Wei (Effortless Action)
 Productivity arises from acting in harmony with the natural flow, not from forceful striving. It is "effortless effort" or "doing by not-doing," where actions feel natural and spontaneous. When the schedule is aligned with the Wu Xing rhythm, the day unfolds with less friction and more ease.
 
-## Sacred Rhythm (Islamic Prayer Anchors)
-The five daily prayers (Salah) serve as immovable spiritual pillars that structure the day. They provide regular pauses for remembrance (Dhikr) and reflection, creating a sacred rhythm that grounds temporal pursuits in a divine context. These anchors take precedence in scheduling, marking the primary transitions between phases.
-
 ## Jar Prioritization (Stones, Pebbles, Sand)
 This metaphor defines the non-negotiable order for filling the "jar" of your day.
 1.  **Stones**: Fixed calendar events and critical, high-urgency tasks. These are scheduled first and are immovable.
-2.  **Anchors**: Prayer times are scheduled around Stones.
+2.  **Anchors**: Prayer is scheduled after Stones, and skipped when a Stone is in its way.
 3.  **Pebbles**: Important but flexible tasks. These are scheduled in the remaining space after Stones and Anchors.
 4.  **Sand**: Habits, low-urgency chores, and self-care. These fill any remaining gaps.
 
@@ -69,9 +62,9 @@ The schedule must incorporate a daily and weekly variety of activities to preven
 A day of only one type of activity, even if productive, leads to imbalance. Variety maintains energy; it keeps things fresh and motivating. The ideal day is 60% hard work and 40% relaxed activity, don't forget about the importance of habits and the peace they bring.
 
 ## Sustainable Boundaries
--   **Sleep Protection**: The 21:45-5:30 sleep window is non-negotiable
--   **Task Chunking**: Large tasks (>2 hours) are scheduled in blocks of 30-180 minutes to maintain focus and feasibility
--   **Reasonable Limit**: No single activity can be done too long, and although variation of activities makes a lot more possible, you must respect the limits of a human.
+-   **Sleep & Rest**: The 21:45-5:30 sleep window is non-negotiable. Habits are equally vital; to preserve energy 1/3 of the day should be habitual downtime. 
+-   **Task Chunking**: Large tasks (>3 hours) are scheduled in intermitted blocks of 30-180 minutes to maintain focus and feasibility.
+-   **Reasonable Limit**: Although variation of activities makes a lot more possible, you must respect the limits of a human.
 
 ## SCHEDULING RULES
 

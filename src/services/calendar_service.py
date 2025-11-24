@@ -65,22 +65,29 @@ class GoogleCalendarService:
                 extended_props = event.get('extendedProperties', {}).get('private', {})
                 
                 # Filter out AI-generated events using the sourceId
-                if extended_props.get('sourceId') != self.generator_id:
-                    try:
-                        # Extract start/end, preferring dateTime (full timestamp) over date (all-day)
-                        start_time_raw = event['start'].get('dateTime', event['start'].get('date'))
-                        end_time_raw = event['end'].get('dateTime', event['end'].get('date'))
-                        
-                        start_dt = self._parse_gc_time(start_time_raw)
-                        end_dt = self._parse_gc_time(end_time_raw)
+                try:
+                    # Extract start/end, preferring dateTime (full timestamp) over date (all-day)
+                    start_time_raw = event['start'].get('dateTime', event['start'].get('date'))
+                    end_time_raw = event['end'].get('dateTime', event['end'].get('date'))
+                    
+                    start_dt = self._parse_gc_time(start_time_raw)
+                    end_dt = self._parse_gc_time(end_time_raw)
 
-                        if start_dt and end_dt:
-                            typed_events.append(CalendarEvent(
-                                event_id=event.get('id'),
-                                summary=event.get('summary', 'No Title'),
-                                start=start_dt,
-                                end=end_dt,
-                                is_generated=False
+                    if start_dt and end_dt and extended_props.get('sourceId') != self.generator_id:
+                        typed_events.append(CalendarEvent(
+                            event_id=event.get('id'),
+                            summary=event.get('summary', 'No Title'),
+                            start=start_dt,
+                            end=end_dt,
+                            is_generated=False
+                            ))
+                    elif start_dt and end_dt and extended_props.get('sourceId') == self.generator_id:
+                        typed_events.append(CalendarEvent(
+                            event_id=event.get('id'),
+                            summary=event.get('summary', 'No Title'),
+                            start=start_dt,
+                            end=end_dt,
+                            is_generated=True
                             ))
                     except Exception as e:
                         logger.warning(f"Could not parse event data for {event.get('summary')}: {e}")

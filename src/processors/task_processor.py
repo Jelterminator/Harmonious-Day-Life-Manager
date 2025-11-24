@@ -125,7 +125,7 @@ class TaskProcessor:
             subtasks: List[Task] = getattr(parent_task, 'subtasks', [])
             
             # Standalone task (no subtasks): Add it to the schedule ONLY if it's not a subtask
-            if not subtasks and not getattr(parent_task, 'is_subtask', False) and subtask.priority.value != PriorityTier.T7.value:
+            if not subtasks and not getattr(parent_task, 'is_subtask', False) and parent_task.priority.value != PriorityTier.T7.value:
                 expanded_tasks.append(parent_task)
                 continue
             

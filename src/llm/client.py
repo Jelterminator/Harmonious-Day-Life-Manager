@@ -15,7 +15,7 @@ import pytz
 from src.core.config_manager import Config
 from src.utils.logger import setup_logger
 # New imports for type-safe models
-from src.models.models import ScheduleEntry, CalendarEvent, Phase, schedule_entry_from_dict 
+from src.models.models import ScheduleEntry, CalendarEvent, Phase, parse_iso_datetime, schedule_entry_from_dict 
 
 logger = setup_logger(__name__)
 
@@ -179,7 +179,7 @@ def _fix_timestamp(timestamp_str: str) -> str:
         timestamp_str: Raw timestamp string from LLM
     
     Returns:
-        Normalized timestamp string
+        Normalized timestamp string in ISO format
     """
     timestamp_str = str(timestamp_str).strip()
     
@@ -189,11 +189,20 @@ def _fix_timestamp(timestamp_str: str) -> str:
     
     # ISO format without timezone: "2025-11-17T18:25:00"
     if re.match(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}', timestamp_str):
-        return timestamp_str
+        return timestamp_str + "+01:00"  # Add default timezone
     
-    # Simple time format "18:25:00" or "18:25" (no date)
-    if re.match(r'^\d{1,2}:\d{2}(:\d{2})?$', timestamp_str):
-        return timestamp_str
+    # Simple time format "18:25:00" or "18:25" (no date) - FIXED
+    time_only_match = re.match(r'^(\d{1,2}):(\d{2})(?::(\d{2}))?$', timestamp_str)
+    if time_only_match:
+        # Use today's date as default for time-only entries
+        from datetime import datetime
+        today = datetime.now().strftime("%Y-%m-%d")
+        hour = time_only_match.group(1).zfill(2)
+        minute = time_only_match.group(2).zfill(2)
+        second = time_only_match.group(3).zfill(2) if time_only_match.group(3) else "00"
+        fixed = f"{today}T{hour}:{minute}:{second}+01:00"
+        logger.debug(f"Fixed time-only timestamp: '{timestamp_str}' -> '{fixed}'")
+        return fixed
     
     # Space-separated: "2025-11-17 18:25:00" or "2025-11-17 18:25" or "2025-11-17 18"
     match = re.match(r'(\d{4}-\d{2}-\d{2})\s+(\d{1,2})(?::(\d{2}))?(?::(\d{2}))?', timestamp_str)
@@ -202,11 +211,11 @@ def _fix_timestamp(timestamp_str: str) -> str:
         hour = match.group(2).zfill(2)
         minute = match.group(3).zfill(2) if match.group(3) else "00"
         second = match.group(4).zfill(2) if match.group(4) else "00"
-        fixed = f"{date_part}T{hour}:{minute}:{second}"
-        logger.debug(f"Fixed timestamp: '{timestamp_str}' -> '{fixed}'")
+        fixed = f"{date_part}T{hour}:{minute}:{second}+01:00"
+        logger.debug(f"Fixed space-separated timestamp: '{timestamp_str}' -> '{fixed}'")
         return fixed
     
-    # If we can't parse it, return as-is
+    # If we can't parse it, return as-is but log a warning
     logger.warning(f"Could not parse timestamp '{timestamp_str}'")
     return timestamp_str
 
@@ -299,6 +308,7 @@ def call_groq_llm(
             }
         
         # 1. Fix timestamps and preliminary validation
+        # In call_groq_llm, after fixing timestamps but before creating ScheduleEntry:
         fixed_entries = []
         for entry in extracted_json.get("schedule_entries", []):
             # Validate required fields
@@ -311,8 +321,36 @@ def call_groq_llm(
             entry["start_time"] = _fix_timestamp(entry["start_time"])
             entry["end_time"] = _fix_timestamp(entry["end_time"])
             
-            fixed_entries.append(entry)
+            # NEW: Validate that timestamps are parseable before proceeding
+            try:
+                start_parsed = parse_iso_datetime(entry["start_time"])
+                end_parsed = parse_iso_datetime(entry["end_time"])
+                
+                if start_parsed is None or end_parsed is None:
+                    logger.warning(f"Skipping entry with unparseable timestamps: {entry.get('title', 'Unknown')}")
+                    logger.debug(f"Start: {entry['start_time']}, End: {entry['end_time']}")
+                    continue
+                    
+                # Also validate that start_time < end_time
+                if start_parsed >= end_parsed:
+                    logger.warning(f"Skipping entry with invalid time range: {entry.get('title', 'Unknown')}")
+                    logger.debug(f"Start: {start_parsed}, End: {end_parsed}")
+                    continue
+                    
+            except Exception as e:
+                logger.warning(f"Skipping entry due to timestamp error: {e}")
+                continue
             
+            fixed_entries.append(entry)
+        
+        # Temporary debug - add this right after the timestamp fixing loop
+        for i, entry in enumerate(fixed_entries):
+            start_parsed = parse_iso_datetime(entry["start_time"])
+            end_parsed = parse_iso_datetime(entry["end_time"])
+            logger.debug(f"Entry {i}: {entry['title']}")
+            logger.debug(f"  Raw start: {entry['start_time']} -> Parsed: {start_parsed}")
+            logger.debug(f"  Raw end: {entry['end_time']} -> Parsed: {end_parsed}")    
+        
         extracted_json["schedule_entries"] = fixed_entries
         logger.info(f"Validated and fixed {len(fixed_entries)} schedule entries")
 

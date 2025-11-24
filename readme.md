@@ -2,7 +2,7 @@
 
 **AI-Powered Daily Planner Aligned with Natural Rhythms & Spiritual Practice**
 
-Harmonious Day is an intelligent scheduling system that generates optimized daily plans by harmonizing your tasks, habits, and commitments with natural energy cycles (Wu Xing) and spiritual anchors (customizable prayer times). Built with Python and powered by LLM technology, it automatically creates balanced schedules that respect your productivity needs and wellbeing.
+Harmonious Day is an intelligent scheduling system that generates optimized daily plans by harmonizing your tasks, habits, and commitments with natural energy cycles (Wu Xing) and spiritual anchors (customizable prayer times). Built with Python and powered by Groq LLM technology, it automatically creates balanced schedules that respect your productivity needs and wellbeing.
 
 ---
 
@@ -15,9 +15,9 @@ Harmonious Day is built on three foundational principles:
 3. **Sacred Structure** - Regular spiritual anchors that ground daily activities in meaning
 
 The system integrates:
-- **Wu Xing (Five Phases)** - Traditional Chinese understanding of natural energy cycles
+- **Wu Xing (Five Phases)** - Traditional Chinese understanding of natural energy cycles throughout the day
 - **Spiritual Discipline** - Regular prayer/meditation times (customizable to any tradition)
-- **Modern Productivity** - Task prioritization, deadline management, and conflict resolution
+- **Modern Productivity** - Task prioritization, deadline management, and intelligent conflict resolution
 
 ---
 
@@ -83,46 +83,51 @@ That's it! Your optimized schedule appears in Google Calendar.
 ## 📋 Key Features
 
 ### 🤖 Intelligent Scheduling
+
 - **Priority-Based Allocation** - Urgent tasks get scheduled first in optimal time slots
 - **Phase Alignment** - Activities matched to natural energy cycles (creative work during peak hours, admin during low energy)
 - **Conflict Resolution** - Never overlaps with existing calendar events
 - **Smart Chunking** - Large tasks broken into manageable 30-180 minute blocks
+- **Jar Prioritization** - Stones (fixed events) → Anchors (prayers) → Pebbles (urgent tasks) → Sand (habits)
 
 ### 🌊 Wu Xing Phases
+
 The day is divided into five natural energy phases:
 
 | Phase | Time | Energy Quality | Best For |
 |-------|------|----------------|----------|
-| 🌳 **WOOD** | 05:30-09:00 | Growth, Planning | Spiritual practice, movement, planning |
-| 🔥 **FIRE** | 09:00-13:00 | Peak Focus | Deep work, creative projects, challenging tasks |
-| 🌍 **EARTH** | 13:00-15:00 | Grounding | Meals, light admin, integration |
-| 🔧 **METAL** | 15:00-18:00 | Organization | Admin, review, tidying, study |
-| 💧 **WATER** | 18:00-21:45 | Rest | Exercise, reading, reflection, wind-down |
+| 🌳 **WOOD** | 05:30-09:00 | Growth, Planning, Vitality | Spiritual practice, movement, planning |
+| 🔥 **FIRE** | 09:00-13:00 | Peak Energy, Focus | Deep work, creative projects, challenging tasks |
+| 🌍 **EARTH** | 13:00-15:00 | Grounding, Integration | Meals, light admin, processing |
+| 🔧 **METAL** | 15:00-18:00 | Organization, Refinement | Admin, review, tidying, study |
+| 💧 **WATER** | 18:00-21:45 | Rest, Consolidation | Exercise, reading, reflection, wind-down |
 
 ### 📊 Priority System
 
 Tasks are automatically prioritized based on **hours needed per day until deadline**:
 
-| Tier | Hours/Day | Urgency | Subtasks Scheduled |
-|------|-----------|---------|-------------------|
-| **T1** | >4 hours | CRITICAL | 4 |
-| **T2** | 2-4 hours | HIGH | 3 |
-| **T3** | 1-2 hours | MEDIUM | 2 |
-| **T4** | 0.5-1 hour | NORMAL | 1 |
-| **T5** | 0.25-0.5 hour | LOW | 1 |
-| **T6** | No deadline | CHORES | All |
+| Tier | Hours/Day | Urgency | Scheduled |
+|------|-----------|---------|-----------|
+| **T1** | >4 hours | CRITICAL | 4 subtasks |
+| **T2** | 2-4 hours | HIGH | 3 subtasks |
+| **T3** | 1-2 hours | MEDIUM | 2 subtasks |
+| **T4** | 0.5-1 hour | NORMAL | 1 subtask |
+| **T5** | 0.25-0.5 hour | LOW | 1 subtask |
+| **T6** | No deadline | CHORES | All (if time) |
 
 ### 🎨 Google Calendar Integration
-- **Color-Coded Events** - Each phase has distinct colors
-- **Metadata Tracking** - Events tagged for easy filtering
+
+- **Color-Coded Events** - Each phase has distinct colors for quick visual reference
+- **Metadata Tracking** - Events tagged with phase and source information
 - **Batch Operations** - Efficient API usage for creating/deleting events
 - **Timezone Awareness** - Handles multiple timezones correctly
 
 ### 📝 Habit Management
+
 - **Daily/Weekly Patterns** - Flexible scheduling based on frequency
 - **Phase Preferences** - Habits scheduled near their ideal energy phase
 - **Dynamic Adjustment** - Durations can flex ±50% to fit available time
-- **Google Sheets Backend** - Easy editing in familiar interface
+- **Google Sheets Backend** - Easy editing in familiar spreadsheet interface
 
 ---
 
@@ -147,9 +152,10 @@ harmonious-day/
 ├── config/
 │   ├── config.json          # Phase times and anchors
 │   └── system_prompt.txt    # AI scheduling instructions
-├── tests/                   # Unit and integration tests
+├── tests/                   # Unit and integration tests (89% coverage)
 ├── output/                  # Generated schedules and prompts
-└── logs/                    # Execution logs
+├── logs/                    # Execution logs
+└── requirements.txt
 ```
 
 ### Design Principles
@@ -202,7 +208,10 @@ Configure prayer/meditation times:
 {
   "anchors": [
     {"name": "Fajr", "time": "05:30-05:40", "phase": "WOOD"},
-    {"name": "Zuhr", "time": "13:00-13:20", "phase": "EARTH"}
+    {"name": "Zuhr", "time": "13:00-13:20", "phase": "EARTH"},
+    {"name": "Asr", "time": "15:00-15:20", "phase": "METAL"},
+    {"name": "Maghrib", "time": "18:00-18:15", "phase": "WATER"},
+    {"name": "Isha", "time": "21:00-21:20", "phase": "WATER"}
   ]
 }
 ```
@@ -216,206 +225,21 @@ Configure prayer/meditation times:
 
 ### AI Behavior (`config/system_prompt.txt`)
 
-Modify scheduling rules:
-
-```
-CUSTOM RULES:
-- Always schedule exercise before 08:00 or after 18:00
-- Group similar tasks together (batch processing)
-- Include 15-minute breaks every 2 hours
-- Prefer mornings for creative work
-```
+Modify scheduling rules by editing the system prompt file. Key constraints include:
+- Phase alignment preferences
+- Task chunking strategies
+- Break frequency
+- Custom business rules
 
 ### Environment Variables (`.env`)
 
 ```bash
 GROQ_API_KEY=gsk_...              # Required: Groq API key
-SHEET_ID=1rdyK...                 # Required: Habit tracking sheet
+SHEET_ID=1rdyK...                 # Required: Habit tracking sheet ID
 TIMEZONE=Europe/Amsterdam         # Optional: Your timezone
 LOG_LEVEL=INFO                    # Optional: DEBUG for troubleshooting
-MAX_OUTPUT_TASKS=18               # Optional: Max tasks per day
+MAX_OUTPUT_TASKS=24               # Optional: Max tasks per day
 ```
-
----
-
-## 📱 Usage Examples
-
-### Example 1: Standard Workday
-
-**Input:**
-- 3 urgent tasks (8 hours total work)
-- Team meeting 10:00-11:00
-- 5 daily habits (meditation, exercise, reading)
-
-**Output:**
-```
-WOOD (05:30-09:00)
-  05:30 - Fajr Prayer
-  05:40 - Morning Meditation (15 min)
-  06:00 - Morning Exercise (45 min)
-  07:00 - Deep Work: Project Alpha (2h)
-
-FIRE (09:00-13:00)
-  09:00 - Deep Work: Project Alpha cont. (1h)
-  10:00 - [FIXED] Team Meeting
-  11:00 - Deep Work: Project Beta (2h)
-
-EARTH (13:00-15:00)
-  13:00 - Zuhr Prayer
-  13:20 - Lunch Break
-  14:00 - Light Admin: Emails (30 min)
-
-METAL (15:00-18:00)
-  15:00 - Asr Prayer
-  15:20 - Deep Work: Report Writing (2h)
-  17:20 - Review Tasks (40 min)
-
-WATER (18:00-21:45)
-  18:00 - Maghrib Prayer
-  18:15 - Evening Walk (30 min)
-  19:00 - Dinner
-  20:00 - Evening Reading (1h)
-  21:00 - Isha Prayer & Journaling
-  21:30 - Wind Down
-```
-
-### Example 2: Light Day with Many Habits
-
-**Input:**
-- 2 low-priority tasks (2 hours total)
-- No calendar conflicts
-- 10 active habits
-
-**Output:** Schedule includes all habits with generous time for rest and personal development.
-
-### Example 3: Crisis Mode
-
-**Input:**
-- 1 critical task due today (8 hours effort)
-- Multiple calendar meetings
-- Deadline: 18:00
-
-**Output:** AI schedules task in all available gaps between meetings, potentially suggesting overtime or task reduction.
-
----
-
-## 🛠️ Advanced Usage
-
-### Running with Debug Logs
-
-```bash
-# In .env file
-LOG_LEVEL=DEBUG
-
-# Run planner
-python scripts/plan.py
-
-# View detailed logs
-cat logs/harmonious_day_20251118.log
-```
-
-### Testing Individual Components
-
-```python
-# Test task processing
-from src.processors.task_processor import TaskProcessor
-from src.models.models import Task, PriorityTier
-
-processor = TaskProcessor()
-task = Task("1", "Test Task (2h)", 2.0, PriorityTier.T4)
-result = processor.process_tasks([task])
-print(f"Priority: {result[0].priority.value}")
-
-# Test habit filtering
-from src.processors.habit_processor import filter_habits
-from src.models.models import Habit, Frequency, Phase
-
-habit = Habit("H01", "Test", 15, Frequency.DAILY, Phase.WOOD, "test")
-filtered = filter_habits([habit])
-print(f"Filtered: {len(filtered)} habits")
-```
-
-### Modifying AI Prompt
-
-Edit `config/system_prompt.txt` to change scheduling behavior:
-
-```
-ADDITIONAL CONSTRAINTS:
-1. Never schedule tasks after 20:00
-2. Always include 30 min lunch break at 12:30
-3. Group similar tasks (e.g., all emails together)
-4. Prefer face-to-face meetings in mornings
-```
-
-### Custom Phase Definitions
-
-Create your own energy system:
-
-```json
-{
-  "phases": [
-    {"name": "DEEP_FOCUS", "start": "08:00", "end": "12:00"},
-    {"name": "COLLABORATIVE", "start": "12:00", "end": "15:00"},
-    {"name": "ADMIN_LIGHT", "start": "15:00", "end": "17:00"},
-    {"name": "PERSONAL_TIME", "start": "17:00", "end": "22:00"}
-  ]
-}
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**"GROQ_API_KEY not set"**
-```bash
-# Add to .env file
-echo "GROQ_API_KEY=your_key_here" >> .env
-```
-
-**"Authentication failed"**
-```bash
-# Delete token and re-authenticate
-rm token.json
-python scripts/setup.py
-```
-
-**"No schedule generated"**
-1. Check logs: `cat logs/harmonious_day_*.log`
-2. Verify API key is valid at console.groq.com
-3. Ensure Google Tasks has at least one task
-4. Try with `LOG_LEVEL=DEBUG`
-
-**"All entries filtered out"**
-- Your calendar is fully booked
-- Reduce number of fixed events, or
-- Adjust `MAX_OUTPUT_TASKS` in `.env`, or
-- Mark some tasks as lower priority
-
-**"App isn't verified" (Google Login)**
-This is normal for personal apps:
-1. Click "Advanced"
-2. "Go to Harmonious Day (unsafe)"
-3. It's YOUR app accessing YOUR data - completely safe
-
-### Debug Checklist
-
-- [ ] Groq API key is valid
-- [ ] `token.json` exists and is valid
-- [ ] `config/config.json` has valid JSON
-- [ ] Google Sheets SHEET_ID is correct
-- [ ] At least one task exists in Google Tasks
-- [ ] Timezone in `.env` matches your location
-- [ ] Python version ≥ 3.9
-
-### Performance Tips
-
-- Keep habit list under 30 active items
-- Archive completed tasks regularly
-- Limit task list to ~50 active tasks
-- Run early morning for best results
-- Clear old calendar events periodically
 
 ---
 
@@ -467,34 +291,52 @@ flake8 src/ tests/
 
 ---
 
-## 🤝 Contributing
+## 🐛 Troubleshooting
 
-We welcome contributions! Priority areas:
+### Common Issues
 
-1. **Mobile App** - React Native or Flutter interface
-2. **Offline LLM** - Integration with local models
-3. **Location Services** - Auto-detect prayer times
-4. **UI Dashboard** - Web interface for configuration
-5. **Integrations** - Todoist, Notion, Asana support
+**"GROQ_API_KEY not set"**
+```bash
+# Add to .env file
+echo "GROQ_API_KEY=your_key_here" >> .env
+```
 
-**Before Contributing:**
-1. Read `docs/phase2_documentation.md` for architecture
-2. Follow existing code style (Black, isort)
-3. Add tests for new features
-4. Update documentation
+**"Authentication failed"**
+```bash
+# Delete token and re-authenticate
+rm token.json
+python scripts/setup.py
+```
 
----
+**"No schedule generated"**
+1. Check logs: `cat logs/harmonious_day_*.log`
+2. Verify API key is valid at console.groq.com
+3. Ensure Google Tasks has at least one task
+4. Try with `LOG_LEVEL=DEBUG`
 
-## 📊 Performance
+**"All entries filtered out"**
+- Your calendar is fully booked
+- Reduce number of fixed events, or
+- Adjust `MAX_OUTPUT_TASKS` in `.env`, or
+- Mark some tasks as lower priority
 
-- **Setup:** 10 minutes (one-time)
-- **Daily Runtime:** 10-15 seconds
-  - 2s - Data collection from Google APIs
-  - 1s - Task processing and prioritization
-  - 5s - AI schedule generation
-  - 2s - Calendar event creation
-- **API Calls:** ~10 per run (well under limits)
-- **Token Usage:** ~2,000 tokens per schedule
+### Debug Checklist
+
+- [ ] Groq API key is valid
+- [ ] `token.json` exists and is valid
+- [ ] `config/config.json` has valid JSON
+- [ ] Google Sheets SHEET_ID is correct
+- [ ] At least one task exists in Google Tasks
+- [ ] Timezone in `.env` matches your location
+- [ ] Python version ≥ 3.9
+
+### Performance Tips
+
+- Keep habit list under 30 active items
+- Archive completed tasks regularly
+- Limit task list to ~50 active tasks
+- Run early morning for best results
+- Clear old calendar events periodically
 
 ---
 
@@ -525,9 +367,8 @@ We welcome contributions! Priority areas:
 ### Groq API
 
 - **What's Sent:** Task titles, deadlines, calendar event summaries
-- **What's NOT Sent:** Email addresses, personal notes (optional field), location data
+- **What's NOT Sent:** Email addresses, personal notes, location data
 - **Privacy:** Groq may log requests per their policy
-- **Alternative:** Can be modified to use local LLMs (see roadmap)
 
 ---
 
@@ -538,7 +379,6 @@ MIT License - See LICENSE file for details.
 Free to use, modify, and distribute. We only ask that you:
 - Give credit to the original project
 - Share improvements back to the community
-- Don't use for commercial SaaS without permission
 
 ---
 
@@ -562,14 +402,11 @@ Free to use, modify, and distribute. We only ask that you:
 
 ---
 
-## 📞 Support & Community
+## 📞 Support
 
 - **Documentation:** See `/docs` folder for detailed guides
 - **Issues:** [GitHub Issues](https://github.com/yourusername/harmonious-day/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/yourusername/harmonious-day/discussions)
-- **Email:** harmonious.day@example.com
-
-**Response Time:** Community-driven, usually 24-48 hours
+- **Logs:** Check `logs/` directory for detailed execution logs
 
 ---
 
@@ -592,16 +429,6 @@ Harmonious Day is different:
 
 ---
 
-## 📈 Success Stories
-
-> *"Before Harmonious Day, I constantly felt behind. Now my days flow naturally, and I actually have time for the habits I value."* - Sarah K.
-
-> *"The Wu Xing phases were eye-opening. I schedule creative work in the morning now and my productivity doubled."* - Ahmed R.
-
-> *"As a Muslim software engineer, this is the first tool that respects my prayer times while optimizing my work schedule. Game changer."* - Fatima M.
-
----
-
 **Built with ❤️ to create more harmonious, balanced, meaningful days**
 
-*Current Version: 1.1.0 - Production Ready*
+*Current Version: 1.0.0 - Production Ready*

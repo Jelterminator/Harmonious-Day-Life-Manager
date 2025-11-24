@@ -629,8 +629,8 @@ class TogglIntegration(Plugin):
 | Version | Release | Focus | Key Features |
 |---------|---------|-------|--------------|
 | **1.1** | Q1 2026 | Config Automation | Dynamic config generation, tradition templates |
-| **1.2** | Q4 2026 | Privacy | Local LLM support, offline mode |
-| **1.3** | Q2-Q3 2026 | Mobile | React Native app, push notifications |
+| **1.2** | Q2 2026 | Privacy | Local LLM support, offline mode |
+| **1.3** | Q3-Q4 2026 | Mobile | React Native app, push notifications |
 | **2.0** | Q1 2027 | Universal | Multi-platform, self-hosted |
 | **2.5** | Q2-Q3 2027 | Intelligence | Pattern learning, predictive scheduling |
 | **3.0** | Q4 2027 | Ecosystem | Plugins, polish, community |

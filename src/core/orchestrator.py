@@ -90,33 +90,44 @@ class Orchestrator:
         """
         Execute the full daily planning pipeline.
         
-        Returns:
-            True if successful, False otherwise
-        
         Pipeline Steps:
             1. Clean up previous AI-generated events
-            2. Gather data (calendar, tasks, habits)
-            3. Process data (filter, prioritize)
-            4. Build prompt for LLM
-            5. Call AI to generate schedule
-            6. Filter conflicts and validate
-            7. Write to Google Calendar
+            2. Create anchor events (fixed prayers/meditations)
+            3. Gather data (calendar, tasks, habits)
+            4. Process data (filter, prioritize)
+            5. Build prompt for LLM
+            6. Call AI to generate schedule
+            7. Filter conflicts and validate
+            8. Write to Google Calendar
         """
         logger.info("="*60)
         logger.info("Starting Daily Plan Generation")
         logger.info("="*60)
         
-        try:            
-            # Step 1: Gather Data
+        try:
+            # Step 0: Load anchors from config
+            anchors = self.rules.get('anchors', [])
+            logger.info(f"Loaded {len(anchors)} anchors from config")
+            
+            # Step 1: Create Anchor Events (BEFORE gathering data)
+            logger.info("STEP 0: Creating Anchor Events")
+            anchor_count = self.calendar_service.create_anchor_events(
+                anchors,
+                self.today_date_str
+            )
+            logger.info(f"Created {anchor_count} anchor events as fixed calendar items")
+            
+            # Step 2: Gather Data
             logger.info("STEP 1: Gathering Data")
             data = self.data_collector.collect_all_data()
             
-            # Assume DataCollector now returns typed model lists
             calendar_events: List[CalendarEvent] = data['calendar_events']
             raw_tasks = data['tasks']
             raw_habits = data['habits']
             
-            # Step 2: Process Data
+            logger.info(f"Calendar now includes {len(calendar_events)} total events (with newly created anchors)")
+            
+            # Step 3: Process Data
             logger.info("STEP 2: Processing Data")
             tasks: List[Task] = self.task_processor.process_tasks(raw_tasks)
             habits: List[Habit] = filter_habits(raw_habits)
@@ -126,7 +137,7 @@ class Orchestrator:
                 f"{len(tasks)} prioritized tasks, {len(habits)} habits"
             )
             
-            # Step 3: Build Prompt
+            # Step 4: Build Prompt (WITHOUT anchors - they're now in calendar)
             logger.info("STEP 3: Building Prompt")
             world_prompt = self.prompt_builder.build_world_prompt(
                 calendar_events, tasks, habits
@@ -137,7 +148,7 @@ class Orchestrator:
             if not system_prompt:
                 raise FileNotFoundError("System prompt could not be loaded")
             
-            # Step 4: Call AI
+            # Step 5: Call AI
             logger.info("STEP 4: Calling AI")
             result = call_groq_llm(system_prompt, world_prompt)
             
@@ -145,14 +156,12 @@ class Orchestrator:
                 logger.error(f"AI generation failed: {result.get('message')}")
                 return False
             
-            # The LLM client now returns a List[ScheduleEntry] directly in 'output'
             generated_entries: List[ScheduleEntry] = result['output']
-            logger.info(f"Schedule generated successfully with {len(generated_entries)} initial entries")
+            logger.info(f"Schedule generated successfully with {len(generated_entries)} entries")
             
-            # Step 5: Post-Process
+            # Step 6: Post-Process
             logger.info("STEP 5: Post-Processing Schedule")
             
-            # Validate entries (valid_entries is List[ScheduleEntry])
             valid_entries, validation_errors = \
                 self.schedule_processor.validate_schedule_entries(generated_entries)
             
@@ -161,7 +170,6 @@ class Orchestrator:
                 for error in validation_errors:
                     logger.warning(f"  - {error}")
             
-            # Filter conflicts (final_entries is List[ScheduleEntry])
             final_entries: List[ScheduleEntry] = self.schedule_processor.filter_conflicting_entries(
                 valid_entries, calendar_events
             )
@@ -170,22 +178,18 @@ class Orchestrator:
                 logger.error("No valid entries after filtering")
                 return False
             
-            # Save to file (passing List[ScheduleEntry] directly)
             self.schedule_processor.save_schedule(final_entries)
-            
-            # Pretty print (passing List[ScheduleEntry] and List[CalendarEvent])
             pretty_print_schedule(final_entries, calendar_events)
             
-            # Step 6: Write to Calendar
+            # Step 7: Write to Calendar
             logger.info("STEP 6: Writing to Calendar")
-            # calendar_service.create_events will need to be updated to accept List[ScheduleEntry]
             created_count = self.calendar_service.create_events(
                 final_entries,
                 self.today_date_str
             )
             
             logger.info("="*60)
-            logger.info(f"SUCCESS: Created {created_count} calendar events")
+            logger.info(f"SUCCESS: Created {anchor_count} anchor events + {created_count} scheduled events")
             logger.info("="*60)
             
             return True

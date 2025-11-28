@@ -170,41 +170,50 @@ def _extract_json(llm_text: str) -> Optional[Dict[str, Any]]:
     return None
 
 
-def _fix_timestamp(timestamp_str: str) -> str:
+def _fix_timestamp(timestamp_str: str, date_category: str = "today") -> str:
     """
-    Fix malformed timestamps returned by the AI.
-    Converts various formats to ISO format.
-    
-    Args:
-        timestamp_str: Raw timestamp string from LLM
-    
-    Returns:
-        Normalized timestamp string in ISO format
+    Fix malformed timestamps. 
+    Uses date_category ('today'/'tomorrow') to determine the correct date 
+    if the LLM only provides a time.
     """
     timestamp_str = str(timestamp_str).strip()
     
+    # 1. Determine the target date based on the category
+    from datetime import datetime, timedelta
+    
+    # Get current local time (or UTC if you prefer, but consistancy matches your code)
+    now = datetime.now()
+    
+    if date_category.lower() == "tomorrow":
+        target_date_obj = now + timedelta(days=1)
+    else:
+        target_date_obj = now
+        
+    target_date_str = target_date_obj.strftime("%Y-%m-%d")
+
     # Already in correct ISO format with timezone
     if re.match(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}', timestamp_str):
+        # OPTIONAL: You could force the date here if the LLM got the specific date wrong
+        # but usually we trust the ISO string if it's fully formed.
         return timestamp_str
     
-    # ISO format without timezone: "2025-11-17T18:25:00"
+    # ISO format without timezone
     if re.match(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}', timestamp_str):
-        return timestamp_str + "+01:00"  # Add default timezone
-    
-    # Simple time format "18:25:00" or "18:25" (no date) - FIXED
+        return timestamp_str + "+01:00" 
+
+    # Simple time format "18:25:00" or "18:25" - FIXED LOGIC
     time_only_match = re.match(r'^(\d{1,2}):(\d{2})(?::(\d{2}))?$', timestamp_str)
     if time_only_match:
-        # Use today's date as default for time-only entries
-        from datetime import datetime
-        today = datetime.now().strftime("%Y-%m-%d")
+        # USE target_date_str INSTEAD OF datetime.now()
         hour = time_only_match.group(1).zfill(2)
         minute = time_only_match.group(2).zfill(2)
         second = time_only_match.group(3).zfill(2) if time_only_match.group(3) else "00"
-        fixed = f"{today}T{hour}:{minute}:{second}+01:00"
-        logger.debug(f"Fixed time-only timestamp: '{timestamp_str}' -> '{fixed}'")
+        
+        fixed = f"{target_date_str}T{hour}:{minute}:{second}+01:00"
+        logger.debug(f"Fixed time-only timestamp ({date_category}): '{timestamp_str}' -> '{fixed}'")
         return fixed
     
-    # Space-separated: "2025-11-17 18:25:00" or "2025-11-17 18:25" or "2025-11-17 18"
+    # Space-separated handling
     match = re.match(r'(\d{4}-\d{2}-\d{2})\s+(\d{1,2})(?::(\d{2}))?(?::(\d{2}))?', timestamp_str)
     if match:
         date_part = match.group(1)
@@ -212,13 +221,10 @@ def _fix_timestamp(timestamp_str: str) -> str:
         minute = match.group(3).zfill(2) if match.group(3) else "00"
         second = match.group(4).zfill(2) if match.group(4) else "00"
         fixed = f"{date_part}T{hour}:{minute}:{second}+01:00"
-        logger.debug(f"Fixed space-separated timestamp: '{timestamp_str}' -> '{fixed}'")
         return fixed
-    
-    # If we can't parse it, return as-is but log a warning
+
     logger.warning(f"Could not parse timestamp '{timestamp_str}'")
     return timestamp_str
-
 
 def call_groq_llm(
     system_prompt: str, 
@@ -317,9 +323,12 @@ def call_groq_llm(
                 logger.warning(f"Skipping entry missing fields: {entry.get('title', 'Unknown')}")
                 continue
                 
-            # Fix timestamps
-            entry["start_time"] = _fix_timestamp(entry["start_time"])
-            entry["end_time"] = _fix_timestamp(entry["end_time"])
+            # Extract the date category ("today" or "tomorrow")
+            date_category = entry.get("date", "today")
+
+            # Pass it to the fixer
+            entry["start_time"] = _fix_timestamp(entry["start_time"], date_category)
+            entry["end_time"] = _fix_timestamp(entry["end_time"], date_category)
             
             # NEW: Validate that timestamps are parseable before proceeding
             try:

@@ -1,124 +1,247 @@
 {
-  "date": "2025-11-27",
-  "generated_at": "2025-11-27T23:13:52.932174",
-  "location": "52.01, 5",
+  "date": "2025-11-28",
+  "tomorrow_date": "2025-11-29",
+  "generated_at": "2025-11-28T15:56:58.572545",
+  "location": "51.01, 4.21",
   "phases": [
     {
-      "name": "WOOD2",
-      "start": "08:20",
-      "end": "11:05",
+      "name": "WOOD",
+      "start": "04:25",
+      "end": "11:49",
       "qualities": "Growth, Planning, Vitality. Spiritual centering & movement.",
       "ideal_tasks": [
         "spiritual",
         "planning",
         "movement"
-      ]
+      ],
+      "date": "today"
     },
     {
       "name": "FIRE",
-      "start": "11:05",
-      "end": "13:08",
+      "start": "09:44",
+      "end": "12:30",
       "qualities": "Peak energy, expression. Deep work & execution.",
       "ideal_tasks": [
         "deep_work",
         "creative",
         "pomodoro"
-      ]
+      ],
+      "date": "today"
     },
     {
       "name": "EARTH",
-      "start": "13:08",
-      "end": "14:31",
+      "start": "12:30",
+      "end": "13:54",
       "qualities": "Stability, nourishment. Lunch & restoration.",
       "ideal_tasks": [
         "rest",
         "integration",
         "light_tasks"
-      ]
+      ],
+      "date": "today"
     },
     {
       "name": "METAL",
-      "start": "14:31",
-      "end": "16:34",
+      "start": "13:54",
+      "end": "16:41",
       "qualities": "Precision, organization. Admin & review.",
       "ideal_tasks": [
         "admin",
         "planning",
         "study"
-      ]
+      ],
+      "date": "today"
     },
     {
       "name": "WATER",
-      "start": "16:34",
-      "end": "04:25",
-      "qualities": "Rest, consolidation. vWind-down & recovery.",
+      "start": "16:41",
+      "end": "04:26",
+      "qualities": "Rest, consolidation. Wind-down & recovery.",
       "ideal_tasks": [
         "rest",
         "reflection",
         "recovery"
-      ]
+      ],
+      "date": "today"
     },
     {
-      "name": "WOOD1",
-      "start": "04:25",
-      "end": "08:21",
+      "name": "WOOD",
+      "start": "04:26",
+      "end": "11:49",
       "qualities": "Growth, Planning, Vitality. Spiritual centering & movement.",
       "ideal_tasks": [
         "spiritual",
         "planning",
         "movement"
-      ]
+      ],
+      "date": "tomorrow"
+    },
+    {
+      "name": "FIRE",
+      "start": "09:45",
+      "end": "12:31",
+      "qualities": "Peak energy, expression. Deep work & execution.",
+      "ideal_tasks": [
+        "deep_work",
+        "creative",
+        "pomodoro"
+      ],
+      "date": "tomorrow"
+    },
+    {
+      "name": "EARTH",
+      "start": "12:31",
+      "end": "13:54",
+      "qualities": "Stability, nourishment. Lunch & restoration.",
+      "ideal_tasks": [
+        "rest",
+        "integration",
+        "light_tasks"
+      ],
+      "date": "tomorrow"
+    },
+    {
+      "name": "METAL",
+      "start": "13:54",
+      "end": "16:40",
+      "qualities": "Precision, organization. Admin & review.",
+      "ideal_tasks": [
+        "admin",
+        "planning",
+        "study"
+      ],
+      "date": "tomorrow"
+    },
+    {
+      "name": "WATER",
+      "start": "16:40",
+      "end": "04:27",
+      "qualities": "Rest, consolidation. Wind-down & recovery.",
+      "ideal_tasks": [
+        "rest",
+        "reflection",
+        "recovery"
+      ],
+      "date": "tomorrow"
     }
   ],
   "anchors": [
     {
+      "time": "08:20",
+      "time_range": "08:20-08:40",
       "name": "Lauds - Morning Prayer",
-      "time": "08:20-08:40",
-      "phase": "Wood2",
+      "phase": "WOOD",
       "tradition": "Major Prayers",
-      "roman_hour": 0
+      "date": "today"
     },
     {
+      "time": "10:25",
+      "time_range": "10:25-10:35",
       "name": "Terce",
-      "time": "10:23-10:33",
-      "phase": "Wood2",
+      "phase": "FIRE",
       "tradition": "Minor Prayers",
-      "roman_hour": 3
+      "date": "today"
     },
     {
+      "time": "12:30",
+      "time_range": "12:30-12:40",
       "name": "Sext",
-      "time": "12:27-12:37",
-      "phase": "Fire",
+      "phase": "EARTH",
       "tradition": "Minor Prayers",
-      "roman_hour": 6
+      "date": "today"
     },
     {
+      "time": "14:36",
+      "time_range": "14:36-14:46",
       "name": "None",
-      "time": "14:31-14:41",
-      "phase": "Metal",
+      "phase": "METAL",
       "tradition": "Minor Prayers",
-      "roman_hour": 9
+      "date": "today"
     },
     {
+      "time": "16:41",
+      "time_range": "16:41-17:01",
       "name": "Vespers - Evening Prayer",
-      "time": "16:34-16:54",
-      "phase": "Water",
+      "phase": "WATER",
       "tradition": "Major Prayers",
-      "roman_hour": 12
+      "date": "today"
     },
     {
+      "time": "20:36",
+      "time_range": "20:36-20:46",
       "name": "Compline - Night Prayer",
-      "time": "20:31-20:41",
-      "phase": "Water",
+      "phase": "WATER",
       "tradition": "Major Prayers",
-      "roman_hour": 15
+      "date": "today"
     },
     {
+      "time": "04:26",
+      "time_range": "04:26-05:26",
       "name": "Vigils - Office of Readings",
-      "time": "04:25-05:25",
-      "phase": "Wood1",
+      "phase": "WOOD",
       "tradition": "Office of Readings",
-      "roman_hour": 21
+      "date": "today"
+    },
+    {
+      "time": "08:22",
+      "time_range": "08:22-08:42",
+      "name": "Lauds - Morning Prayer",
+      "phase": "WOOD",
+      "tradition": "Major Prayers",
+      "date": "tomorrow"
+    },
+    {
+      "time": "10:26",
+      "time_range": "10:26-10:36",
+      "name": "Terce",
+      "phase": "FIRE",
+      "tradition": "Minor Prayers",
+      "date": "tomorrow"
+    },
+    {
+      "time": "12:31",
+      "time_range": "12:31-12:41",
+      "name": "Sext",
+      "phase": "EARTH",
+      "tradition": "Minor Prayers",
+      "date": "tomorrow"
+    },
+    {
+      "time": "14:36",
+      "time_range": "14:36-14:46",
+      "name": "None",
+      "phase": "METAL",
+      "tradition": "Minor Prayers",
+      "date": "tomorrow"
+    },
+    {
+      "time": "16:40",
+      "time_range": "16:40-17:00",
+      "name": "Vespers - Evening Prayer",
+      "phase": "WATER",
+      "tradition": "Major Prayers",
+      "date": "tomorrow"
+    },
+    {
+      "time": "20:36",
+      "time_range": "20:36-20:46",
+      "name": "Compline - Night Prayer",
+      "phase": "WATER",
+      "tradition": "Major Prayers",
+      "date": "tomorrow"
+    },
+    {
+      "time": "04:27",
+      "time_range": "04:27-05:27",
+      "name": "Vigils - Office of Readings",
+      "phase": "WOOD",
+      "tradition": "Office of Readings",
+      "date": "tomorrow"
     }
-  ]
+  ],
+  "sleep_window": {
+    "start": "21:00",
+    "end": "05:30",
+    "description": "Do NOT schedule any tasks during sleep hours"
+  }
 }

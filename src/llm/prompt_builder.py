@@ -30,139 +30,185 @@ class PromptBuilder:
         self.rules = rules
         self.logger = setup_logger(__name__)
     
+    # File: src/llm/prompt_builder.py - Update to show tomorrow availability more explicitly
+
     def build_world_prompt(
         self,
-        calendar_events: List[CalendarEvent],  # Accepts typed CalendarEvent
-        tasks: List[Task],                     # Accepts typed Task
-        habits: List[Habit]                   # Accepts typed Habit
+        calendar_events: List[CalendarEvent],
+        tasks: List[Task],
+        habits: List[Habit]
     ) -> str:
         """
         Build the complete world prompt for the LLM.
-        
-        Args:
-            calendar_events: List of fixed CalendarEvent objects
-            tasks: List of processed, prioritized Task objects
-            habits: List of filtered Habit objects for today
-        
-        Returns:
-            Complete world prompt string
+        Anchors are now pre-scheduled as calendar events, so they appear as STONES.
+        NOW: Explicitly shows available time windows for TODAY and TOMORROW
         """
-        self.logger.info("Building world prompt")
+        self.logger.info("Building world prompt with tomorrow scheduling")
+            
+        import datetime
+        import pytz
         
-        # Use a consistent timezone-aware 'now' for calculations
+        local_tz = pytz.timezone(Config.TARGET_TIMEZONE)
+        
+        # Use timezone-aware 'now'
         now = datetime.datetime.now(datetime.timezone.utc).astimezone() 
         now_str = now.strftime("%Y-%m-%d %H:%M")
         today_date = now.date()
         tomorrow_date = today_date + datetime.timedelta(days=1)
         
+        # Create proper end boundary
+        end_of_tomorrow = datetime.datetime.combine(
+            tomorrow_date, 
+            datetime.time(23, 59)
+        ).strftime("%Y-%m-%d %H:%M")
+                
         prompt_lines = []
         
-        # 1. HEADER & TIME WINDOW
+        # 1. HEADER & TIME WINDOW (FIXED)
         prompt_lines.append(f"SCHEDULE REQUEST")
-        prompt_lines.append(f"NOW: {now_str}")
-        # Note: The schedule window is implicitly until the end of tomorrow
-        prompt_lines.append(f"SCHEDULE_WINDOW: {now_str} -> {tomorrow_date} 23:59")
-        prompt_lines.append(f"SKIP_BEFORE: {now.strftime('%H:%M')}")
+        prompt_lines.append(f"CURRENT_TIME: {now_str}")
+        prompt_lines.append(f"TODAY: {today_date.strftime('%Y-%m-%d')}")
+        prompt_lines.append(f"TOMORROW: {tomorrow_date.strftime('%Y-%m-%d')}")
+        prompt_lines.append(f"")
+        prompt_lines.append(f"SCHEDULE_WINDOW: From {now_str} until {end_of_tomorrow}")
+        prompt_lines.append(f"Do NOT schedule anything before {now_str}")
+        prompt_lines.append(f"")
+        prompt_lines.append(f"DATE_FIELD_INSTRUCTIONS:")
+        prompt_lines.append(f"- Use 'today' in the date field for entries on {today_date.strftime('%Y-%m-%d')}")
+        prompt_lines.append(f"- Use 'tomorrow' in the date field for entries on {tomorrow_date.strftime('%Y-%m-%d')}")
+        prompt_lines.append(f"- Make sure start_time and end_time timestamps match the date field!")
         prompt_lines.append("")
         
-        # 2. PHASE TIME BLOCKS
-        phase_parts = []
+        # 2. CRITICAL: SLEEP BOUNDARIES - for both days
+        sleep_window = self.rules.get("sleep_window", {})
+        if sleep_window:
+            prompt_lines.append("=== CRITICAL: SLEEP BOUNDARIES (BOTH DAYS) ===")
+            prompt_lines.append(f"Do NOT schedule ANY tasks between {sleep_window.get('start', '21:00')} and {sleep_window.get('end', '05:30')}")
+            prompt_lines.append("")
+        
+        # 3. PHASE TIME BLOCKS - Separate sections for today and tomorrow
+        prompt_lines.append("AVAILABLE PHASE WINDOWS:")
+        prompt_lines.append("")
+        
+        # Group phases by date
+        phases_by_date = {"today": [], "tomorrow": []}
         for p in self.rules.get("phases", []):
-            phase_name = p['name'].split()[0] if ' ' in p['name'] else p['name']
-            phase_parts.append(f"{phase_name}:{p['start']}-{p['end']}")
-        prompt_lines.append("PHASES: " + " | ".join(phase_parts))
+            date_key = p.get('date', 'today')
+            if date_key in phases_by_date:
+                phase_name = p['name']
+                phases_by_date[date_key].append(p)
+        
+        # TODAY phases
+        prompt_lines.append(f"TODAY ({today_date.strftime('%A')}):")
+        if phases_by_date["today"]:
+            for p in phases_by_date["today"]:
+                prompt_lines.append(f"  {p['name']:6} | {p['start']} - {p['end']:8} | Tasks: {', '.join(p.get('ideal_tasks', []))}")
         prompt_lines.append("")
         
-        # 3. STONES: Calendar Events
-        prompt_lines.append("1. STONES: IMMOVABLE CALENDAR EVENTS (summary|start|end)")
+        # TOMORROW phases
+        prompt_lines.append(f"TOMORROW ({tomorrow_date.strftime('%A')}):")
+        if phases_by_date["tomorrow"]:
+            for p in phases_by_date["tomorrow"]:
+                prompt_lines.append(f"  {p['name']:6} | {p['start']} - {p['end']:8} | Tasks: {', '.join(p.get('ideal_tasks', []))}")
+        prompt_lines.append("")
+        
+        # 4. STONES: Calendar Events (includes anchors and fixed events)
+        prompt_lines.append("1. STONES: IMMOVABLE CALENDAR EVENTS")
+        prompt_lines.append("(These occupy time and must NOT be overwritten)")
+        prompt_lines.append("")
+        
         if calendar_events:
+            # Separate today and tomorrow events
+            today_events = []
+            tomorrow_events = []
+            
             for e in calendar_events:
-                # Use isoformat() on the datetime objects
-                prompt_lines.append(
-                    f"{e.summary}|{e.start.isoformat()}|{e.end.isoformat()}"
-                )
-            prompt_lines.append(
-                "CONSTRAINT: Do not schedule ANY entry (Anchor, Pebble, or Sand) "
-                "during Stone times."
-            )
+                event_dt = e.start.astimezone(local_tz)
+                event_date = event_dt.date()
+                
+                if event_date == today_date:
+                    today_events.append(e)
+                elif event_date == tomorrow_date:
+                    tomorrow_events.append(e)
+            
+            if today_events:
+                prompt_lines.append(f"TODAY ({today_date.strftime('%A')}):")
+                for e in sorted(today_events, key=lambda x: x.start):
+                    start_fmt = e.start.astimezone(local_tz).strftime("%H:%M")
+                    end_fmt = e.end.astimezone(local_tz).strftime("%H:%M")
+                    marker = "[ANCHOR]" if "[ANCHOR]" in e.summary else "[FIXED]"
+                    prompt_lines.append(f"  {start_fmt}-{end_fmt}: {e.summary} {marker}")
+            
+            if tomorrow_events:
+                prompt_lines.append(f"TOMORROW ({tomorrow_date.strftime('%A')}):")
+                for e in sorted(tomorrow_events, key=lambda x: x.start):
+                    start_fmt = e.start.astimezone(local_tz).strftime("%H:%M")
+                    end_fmt = e.end.astimezone(local_tz).strftime("%H:%M")
+                    marker = "[ANCHOR]" if "[ANCHOR]" in e.summary else "[FIXED]"
+                    prompt_lines.append(f"  {start_fmt}-{end_fmt}: {e.summary} {marker}")
+            
+            prompt_lines.append("")
+            prompt_lines.append("CONSTRAINT: Schedule tasks ONLY in gaps between these events.")
+            prompt_lines.append("Respect sleep boundaries (21:00-05:30).")
         else:
-            prompt_lines.append("NONE")
-        prompt_lines.append("")
+            prompt_lines.append("NONE - Full availability")
         
-        # 4. ANCHORS: Spiritual Commitments
-        # Assuming rules['anchors'] is a list of dicts: [{'time': '06:00', 'name': 'Morning Prayer'}]
-        anchors = [f"{a['time']}:{a['name']}" for a in self.rules.get("anchors", [])]
-        prompt_lines.append("2. ANCHORS: SPIRITUAL PRAYERS (time:name)")
-        prompt_lines.append(" | ".join(anchors) if anchors else "NONE")
-        prompt_lines.append(
-            "CONSTRAINT: Schedule Anchors first. "
-            "Must be skipped if blocked by a STONE."
-        )
         prompt_lines.append("")
         
         # 5. PEBBLES: Urgent Tasks
-        prompt_lines.append(
-            "3. PEBBLES: URGENT/DIFFICULT TASKS (T1-T5) "
-            "(title|priority|effort_h|total_remain_h|deadline|days_left|"
-            "h_per_day|is_subtask|parent|notes)"
-        )
+        prompt_lines.append("2. PEBBLES: URGENT/DIFFICULT TASKS (T1-T5)")
+        prompt_lines.append("(title|priority|effort_h|h_total|deadline|days_left|h_per_day|is_subtask|project_name|note)")
+        prompt_lines.append("")
         
         pebbles_present = self._add_pebbles(prompt_lines, tasks)
         
         if not pebbles_present:
             prompt_lines.append("NONE")
         
-        prompt_lines.append("CONSTRAINTS:")
-        prompt_lines.append(
-            "Schedule urgent tasks first: all deadlines must be met. "
-            "Fit in many Pebbles (2-8 hours) after scheduling the Stones. "
-            "To achieve this their duration can be reduced by maximally 20%."
-        )
-        prompt_lines.append(
-            "Chunking: If effort_h >= 3.0, then you may schedule the task in "
-            "multiple blocks with breaks added in bewteen. It is also okay to "
-            "leave half-finished tasks for the future."
-        )
-        prompt_lines.append(
-            "When a parent task has numbered subtasks it is necessary to do "
-            "the subtasks in the order of the numbering."
-        )
+        prompt_lines.append("")
+        prompt_lines.append("STRATEGY: Schedule all urgent pebbles first.")
+        prompt_lines.append("Spread across today and tomorrow to meet deadlines.")
+        prompt_lines.append("DURATION FLEXIBILITY:")
+        prompt_lines.append("  - Subtasks should be executed in numeric order as in the title")
+        prompt_lines.append("  - Task durations CAN be reduced by up to 30% if needed to fit")
+        prompt_lines.append("  - Task durations CAN be increased by up to 30% for deeper work")
+        prompt_lines.append("  - Chunk large tasks: split 3+ hour tasks into multiple sessions broken up by habits and anchors")
+        prompt_lines.append("  - It's OK to leave tasks partially done for tomorrow")
         prompt_lines.append("")
         
         # 6. SAND: Chores & Habits
-        prompt_lines.append("4. SAND: CHORES (T6) & HABITS (Fill remaining gaps)")
+        prompt_lines.append("3. SAND: CHORES (T6) & HABITS")
+        prompt_lines.append("(Fill remaining time gaps with these)")
+        prompt_lines.append("")
         
         self._add_chores(prompt_lines, tasks)
         self._add_habits(prompt_lines, habits)
         
-        prompt_lines.append("CONSTRAINTS:")
-        prompt_lines.append(
-            "Like the sand entering the jar last and filling it to completion, "
-            "fill all remaining spare time with habits."
-        )
-        prompt_lines.append(
-            "Schedule habits near their correct Phase. Skipping habits is no "
-            "problem at all. Durations may be changed up to 50%."
-        )
-        prompt_lines.append(
-            "When choosing habits you firstly prioritise emotional wellbeing, "
-            "secondly reading and thirdly physical health."
-        )
+        prompt_lines.append("")
+        prompt_lines.append("STRATEGY:")
+        prompt_lines.append("- Fill remaining gaps TODAY first")
+        prompt_lines.append("- Fill remaining gaps TOMORROW second")
+        prompt_lines.append("- Prioritize by: emotional wellbeing > reading > physical health")
+        prompt_lines.append("- May skip habits if no time available")
+        prompt_lines.append("DURATION FLEXIBILITY FOR HABITS:")
+        prompt_lines.append("  - Habit durations CAN vary by ±50% (e.g., 30min habit → 15-45 min)")
+        prompt_lines.append("  - Shorter versions are fine if time is tight")
+        prompt_lines.append("  - Extended versions are fine if time is abundant")
+        prompt_lines.append("  - Completely skip habits if the schedule is too packed")
         prompt_lines.append("")
         
         # 7. OUTPUT SCHEMA
-        prompt_lines.append(
-            "Do not include reasoning. Keep titles long enough to be intelligible."
-            "\nReturn only JSON conforming to the following schema." 
-        )
+        prompt_lines.append("OUTPUT REQUIREMENTS:")
+        prompt_lines.append("- Return ONLY valid JSON (no markdown, no explanation)")
+        prompt_lines.append("- Schedule entries for BOTH today and tomorrow where possible")
+        prompt_lines.append("- Use date field: 'today' or 'tomorrow'")
+        prompt_lines.append("- Ensure all times are in HH:MM format")
+        prompt_lines.append("")
         
-        # NOTE: Keeping the import inside the method as in the original file, 
-        # but importing from a dummy for submission safety.
         try:
             from src.llm.client import OUTPUT_SCHEMA
             prompt_lines.append(json.dumps(OUTPUT_SCHEMA, indent=2))
         except ImportError:
-            # Fallback for environment without full project structure
             prompt_lines.append("JSON_SCHEMA_DEFINITION_HERE") 
         
         prompt = "\n".join(prompt_lines)
@@ -171,10 +217,7 @@ class PromptBuilder:
         chore_count = sum(1 for t in tasks if t.priority == PriorityTier.T6)
         
         self.logger.info(f"World prompt built: {len(prompt)} characters")
-        self.logger.debug(f"Prompt includes: {len(calendar_events)} events, "
-                          f"{pebble_count} pebbles, "
-                          f"{chore_count} chores, "
-                          f"{len(habits)} habits")
+        self.logger.debug(f"Prompt includes explicit scheduling for TODAY and TOMORROW")
         
         return prompt
     

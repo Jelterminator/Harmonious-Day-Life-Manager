@@ -1,4 +1,4 @@
-# Fukw: src/core/anchor_manager.py
+# File: src/core/anchor_manager.py
 
 import sqlite3
 import json
@@ -26,13 +26,17 @@ class AnchorManager:
     """
     
     # Standard 5-element phase mapping to Roman Hours (0=Sunrise, 12=Sunset)
+    # WOOD: 21-23 (previous day) + 0-4 (current day)
+    # FIRE: 4-7
+    # EARTH: 7-9
+    # METAL: 9-12
+    # WATER: 12-21
     PHASE_MAP = {
-        "WOOD2":  {"range": range(0, 4),   "qualities": "Growth, Planning, Vitality. Spiritual centering & movement.", "tasks": ["spiritual", "planning", "movement"]},
-        "FIRE":  {"range": range(4, 7),   "qualities": "Peak energy, expression. Deep work & execution.", "tasks": ["deep_work", "creative", "pomodoro"]},
-        "EARTH": {"range": range(7, 9),   "qualities": "Stability, nourishment. Lunch & restoration.", "tasks": ["rest", "integration", "light_tasks"]},
-        "METAL": {"range": range(9, 12),  "qualities": "Precision, organization. Admin & review.", "tasks": ["admin", "planning", "study"]},
-        "WATER": {"range": range(12, 21), "qualities": "Rest, consolidation. vWind-down & recovery.", "tasks": ["rest", "reflection", "recovery"]},
-        "WOOD1":  {"range": range(21, 24),   "qualities": "Growth, Planning, Vitality. Spiritual centering & movement.", "tasks": ["spiritual", "planning", "movement"]},
+        "WOOD":  {"range": [0, 1, 2, 21, 22, 23],  "qualities": "Growth, Planning, Vitality. Spiritual centering & movement.", "tasks": ["spiritual", "planning", "movement"]},
+        "FIRE":  {"range": range(2, 6),                   "qualities": "Peak energy, expression. Deep work & execution.", "tasks": ["deep_work", "creative", "pomodoro"]},
+        "EARTH": {"range": range(6, 8),                   "qualities": "Stability, nourishment. Lunch & restoration.", "tasks": ["rest", "integration", "light_tasks"]},
+        "METAL": {"range": range(8, 12),                  "qualities": "Precision, organization. Admin & review.", "tasks": ["admin", "planning", "study"]},
+        "WATER": {"range": range(12, 21),                 "qualities": "Rest, consolidation. Wind-down & recovery.", "tasks": ["rest", "reflection", "recovery"]},
     }
 
     def __init__(self, project_root: Path):
@@ -101,94 +105,131 @@ class AnchorManager:
 
     def generate_daily_config(self) -> bool:
         """
-        Generates the config.json file with today's specific solar times.
+        Generates the config.json file with today's AND tomorrow's specific solar times.
+        Correctly handles WOOD phase wraparound (21:00 previous day -> 04:00 current day)
         Returns: True if successful.
         """
         try:
-            logger.info("Generating daily anchor configuration...")
+            logger.info("Generating daily anchor configuration for today and tomorrow...")
             settings = self._get_location_settings()
             if not settings:
                 logger.error("No location settings found in DB.")
                 return False
-
+    
             today = datetime.date.today()
+            tomorrow = today + datetime.timedelta(days=1)
             
-            # 1. Calculate Grid
-            time_grid = self._calculate_roman_schedule(
-                settings.get('latitude', 52.01),
-                settings.get('longitude', 4.35),
-                settings.get('timezone', 'Europe/Amsterdam'),
-                today
-            )
-
-            # 2. Fetch Active Practices
-            conn = self._get_db_connection()
-            cursor = conn.cursor()
-            query = """
-                SELECT p.name, p.roman_hour, p.duration_minutes, t.name as tradition
-                FROM Practices p
-                JOIN ActiveTraditions at ON p.tradition_id = at.tradition_id
-                JOIN Traditions t ON p.tradition_id = t.id
-                ORDER BY p.roman_hour ASC
-            """
-            cursor.execute(query)
-            practices = cursor.fetchall()
-            conn.close()
-
-            # 3. Build Anchors
-            anchors_list = []
-            for name, hour, duration, tradition in practices:
-                if hour in time_grid:
-                    start_dt, end_hour_dt = time_grid[hour]
+            # Build config for both days
+            all_phases = []
+            all_anchors = []
+            
+            for current_date, day_label in [(today, "today"), (tomorrow, "tomorrow")]:
+                # 1. Calculate Grid for this day
+                time_grid = self._calculate_roman_schedule(
+                    settings.get('latitude', 52.01),
+                    settings.get('longitude', 4.35),
+                    settings.get('timezone', 'Europe/Amsterdam'),
+                    current_date
+                )
+    
+                # 2. Fetch Active Practices
+                conn = self._get_db_connection()
+                cursor = conn.cursor()
+                query = """
+                    SELECT p.name, p.roman_hour, p.duration_minutes, t.name as tradition
+                    FROM Practices p
+                    JOIN ActiveTraditions at ON p.tradition_id = at.tradition_id
+                    JOIN Traditions t ON p.tradition_id = t.id
+                    ORDER BY p.roman_hour ASC
+                """
+                cursor.execute(query)
+                practices = cursor.fetchall()
+                conn.close()
+    
+                # 3. Build Anchors for this day
+                for name, hour, duration, tradition in practices:
+                    if hour in time_grid:
+                        start_dt, end_hour_dt = time_grid[hour]
+                        
+                        if duration:
+                            end_dt = start_dt + datetime.timedelta(minutes=duration)
+                        else:
+                            end_dt = end_hour_dt
+                        
+                        fmt = "%H:%M"
+                        all_anchors.append({
+                            "time": start_dt.strftime(fmt),
+                            "time_range": f"{start_dt.strftime(fmt)}-{end_dt.strftime(fmt)}",
+                            "name": name,
+                            "phase": self._get_phase_for_hour(hour),
+                            "tradition": tradition,
+                            "date": day_label,
+                        })
+    
+                # 4. Build Phases for this day
+                for phase_name in ["WOOD", "FIRE", "EARTH", "METAL", "WATER"]:
+                    data = self.PHASE_MAP[phase_name]
+                    hour_range = list(data['range']) if isinstance(data['range'], list) else list(data['range'])
                     
-                    # Calculate specific end time based on duration
-                    if duration:
-                        end_dt = start_dt + timedelta(minutes=duration)
+                    if not hour_range:
+                        continue
+                    
+                    # Special handling for WOOD which wraps around midnight
+                    if phase_name == "WOOD" and 21 in hour_range:
+                        # WOOD: 21:00 (previous day) -> 04:00 (current day)
+                        # Get times from yesterday's sunset to today's early morning
+                        yesterday = current_date - datetime.timedelta(days=1)
+                        time_grid_yesterday = self._calculate_roman_schedule(
+                            settings.get('latitude', 52.01),
+                            settings.get('longitude', 4.35),
+                            settings.get('timezone', 'Europe/Amsterdam'),
+                            yesterday
+                        )
+                        
+                        phase_start = time_grid_yesterday[21][0]  # Yesterday at 21:00
+                        phase_end = time_grid[4][1]  # Today at end of hour 4
+                        
+                    elif phase_name == "WATER":
+                        # WATER: 12:00 -> 21:00 (same day)
+                        phase_start = time_grid[12][0]
+                        phase_end = time_grid[21][0]  # Start of WOOD, not end of previous phase
+                        
                     else:
-                        end_dt = end_hour_dt
+                        # Other phases: normal sequential hours
+                        phase_start = time_grid[hour_range[0]][0]
+                        phase_end = time_grid[hour_range[-1]][1]
                     
-                    fmt = "%H:%M"
-                    anchors_list.append({
-                        "name": name,
-                        "time": f"{start_dt.strftime(fmt)}-{end_dt.strftime(fmt)}",
-                        "phase": self._get_phase_for_hour(hour).title(),
-                        "tradition": tradition,
-                        "roman_hour": hour
+                    all_phases.append({
+                        "name": phase_name,
+                        "start": phase_start.strftime("%H:%M"),
+                        "end": phase_end.strftime("%H:%M"),
+                        "qualities": data['qualities'],
+                        "ideal_tasks": data['tasks'],
+                        "date": day_label,
                     })
-
-            # 4. Build Phases
-            phases_list = []
-            for phase_name in ["WOOD2", "FIRE", "EARTH", "METAL", "WATER", "WOOD1"]:
-                data = self.PHASE_MAP[phase_name]
-                hour_range = list(data['range'])
-                
-                # Dynamic start/end based on today's sun
-                phase_start = time_grid[hour_range[0]][0]
-                phase_end = time_grid[hour_range[-1]][1]
-                
-                phases_list.append({
-                    "name": phase_name,
-                    "start": phase_start.strftime("%H:%M"),
-                    "end": phase_end.strftime("%H:%M"),
-                    "qualities": data['qualities'],
-                    "ideal_tasks": data['tasks']
-                })
-
-            # 5. Output
+    
+            # 5. Output combined config
             final_json = {
                 "date": str(today),
+                "tomorrow_date": str(tomorrow),
                 "generated_at": datetime.datetime.now().isoformat(),
                 "location": f"{settings.get('latitude')}, {settings.get('longitude')}",
-                "phases": phases_list,
-                "anchors": anchors_list
+                "phases": all_phases,
+                "anchors": all_anchors,
+                "sleep_window": {
+                    "start": "21:00",
+                    "end": "05:30",
+                    "description": "Do NOT schedule any tasks during sleep hours"
+                }
             }
-
+    
             with open(self.config_path, 'w') as f:
                 json.dump(final_json, f, indent=2)
             
             logger.info(f"Daily configuration written to {self.config_path}")
+            logger.info(f"Configured {len(all_phases)} phases and {len(all_anchors)} anchors for today and tomorrow")
             return True
-
+    
         except Exception as e:
             logger.error(f"Failed to generate daily config: {e}", exc_info=True)
             return False

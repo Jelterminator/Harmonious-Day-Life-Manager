@@ -73,15 +73,7 @@ class GoogleCalendarService:
                     start_dt = self._parse_gc_time(start_time_raw)
                     end_dt = self._parse_gc_time(end_time_raw)
 
-                    if start_dt and end_dt and extended_props.get('sourceId') != self.generator_id:
-                        typed_events.append(CalendarEvent(
-                            event_id=event.get('id'),
-                            summary=event.get('summary', 'No Title'),
-                            start=start_dt,
-                            end=end_dt,
-                            is_generated=False
-                            ))
-                    elif start_dt and end_dt and extended_props.get('sourceId') == self.generator_id:
+                    if start_dt and end_dt and extended_props.get('sourceId') == self.generator_id:
                         typed_events.append(CalendarEvent(
                             event_id=event.get('id'),
                             summary=event.get('summary', 'No Title'),
@@ -89,8 +81,19 @@ class GoogleCalendarService:
                             end=end_dt,
                             is_generated=True
                             ))
-                    except Exception as e:
-                        logger.warning(f"Could not parse event data for {event.get('summary')}: {e}")
+                    elif start_dt and end_dt:
+                        typed_events.append(CalendarEvent(
+                            event_id=event.get('id'),
+                            summary=event.get('summary', 'No Title'),
+                            start=start_dt,
+                            end=end_dt,
+                            is_generated=False
+                        ))
+                    else:
+                        logger.warning(f"No start or end times found.")
+                        return None
+                except Exception as e:
+                    logger.warning(f"Could not parse event data for {event.get('summary')}: {e}")
 
             logger.info(f"Found {len(typed_events)} fixed calendar events")
             return typed_events

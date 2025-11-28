@@ -1,26 +1,80 @@
-"""
-One-time setup wizard for Harmonious Day.
-Guides users through dependency installation, API key configuration,
-and Google Cloud authentication.
-"""
-
 import sys
 import subprocess
 import re
+import sqlite3
 from pathlib import Path
 
 # Add project root to Python path
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-# Ensure Google dependencies are installed before importing
-GOOGLE_DEPENDENCIES = [
-    'google-auth>=2.20.0',
-    'google-auth-oauthlib>=1.0.0',
-    'google-api-python-client>=2.70.0'
-]
-
+DB_PATH = PROJECT_ROOT / "src/yyanchors.db"
 DEFAULT_SHEET_TITLE = 'Harmonious Day: Habit Database'
+
+# --- SQL SCHEMA & DATA CONSTANTS (UNCHANGED) ---
+# ... (Keep SCHEMA_SQL constant as defined previously) ...
+SCHEMA_SQL = """
+-- Only drop tables related to traditions and practices if needed, 
+-- but we will update the setup logic to only execute this block 
+-- if the DB is new or reset is requested. 
+
+CREATE TABLE IF NOT EXISTS Traditions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    category TEXT
+);
+
+CREATE TABLE IF NOT EXISTS Practices (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tradition_id INTEGER NOT NULL,
+    roman_hour INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    duration_minutes INTEGER,
+    notes TEXT,
+    FOREIGN KEY(tradition_id) REFERENCES Traditions(id)
+);
+
+CREATE TABLE IF NOT EXISTS UserSettings (
+    key TEXT PRIMARY KEY,
+    value TEXT
+);
+
+CREATE TABLE IF NOT EXISTS ActiveTraditions (
+    tradition_id INTEGER,
+    FOREIGN KEY(tradition_id) REFERENCES Traditions(id)
+);
+"""
+
+# The data insertion part is now separate.
+INITIAL_DATA_SQL = """
+-- Traditions
+INSERT OR IGNORE INTO Traditions (id, name, category) VALUES
+(1, 'Major Prayers', 'Christianity'), (2, 'Office of Readings', 'Christianity'), (3, 'Minor Prayers', 'Christianity'),
+(4, 'Core Salah', 'Islam'), (5, 'Complete Salah', 'Islam'),
+(6, 'Core Prayers', 'Judaism'), (7, 'Blessings', 'Judaism'),
+(8, 'Sandhyavandanam', 'Hinduism'), (9, 'Brahma Murta', 'Hinduism'), (10, 'Puja', 'Hinduism'),
+(11, 'Layman''s Practice', 'Buddhism'), (12, 'Kyoto Zen', 'Buddhism'), (13, 'Shaolin Kung Fu', 'Buddhism'),
+(14, 'Three Daily Meals', 'Secular'), (15, 'Wake up before dawn', 'Secular'), (16, 'Secular - Sunset winddown', 'Secular');
+
+-- Practices (A sample subset, ensure all 30+ inserts are included here)
+INSERT OR IGNORE INTO Practices (tradition_id, roman_hour, name, duration_minutes) VALUES
+(1, 0, 'Lauds - Morning Prayer', 20), (1, 12, 'Vespers - Evening Prayer', 20), (1, 15, 'Compline - Night Prayer', 10),
+(2, 21, 'Vigils - Office of Readings', 60),
+(3, 3, 'Terce', 10), (3, 6, 'Sext', 10), (3, 9, 'None', 10),
+(4, 0, 'Fajr', 10), (4, 6, 'Dhuhr', 20), (4, 10, 'Asr', 20), (4, 12, 'Maghrib', 15), (4, 14, 'Isha', 20),
+(5, 21, 'Tahajjud', 30), (5, 2, 'Duha', 15), (5, 15, 'Witr', 5),
+-- Add all other previous INSERT statements here with INSERT OR IGNORE
+(6, 0, 'Shacharit', 45), (6, 9, 'Mincha', 20), (6, 12, 'Ma''ariv / Arvit', 20),
+(7, 21, 'Modeh Ani', 5), (7, 6, 'Birkat Hamazon', 10), (7, 15, 'Kriat Shema al Hamita', 5),
+(8, 0, 'Pratah Sandhya', 30), (8, 6, 'Madhyahna Sandhya', 30), (8, 12, 'Sayam Sandhya', 30),
+(9, 21, 'Brahma Muhurta', 180),
+(10, 3, 'Morning Puja', 30), (10, 9, 'Midday Aarti', 10), (10, 15, 'Evening Aarti', 10),
+(11, 0, 'Mindfulness practice', 15), (11, 12, '''Just sitting''', 30), (11, 15, 'Metta practice', 10),
+(12, 21, 'Early Meditation', 45), (12, 4, 'Morning Meditation', 25), (12, 8, 'Afternoon Meditation', 25),
+(13, 1, 'Chi Gong practice', 60), (13, 5, 'Kung Fu - conditioning', 60), (13, 9, 'Kung Fu - martial arts', 60),
+(14, 1, 'Breakfast', 20), (14, 7, 'Lunch', 20), (14, 11, 'Dinner', 30),
+(15, 23, 'Wake up', 60), (16, 12, 'Winddown', 120);
+"""
 
 
 def install_dependencies() -> bool:
@@ -252,6 +306,97 @@ def update_env_with_sheet_id(sheet_id: str) -> bool:
         print(f"Could not update .env: {e}")
         print(f"Please manually add to .env: SHEET_ID={sheet_id}")
         return False
+    
+# --- LOCAL DATABASE FUNCTIONS ---
+
+def setup_local_database():
+    """Initializes SQLite database schema and inserts base data if tables are empty."""
+    print("\n--- Initializing Local Anchor Database Schema ---")
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        # Create schema (using IF NOT EXISTS)
+        cursor.executescript(SCHEMA_SQL) 
+        
+        # Check if traditions table is empty
+        cursor.execute("SELECT COUNT(*) FROM Traditions")
+        if cursor.fetchone()[0] == 0:
+            print("Seeding base tradition and practice data...")
+            cursor.executescript(INITIAL_DATA_SQL)
+            conn.commit()
+        else:
+            print("Base data already present.")
+            
+        print(f"Database schema and base data checked at {DB_PATH}")
+        return conn
+    except Exception as e:
+        print(f"Database creation failed: {e}")
+        return None
+
+def configure_location(conn):
+    """Collects Lat/Long/Timezone only if settings are missing."""
+    cursor = conn.cursor()
+    cursor.execute("SELECT value FROM UserSettings WHERE key IN ('latitude', 'longitude', 'timezone')")
+    existing_settings = [row[0] for row in cursor.fetchall()]
+    
+    if len(existing_settings) == 3:
+        lat, lng, tz = existing_settings
+        print("\n--- Location Setup ---")
+        choice = input(f"Existing location found ({lat}, {lng}, {tz}). Reconfigure? (y/N): ").lower()
+        if choice != 'y':
+            print("Location configuration skipped.")
+            return
+
+    print("\n--- Location Setup (for Solar Time/Roman Hours) ---")
+    lat = input("Enter Latitude (default 52.01): ") or "52.01"
+    lng = input("Enter Longitude (default 4.35): ") or "4.35"
+    tz = input("Enter Timezone (default Europe/Amsterdam): ") or "Europe/Amsterdam"
+    
+    cursor.execute("INSERT OR REPLACE INTO UserSettings (key, value) VALUES ('latitude', ?)", (lat,))
+    cursor.execute("INSERT OR REPLACE INTO UserSettings (key, value) VALUES ('longitude', ?)", (lng,))
+    cursor.execute("INSERT OR REPLACE INTO UserSettings (key, value) VALUES ('timezone', ?)", (tz,))
+    conn.commit()
+    print("Location settings saved.")
+
+def select_traditions(conn):
+    """Interactive selection of traditions, allowing skip if already configured."""
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM ActiveTraditions")
+    if cursor.fetchone()[0] > 0:
+        print("\n--- Tradition Selection ---")
+        choice = input("Active traditions already configured. Reconfigure? (y/N): ").lower()
+        if choice != 'y':
+            print("Tradition configuration skipped.")
+            return
+        
+        # If user chooses 'y', clear existing selections first
+        cursor.execute("DELETE FROM ActiveTraditions")
+        conn.commit()
+
+    print("\n--- Tradition Selection ---")
+    print("Which traditions do you want to include in your schedule?")
+    
+    cursor.execute("SELECT id, name, category FROM Traditions")
+    traditions = cursor.fetchall()
+    
+    active_ids = []
+    current_category = None
+    
+    for t_id, name, cat in traditions:
+        if cat != current_category:
+            print(f"\n--- {cat} ---")
+            current_category = cat
+        
+        choice = input(f"Include {name}? (y/N): ").lower()
+        if choice == 'y':
+            active_ids.append((t_id,))
+            
+    if active_ids:
+        cursor.executemany("INSERT INTO ActiveTraditions (tradition_id) VALUES (?)", active_ids)
+        conn.commit()
+        print(f"\nSaved {len(active_ids)} active traditions.")
+    else:
+        print("No traditions selected. Anchors section in config will be empty.")
 
 
 def main() -> None:
@@ -321,9 +466,19 @@ def main() -> None:
         update_env_with_sheet_id(final_sheet_id)
     else:
         print("WARNING: Could not determine the Habit Database ID. Please check Google Sheets setup.")
+        
+    # Step 5: Creating user config file.
+    print("\nStep 5: Anchor Database Setup")
+    db_conn = setup_local_database()
+    if db_conn:
+        configure_location(db_conn)
+        select_traditions(db_conn)
+        db_conn.close()
+    else:
+        print("Skipping database configuration due to error.")
     
     # Final verification
-    print("\nStep 5: Verification")
+    print("\nStep 6 Verification")
     if Config.validate():
         logger.info("Setup completed successfully")
         print("="*60)

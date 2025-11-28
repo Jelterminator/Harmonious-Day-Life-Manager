@@ -12,9 +12,10 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-# Now imports will work
+# Imports
 from src.core.orchestrator import OrchestratorFactory
 from src.core.config_manager import Config
+from src.core.anchor_manager import AnchorManager  # <--- New Import
 from src.utils.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -33,7 +34,22 @@ def main() -> int:
     logger.info("="*60)
     
     try:
-        # Validate configuration
+        # ---------------------------------------------------------
+        # STEP 1: Generate Today's Anchor Configuration
+        # ---------------------------------------------------------
+        logger.info("Calculating Solar Phases & Fixed Anchors...")
+        anchor_manager = AnchorManager(PROJECT_ROOT)
+        
+        if not anchor_manager.generate_daily_config():
+            logger.error("Failed to generate anchor configuration.")
+            logger.error("Please ensure database is set up correctly via scripts/setup.py")
+            return 1
+            
+        logger.info("Daily configuration updated.")
+
+        # ---------------------------------------------------------
+        # STEP 2: Validate Full Configuration
+        # ---------------------------------------------------------
         if not Config.validate():
             logger.error("Configuration validation failed")
             logger.error("Please run 'python scripts/setup.py' to configure the application")
@@ -41,7 +57,9 @@ def main() -> int:
         
         logger.info("Configuration validated successfully")
         
-        # Create the Orchestrator using factory
+        # ---------------------------------------------------------
+        # STEP 3: Run Orchestrator
+        # ---------------------------------------------------------
         logger.info("Initializing Orchestrator...")
         orchestrator = OrchestratorFactory.create()
         
@@ -65,13 +83,11 @@ def main() -> int:
     except FileNotFoundError as e:
         logger.error("Missing required file", exc_info=True)
         logger.error(f"Could not find: {e.filename}")
-        logger.error("Please make sure config.json and credentials.json exist")
         return 1
         
     except ConnectionError as e:
         logger.error("Authentication failed", exc_info=True)
         logger.error(str(e))
-        logger.error("Please try running 'python scripts/setup.py' again")
         return 1
         
     except KeyboardInterrupt:

@@ -1,13 +1,13 @@
 {
-  "date": "2025-11-28",
-  "tomorrow_date": "2025-11-29",
-  "generated_at": "2025-11-28T15:56:58.572545",
+  "date": "2025-12-01",
+  "tomorrow_date": "2025-12-02",
+  "generated_at": "2025-12-01T10:22:05.395728",
   "location": "51.01, 4.21",
   "phases": [
     {
       "name": "WOOD",
-      "start": "04:25",
-      "end": "11:49",
+      "start": "04:28",
+      "end": "11:50",
       "qualities": "Growth, Planning, Vitality. Spiritual centering & movement.",
       "ideal_tasks": [
         "spiritual",
@@ -18,8 +18,8 @@
     },
     {
       "name": "FIRE",
-      "start": "09:44",
-      "end": "12:30",
+      "start": "09:47",
+      "end": "12:32",
       "qualities": "Peak energy, expression. Deep work & execution.",
       "ideal_tasks": [
         "deep_work",
@@ -30,7 +30,7 @@
     },
     {
       "name": "EARTH",
-      "start": "12:30",
+      "start": "12:32",
       "end": "13:54",
       "qualities": "Stability, nourishment. Lunch & restoration.",
       "ideal_tasks": [
@@ -43,7 +43,7 @@
     {
       "name": "METAL",
       "start": "13:54",
-      "end": "16:41",
+      "end": "16:39",
       "qualities": "Precision, organization. Admin & review.",
       "ideal_tasks": [
         "admin",
@@ -54,8 +54,8 @@
     },
     {
       "name": "WATER",
-      "start": "16:41",
-      "end": "04:26",
+      "start": "16:39",
+      "end": "04:29",
       "qualities": "Rest, consolidation. Wind-down & recovery.",
       "ideal_tasks": [
         "rest",
@@ -66,8 +66,8 @@
     },
     {
       "name": "WOOD",
-      "start": "04:26",
-      "end": "11:49",
+      "start": "04:29",
+      "end": "11:51",
       "qualities": "Growth, Planning, Vitality. Spiritual centering & movement.",
       "ideal_tasks": [
         "spiritual",
@@ -78,8 +78,8 @@
     },
     {
       "name": "FIRE",
-      "start": "09:45",
-      "end": "12:31",
+      "start": "09:48",
+      "end": "12:32",
       "qualities": "Peak energy, expression. Deep work & execution.",
       "ideal_tasks": [
         "deep_work",
@@ -90,7 +90,7 @@
     },
     {
       "name": "EARTH",
-      "start": "12:31",
+      "start": "12:32",
       "end": "13:54",
       "qualities": "Stability, nourishment. Lunch & restoration.",
       "ideal_tasks": [
@@ -103,7 +103,7 @@
     {
       "name": "METAL",
       "start": "13:54",
-      "end": "16:40",
+      "end": "16:38",
       "qualities": "Precision, organization. Admin & review.",
       "ideal_tasks": [
         "admin",
@@ -114,8 +114,8 @@
     },
     {
       "name": "WATER",
-      "start": "16:40",
-      "end": "04:27",
+      "start": "16:38",
+      "end": "04:30",
       "qualities": "Rest, consolidation. Wind-down & recovery.",
       "ideal_tasks": [
         "rest",
@@ -127,115 +127,99 @@
   ],
   "anchors": [
     {
-      "time": "08:20",
-      "time_range": "08:20-08:40",
-      "name": "Lauds - Morning Prayer",
+      "time": "08:24",
+      "time_range": "08:24-08:39",
+      "name": "Mindfulness practice",
       "phase": "WOOD",
-      "tradition": "Major Prayers",
+      "tradition": "Layman's Practice",
       "date": "today"
     },
     {
-      "time": "10:25",
-      "time_range": "10:25-10:35",
-      "name": "Terce",
+      "time": "11:09",
+      "time_range": "11:09-11:34",
+      "name": "Morning Meditation",
       "phase": "FIRE",
-      "tradition": "Minor Prayers",
+      "tradition": "Kyoto Zen",
       "date": "today"
     },
     {
-      "time": "12:30",
-      "time_range": "12:30-12:40",
-      "name": "Sext",
-      "phase": "EARTH",
-      "tradition": "Minor Prayers",
-      "date": "today"
-    },
-    {
-      "time": "14:36",
-      "time_range": "14:36-14:46",
-      "name": "None",
+      "time": "13:54",
+      "time_range": "13:54-14:19",
+      "name": "Afternoon Meditation",
       "phase": "METAL",
-      "tradition": "Minor Prayers",
+      "tradition": "Kyoto Zen",
       "date": "today"
     },
     {
-      "time": "16:41",
-      "time_range": "16:41-17:01",
-      "name": "Vespers - Evening Prayer",
+      "time": "16:39",
+      "time_range": "16:39-17:09",
+      "name": "'Just sitting'",
       "phase": "WATER",
-      "tradition": "Major Prayers",
+      "tradition": "Layman's Practice",
       "date": "today"
     },
     {
       "time": "20:36",
       "time_range": "20:36-20:46",
-      "name": "Compline - Night Prayer",
+      "name": "Metta practice",
       "phase": "WATER",
-      "tradition": "Major Prayers",
+      "tradition": "Layman's Practice",
       "date": "today"
     },
     {
-      "time": "04:26",
-      "time_range": "04:26-05:26",
-      "name": "Vigils - Office of Readings",
+      "time": "04:29",
+      "time_range": "04:29-05:14",
+      "name": "Early Meditation",
       "phase": "WOOD",
-      "tradition": "Office of Readings",
+      "tradition": "Kyoto Zen",
       "date": "today"
     },
     {
-      "time": "08:22",
-      "time_range": "08:22-08:42",
-      "name": "Lauds - Morning Prayer",
+      "time": "08:26",
+      "time_range": "08:26-08:41",
+      "name": "Mindfulness practice",
       "phase": "WOOD",
-      "tradition": "Major Prayers",
+      "tradition": "Layman's Practice",
       "date": "tomorrow"
     },
     {
-      "time": "10:26",
-      "time_range": "10:26-10:36",
-      "name": "Terce",
+      "time": "11:10",
+      "time_range": "11:10-11:35",
+      "name": "Morning Meditation",
       "phase": "FIRE",
-      "tradition": "Minor Prayers",
+      "tradition": "Kyoto Zen",
       "date": "tomorrow"
     },
     {
-      "time": "12:31",
-      "time_range": "12:31-12:41",
-      "name": "Sext",
-      "phase": "EARTH",
-      "tradition": "Minor Prayers",
-      "date": "tomorrow"
-    },
-    {
-      "time": "14:36",
-      "time_range": "14:36-14:46",
-      "name": "None",
+      "time": "13:54",
+      "time_range": "13:54-14:19",
+      "name": "Afternoon Meditation",
       "phase": "METAL",
-      "tradition": "Minor Prayers",
+      "tradition": "Kyoto Zen",
       "date": "tomorrow"
     },
     {
-      "time": "16:40",
-      "time_range": "16:40-17:00",
-      "name": "Vespers - Evening Prayer",
+      "time": "16:38",
+      "time_range": "16:38-17:08",
+      "name": "'Just sitting'",
       "phase": "WATER",
-      "tradition": "Major Prayers",
+      "tradition": "Layman's Practice",
       "date": "tomorrow"
     },
     {
-      "time": "20:36",
-      "time_range": "20:36-20:46",
-      "name": "Compline - Night Prayer",
+      "time": "20:35",
+      "time_range": "20:35-20:45",
+      "name": "Metta practice",
       "phase": "WATER",
-      "tradition": "Major Prayers",
+      "tradition": "Layman's Practice",
       "date": "tomorrow"
     },
     {
-      "time": "04:27",
-      "time_range": "04:27-05:27",
-      "name": "Vigils - Office of Readings",
+      "time": "04:30",
+      "time_range": "04:30-05:15",
+      "name": "Early Meditation",
       "phase": "WOOD",
-      "tradition": "Office of Readings",
+      "tradition": "Kyoto Zen",
       "date": "tomorrow"
     }
   ],

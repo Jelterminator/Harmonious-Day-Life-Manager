@@ -12,7 +12,7 @@ from typing import Dict, Any, List
 from dotenv import load_dotenv
 
 # Import the new type models
-from src.models.models import PriorityTier, Phase
+from src.models import PriorityTier, Phase
 
 class Config:
     """Application configuration singleton."""

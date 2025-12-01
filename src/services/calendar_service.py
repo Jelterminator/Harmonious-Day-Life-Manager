@@ -7,7 +7,7 @@ from googleapiclient.discovery import Resource
 # Import necessary models and helper functions
 from src.core.config_manager import Config
 from src.utils.logger import setup_logger
-from src.models.models import CalendarEvent, ScheduleEntry
+from src.models import CalendarEvent, ScheduleEntry, parse_iso_datetime
 
 logger = setup_logger(__name__)
 
@@ -288,9 +288,6 @@ class GoogleCalendarService:
         
         if not anchors:
             return 0
-        
-        import datetime
-        from src.models.models import parse_iso_datetime
         
         base_date_today = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
         base_date_tomorrow = base_date_today + datetime.timedelta(days=1)

@@ -26,7 +26,7 @@ from src.llm.client import (
     pretty_print_schedule
 )
 # New imports for type safety
-from src.models.models import ScheduleEntry, CalendarEvent, Task, Habit, task_from_dict
+from src.models import ScheduleEntry, CalendarEvent, Task, Habit, task_from_dict
 
 logger = setup_logger(__name__)
 

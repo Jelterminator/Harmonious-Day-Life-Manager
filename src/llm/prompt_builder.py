@@ -12,7 +12,7 @@ from collections import defaultdict
 from src.core.config_manager import Config
 from src.utils.logger import setup_logger
 # Import the typed models
-from src.models.models import CalendarEvent, Task, Habit, PriorityTier
+from src.models import CalendarEvent, Task, Habit, PriorityTier, task_from_dict
 
 logger = setup_logger(__name__)
 
@@ -21,36 +21,34 @@ class PromptBuilder:
     """Builds prompts for LLM schedule generation."""
     
     def __init__(self, rules: Dict[str, Any]):
-        """
-        Initialize prompt builder with scheduling rules.
-        
-        Args:
-            rules: Dictionary containing phases and anchors from config.json
-        """
-        self.rules = rules
-        self.logger = setup_logger(__name__)
-    
-    # File: src/llm/prompt_builder.py - Update to show tomorrow availability more explicitly
+        self.logger = logger  # FIX: logger must be assigned
+        self.rules = rules    # FIX: rules stored for later use
+
+        self.logger.info("PromptBuilder initialized")
 
     def build_world_prompt(
         self,
-        calendar_events: List[CalendarEvent],
-        tasks: List[Task],
-        habits: List[Habit]
+        calendar_events: List[CalendarEvent],  # Accepts typed CalendarEvent
+        tasks: List[Task],                     # Accepts typed Task
+        habits: List[Habit]                   # Accepts typed Habit
     ) -> str:
         """
         Build the complete world prompt for the LLM.
-        Anchors are now pre-scheduled as calendar events, so they appear as STONES.
-        NOW: Explicitly shows available time windows for TODAY and TOMORROW
+        
+        Args:
+            calendar_events: List of fixed CalendarEvent objects
+            tasks: List of processed, prioritized Task objects
+            habits: List of filtered Habit objects for today
+        
+        Returns:
+            Complete world prompt string
         """
-        self.logger.info("Building world prompt with tomorrow scheduling")
-            
-        import datetime
+        self.logger.info("Building world prompt")
         import pytz
         
         local_tz = pytz.timezone(Config.TARGET_TIMEZONE)
         
-        # Use timezone-aware 'now'
+        # Use a consistent timezone-aware 'now' for calculations
         now = datetime.datetime.now(datetime.timezone.utc).astimezone() 
         now_str = now.strftime("%Y-%m-%d %H:%M")
         today_date = now.date()
@@ -230,9 +228,6 @@ class PromptBuilder:
         Add pebble tasks (T1-T5) to prompt.
         """
         pebbles_present = False
-        
-        # Task by id dictionary, will be useful later
-        task_by_id = {t.id: t for t in tasks}
         
         # Group by priority
         by_priority = defaultdict(list)

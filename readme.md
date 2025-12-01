@@ -65,6 +65,9 @@ The setup wizard will:
 - ✅ Guide you through Google Cloud authentication
 - ✅ Create your habit tracking spreadsheet
 - ✅ Configure your Groq API key
+- ✅ Initialize the local anchor database
+- ✅ Configure your location (for solar time calculations)
+- ✅ Select your spiritual traditions/anchors
 
 ### Daily Usage
 
@@ -94,13 +97,13 @@ That's it! Your optimized schedule appears in Google Calendar.
 
 The day is divided into five natural energy phases:
 
-| Phase | Time | Energy Quality | Best For |
-|-------|------|----------------|----------|
-| 🌳 **WOOD** | 05:30-09:00 | Growth, Planning, Vitality | Spiritual practice, movement, planning |
-| 🔥 **FIRE** | 09:00-13:00 | Peak Energy, Focus | Deep work, creative projects, challenging tasks |
-| 🌍 **EARTH** | 13:00-15:00 | Grounding, Integration | Meals, light admin, processing |
-| 🔧 **METAL** | 15:00-18:00 | Organization, Refinement | Admin, review, tidying, study |
-| 💧 **WATER** | 18:00-21:45 | Rest, Consolidation | Exercise, reading, reflection, wind-down |
+| Phase | Solar Time | Energy Quality | Best For |
+|-------|------------|----------------|----------|
+| 🌳 **WOOD** | Sunrise → +2h | Growth, Planning, Vitality | Spiritual practice, movement, planning |
+| 🔥 **FIRE** | +2h → Noon | Peak Energy, Focus | Deep work, creative projects, challenging tasks |
+| 🌍 **EARTH** | Noon → +2h | Grounding, Integration | Meals, light admin, processing |
+| 🔧 **METAL** | +2h → Sunset | Organization, Refinement | Admin, review, tidying, study |
+| 💧 **WATER** | Sunset → Sunrise | Rest, Consolidation | Exercise, reading, reflection, wind-down |
 
 ### 📊 Priority System
 
@@ -108,11 +111,11 @@ Tasks are automatically prioritized based on **hours needed per day until deadli
 
 | Tier | Hours/Day | Urgency | Scheduled |
 |------|-----------|---------|-----------|
-| **T1** | >4 hours | CRITICAL | 4 subtasks |
-| **T2** | 2-4 hours | HIGH | 3 subtasks |
-| **T3** | 1-2 hours | MEDIUM | 2 subtasks |
-| **T4** | 0.5-1 hour | NORMAL | 1 subtask |
-| **T5** | 0.25-0.5 hour | LOW | 1 subtask |
+| **T1** | >12h or <1 day | CRITICAL | 4 subtasks |
+| **T2** | >6 hours | HIGH | 3 subtasks |
+| **T3** | >3 hours | MEDIUM | 2 subtasks |
+| **T4** | >1.5 hours | NORMAL | 1 subtask |
+| **T5** | >0.75 hours | LOW | 1 subtask |
 | **T6** | No deadline | CHORES | All (if time) |
 
 ### 🎨 Google Calendar Integration
@@ -140,17 +143,20 @@ harmonious-day/
 ├── scripts/
 │   ├── plan.py              # Daily planner entry point
 │   ├── clear.py             # Clear previous schedules
-│   └── setup.py             # One-time setup wizard
+│   └── setup.py             # Setup wizard (auth, DB, location)
 ├── src/
 │   ├── auth/                # Google OAuth authentication
 │   ├── core/                # Configuration and orchestration
+│   │   ├── anchor_manager.py # Solar time & anchor calculations
+│   │   └── ...
 │   ├── llm/                 # LLM integration (prompt building, API calls)
 │   ├── models/              # Type-safe data models
 │   ├── processors/          # Task/habit/schedule processing
 │   ├── services/            # Google API service layer
-│   └── utils/               # Logging and utilities
+│   ├── utils/               # Logging and utilities
+│   └── anchors.db           # SQLite DB for traditions & practices
 ├── config/
-│   ├── config.json          # Phase times and anchors
+│   ├── config.json          # Auto-generated daily config
 │   └── system_prompt.txt    # AI scheduling instructions
 ├── tests/                   # Unit and integration tests (89% coverage)
 ├── output/                  # Generated schedules and prompts
@@ -177,51 +183,21 @@ harmonious-day/
 
 ## ⚙️ Configuration
 
-### Phase Times (`config/config.json`)
+### Dynamic Configuration
 
-Customize when each phase occurs:
+**Note:** `config/config.json` is **auto-generated** daily based on your location and solar rhythms. Do not edit it manually as it will be overwritten.
 
-```json
-{
-  "phases": [
-    {
-      "name": "WOOD",
-      "start": "05:30",
-      "end": "09:00",
-      "qualities": "Growth, Planning, Vitality",
-      "ideal_tasks": ["spiritual", "planning", "movement"]
-    }
-  ]
-}
-```
+To change your configuration:
 
-**Common Adjustments:**
-- **Night Owl:** Shift all phases 4-6 hours later
-- **Early Bird:** Keep WOOD phase, extend FIRE phase
-- **Flexible Schedule:** Remove phase constraints entirely
+1. **Location & Traditions:** Run `python scripts/setup.py` again to update your location (for accurate solar time) or change your active spiritual traditions.
+2. **Habits:** Edit the "Habits" sheet in your Google Drive.
+3. **AI Behavior:** Edit `config/system_prompt.txt`.
 
-### Spiritual Anchors (`config/config.json`)
+### Solar Anchors
 
-Configure prayer/meditation times:
+The system calculates "Roman Hours" (dividing day and night into 12 equal parts each) based on your location's sunrise and sunset. This ensures your schedule aligns with the actual solar cycle, not just the clock.
 
-```json
-{
-  "anchors": [
-    {"name": "Fajr", "time": "05:30-05:40", "phase": "WOOD"},
-    {"name": "Zuhr", "time": "13:00-13:20", "phase": "EARTH"},
-    {"name": "Asr", "time": "15:00-15:20", "phase": "METAL"},
-    {"name": "Maghrib", "time": "18:00-18:15", "phase": "WATER"},
-    {"name": "Isha", "time": "21:00-21:20", "phase": "WATER"}
-  ]
-}
-```
-
-**Customization Options:**
-- **Islamic:** Keep default 5 daily prayers
-- **Christian:** Morning prayer, Midday, Compline
-- **Buddhist:** Meditation sessions (morning, noon, evening)
-- **Secular:** "Morning Routine", "Lunch Break", "Evening Routine"
-- **None:** Remove anchors array entirely
+Your selected traditions (configured via `setup.py`) are mapped to these solar hours.
 
 ### AI Behavior (`config/system_prompt.txt`)
 
@@ -237,8 +213,6 @@ Modify scheduling rules by editing the system prompt file. Key constraints inclu
 GROQ_API_KEY=gsk_...              # Required: Groq API key
 SHEET_ID=1rdyK...                 # Required: Habit tracking sheet ID
 TIMEZONE=Europe/Amsterdam         # Optional: Your timezone
-LOG_LEVEL=INFO                    # Optional: DEBUG for troubleshooting
-MAX_OUTPUT_TASKS=24               # Optional: Max tasks per day
 ```
 
 ---
@@ -317,7 +291,6 @@ python scripts/setup.py
 **"All entries filtered out"**
 - Your calendar is fully booked
 - Reduce number of fixed events, or
-- Adjust `MAX_OUTPUT_TASKS` in `.env`, or
 - Mark some tasks as lower priority
 
 ### Debug Checklist

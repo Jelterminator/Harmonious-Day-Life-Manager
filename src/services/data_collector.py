@@ -2,7 +2,7 @@
 
 import datetime
 from typing import List, Dict, Any, Optional
-from src.models.models import CalendarEvent, Task, Habit, task_from_dict, habit_from_dict 
+from src.models import CalendarEvent, Task, Habit, task_from_dict, habit_from_dict 
 from src.core.config_manager import Config
 from src.utils.logger import setup_logger
 

@@ -14,7 +14,7 @@ import pytz
 from src.core.config_manager import Config
 from src.utils.logger import setup_logger
 # Import the typed models and factory function
-from src.models.models import ScheduleEntry, CalendarEvent, Phase, schedule_entry_from_dict, parse_iso_datetime
+from src.models import ScheduleEntry, CalendarEvent, Phase, schedule_entry_from_dict, parse_iso_datetime
 
 logger = setup_logger(__name__)
 

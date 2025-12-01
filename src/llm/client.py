@@ -15,9 +15,12 @@ import pytz
 from src.core.config_manager import Config
 from src.utils.logger import setup_logger
 # New imports for type-safe models
-from src.models.models import ScheduleEntry, CalendarEvent, Phase, parse_iso_datetime, schedule_entry_from_dict 
+from src.models import ScheduleEntry, CalendarEvent, Phase, parse_iso_datetime, schedule_entry_from_dict 
 
 logger = setup_logger(__name__)
+
+# Cache for phase configuration to avoid repeated file reads
+_PHASE_CONFIG_CACHE: Optional[Dict[str, Any]] = None
 
 
 def get_groq_api_key() -> Optional[str]:
@@ -399,7 +402,7 @@ def call_groq_llm(
 
 def get_phase_by_time(dt_obj: Any) -> Phase:
     """
-    Determine the Wu Xing phase from a datetime object or string.
+    Determine the Wu Xing phase from a datetime object or string using config.json.
     
     Args:
         dt_obj: Datetime object or time string (ISO or HH:MM).
@@ -407,16 +410,15 @@ def get_phase_by_time(dt_obj: Any) -> Phase:
     Returns:
         Phase enum (Phase.WOOD, Phase.FIRE, etc.)
     """
+    # 1. Parse input to datetime
     if isinstance(dt_obj, str):
-        # Parse string to datetime
-        try:
-            if 'T' in dt_obj:
-                # Handle ISO format with date/time
-                dt_obj = datetime.datetime.fromisoformat(dt_obj.replace('Z', '+00:00'))
-            else:
-                # Assume it's just time: HH:MM or HH:MM:SS
+        parsed = parse_iso_datetime(dt_obj)
+        if parsed:
+            dt_obj = parsed
+        else:
+            # Fallback for HH:MM format
+            try:
                 time_parts = list(map(int, dt_obj.split(':')))
-                # Create a placeholder datetime for the current day
                 now = datetime.datetime.now()
                 dt_obj = now.replace(
                     hour=time_parts[0], 
@@ -424,16 +426,85 @@ def get_phase_by_time(dt_obj: Any) -> Phase:
                     second=time_parts[2] if len(time_parts) > 2 else 0,
                     microsecond=0
                 )
-        except Exception:
-            # Fallback for unparseable string, assume current time to get a phase
-            logger.warning(f"Could not parse time string '{dt_obj}' in get_phase_by_time. Using current time.")
-            dt_obj = datetime.datetime.now()
+            except Exception:
+                logger.warning(f"Could not parse time string '{dt_obj}' in get_phase_by_time. Using current time.")
+                dt_obj = datetime.datetime.now()
 
+    # Ensure we have a datetime object
+    if not isinstance(dt_obj, datetime.datetime):
+         dt_obj = datetime.datetime.now()
+
+    # 2. Ensure Timezone Awareness (Convert to Target Timezone)
+    try:
+        target_tz = pytz.timezone(Config.TARGET_TIMEZONE)
+        if dt_obj.tzinfo is None:
+            # Assume local/target time if naive
+            dt_obj = target_tz.localize(dt_obj)
+        else:
+            dt_obj = dt_obj.astimezone(target_tz)
+    except Exception as e:
+        logger.warning(f"Timezone conversion failed in get_phase_by_time: {e}")
+
+    # 3. Load Config
+    global _PHASE_CONFIG_CACHE
+    if _PHASE_CONFIG_CACHE is None:
+        try:
+            _PHASE_CONFIG_CACHE = Config.load_phase_config()
+        except Exception as e:
+            logger.error(f"Failed to load phase config: {e}")
+            _PHASE_CONFIG_CACHE = {}
+
+    config = _PHASE_CONFIG_CACHE
+    
+    # 4. Determine Date Key (today/tomorrow)
+    target_date_str = dt_obj.strftime("%Y-%m-%d")
+    date_key = "today" # Default
+    
+    if config.get("date") == target_date_str:
+        date_key = "today"
+    elif config.get("tomorrow_date") == target_date_str:
+        date_key = "tomorrow"
+    
+    # 5. Find matching phase in Config
+    target_time = dt_obj.time()
+    
+    if config and "phases" in config:
+        for phase_def in config.get("phases", []):
+            if phase_def.get("date") != date_key:
+                continue
+                
+            try:
+                start_str = phase_def["start"]
+                end_str = phase_def["end"]
+                
+                start_time = datetime.datetime.strptime(start_str, "%H:%M").time()
+                end_time = datetime.datetime.strptime(end_str, "%H:%M").time()
+                
+                # Check range
+                matches = False
+                if start_time <= end_time:
+                    if start_time <= target_time < end_time:
+                        matches = True
+                else:
+                    # Wrap around (e.g. 16:40 to 04:28)
+                    if start_time <= target_time or target_time < end_time:
+                        matches = True
+                
+                if matches:
+                    try:
+                        return Phase(phase_def["name"])
+                    except ValueError:
+                        continue
+                        
+            except (ValueError, KeyError):
+                continue
+
+    # 6. Fallback (Hardcoded) if config fails or no match
+    # This matches the original logic as a safety net
     hour = dt_obj.hour
     minute = dt_obj.minute
     time_in_minutes = hour * 60 + minute
     
-    # Phase boundaries (in minutes from midnight)
     if 330 <= time_in_minutes < 540:  # 05:30 - 09:00
         return Phase.WOOD
     elif 540 <= time_in_minutes < 780:  # 09:00 - 13:00
@@ -442,7 +513,7 @@ def get_phase_by_time(dt_obj: Any) -> Phase:
         return Phase.EARTH
     elif 900 <= time_in_minutes < 1080:  # 15:00 - 18:00
         return Phase.METAL
-    else:  # 18:00 - 05:30 (handles wrap-around)
+    else:  # 18:00 - 05:30
         return Phase.WATER
 
 

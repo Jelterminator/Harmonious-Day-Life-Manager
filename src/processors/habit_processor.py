@@ -9,7 +9,7 @@ from typing import List
 
 from src.utils.logger import setup_logger
 # Import the Habit and Frequency models
-from src.models.models import Habit, Frequency
+from src.models import Habit, Frequency
 
 logger = setup_logger(__name__)
 

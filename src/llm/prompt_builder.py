@@ -21,8 +21,8 @@ class PromptBuilder:
     """Builds prompts for LLM schedule generation."""
     
     def __init__(self, rules: Dict[str, Any]):
-        self.logger = logger  # FIX: logger must be assigned
-        self.rules = rules    # FIX: rules stored for later use
+        self.logger = logger
+        self.rules = rules
 
         self.logger.info("PromptBuilder initialized")
 
@@ -182,6 +182,11 @@ class PromptBuilder:
         self._add_chores(prompt_lines, tasks)
         self._add_habits(prompt_lines, habits)
         
+        # Check if both chores and habits are empty
+        chore_count = sum(1 for t in tasks if t.priority == PriorityTier.T6)
+        if not habits and chore_count == 0:
+            prompt_lines.append("NONE")
+        
         prompt_lines.append("")
         prompt_lines.append("STRATEGY:")
         prompt_lines.append("- Fill remaining gaps TODAY first")
@@ -210,9 +215,6 @@ class PromptBuilder:
             prompt_lines.append("JSON_SCHEMA_DEFINITION_HERE") 
         
         prompt = "\n".join(prompt_lines)
-        
-        pebble_count = sum(1 for t in tasks if t.priority != PriorityTier.T6)
-        chore_count = sum(1 for t in tasks if t.priority == PriorityTier.T6)
         
         self.logger.info(f"World prompt built: {len(prompt)} characters")
         self.logger.debug(f"Prompt includes explicit scheduling for TODAY and TOMORROW")
@@ -288,9 +290,6 @@ class PromptBuilder:
                     str(h.duration_min),
                     h.ideal_phase.value # Use .value for string
                 ]))
-        
-        if not habits and not any(t.priority == PriorityTier.T6 for t in tasks):
-            prompt_lines.append("NONE")
     
     def save_prompt(self, prompt: str, filepath: str = None) -> None:
         """

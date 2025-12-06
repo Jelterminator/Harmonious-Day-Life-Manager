@@ -6,11 +6,12 @@ Tests all dataclasses and their methods.
 
 import pytest
 from datetime import datetime, timedelta
-from src.models.models import (
-    Task, PriorityTier, Phase, Frequency,
-    Habit, CalendarEvent, ScheduleEntry, Schedule,
-    ValidationError, task_from_dict, habit_from_dict
-)
+from src.models.tasks import Task, task_from_dict
+from src.models.enums import PriorityTier, Frequency
+from src.models.phase import Phase
+from src.models.habits import Habit, habit_from_dict
+from src.models.calendar import CalendarEvent
+from src.models.schedule import ScheduleEntry, Schedule
 
 
 # ==================== Task Tests ====================

@@ -104,109 +104,9 @@ class ConfigGenerator:
 - **Custom Schedules** - Work hours, sleep schedule, preferred phase times
 - **Timezone Handling** - Automatic daylight saving adjustments
 
-**UI Flow:**
-```
-$ python scripts/setup.py
-
-Welcome to Harmonious Day!
-
-1. Location Setup
-   Enter city: [Delft, Netherlands]
-   Detected timezone: Europe/Amsterdam ✓
-
-2. Spiritual Tradition
-   Choose: [1] Islamic  [2] Christian  [3] Buddhist
-           [4] Hindu    [5] Jewish     [6] Secular  [7] Custom
-   Selection: 1
- 
-   Fetching prayer times for Delft...
-   ✓ Fajr: 05:31  ✓ Zuhr: 13:15  ✓ Asr: 15:45
-   ✓ Maghrib: 18:03  ✓ Isha: 20:47
-
-4. Work Schedule
-   Work start: [09:00]
-   Work end: [17:00]
-   Lunch break: [12:30-13:30]
-
-5. Preview Generated Config
-   [Shows config.json preview]
-   
-   Looks good? [Y/n]: Y
-   
-✓ Configuration saved to config/config.json
-✓ Setup complete! Run: python scripts/plan.py
-```
-
-## 🏠 Version 1.2 (Q4 2026) - Local LLM Support
-
-**Theme:** Privacy-first offline capability
-
-### Features
-
-#### 1. On-Device LLM Integration
-**Problem:** Cloud dependency, privacy concerns, API costs and rate limits.
-
-**Solution:** Run fine-tuned model locally.
-
-**Implementation:**
-```python
-# New module: src/llm/local_model.py
-
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
-
-class LocalLLM:
-    def __init__(self, model_path: str):
-        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_path,
-            torch_dtype=torch.float16,
-            device_map="auto"
-        )
-    
-    def generate_schedule(
-        self,
-        system_prompt: str,
-        world_prompt: str
-    ) -> dict:
-        """Generate schedule using local model."""
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": world_prompt}
-        ]
-        
-        inputs = self.tokenizer.apply_chat_template(
-            messages,
-            return_tensors="pt"
-        )
-        
-        outputs = self.model.generate(
-            inputs,
-            max_new_tokens=2048,
-            temperature=0.0,
-            do_sample=False
-        )
-        
-        response = self.tokenizer.decode(outputs[0])
-        return self._parse_json_response(response)
-```
-
-**Fine-Tuning Dataset:**
-Create 1,000+ examples of:
-- System prompt + world prompt → valid schedule JSON
-- Various constraint scenarios
-- Edge cases (overbooked days, no tasks, urgent deadlines)
-
-**Model Selection UI:**
-
-Settings → AI Provider
-  ○ Cloud (Groq) - Fast, requires internet but has token limits
-  ● Local (GPT-OSS-20B) - Private, offline capable, unlimited
-
-
 ---
 
-## 📱 Version 1.3 (Q2-Q3 2026) - Mobile Application
+## 📱 Version 1.2 (Q4 2025) - Mobile Application
 
 **Theme:** Harmonious Day in your pocket
 
@@ -305,6 +205,76 @@ Google APIs
 - Progressive loading (show skeleton → fill data)
 
 ---
+
+## 🏠 Version 1.3 (Q4 2026) - Local LLM Support
+
+**Theme:** Privacy-first offline capability
+
+### Features
+
+#### 1. On-Device LLM Integration
+**Problem:** Cloud dependency, privacy concerns, API costs and rate limits.
+
+**Solution:** Run fine-tuned model locally.
+
+**Implementation:**
+```python
+# New module: src/llm/local_model.py
+
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
+
+class LocalLLM:
+    def __init__(self, model_path: str):
+        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            torch_dtype=torch.float16,
+            device_map="auto"
+        )
+    
+    def generate_schedule(
+        self,
+        system_prompt: str,
+        world_prompt: str
+    ) -> dict:
+        """Generate schedule using local model."""
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": world_prompt}
+        ]
+        
+        inputs = self.tokenizer.apply_chat_template(
+            messages,
+            return_tensors="pt"
+        )
+        
+        outputs = self.model.generate(
+            inputs,
+            max_new_tokens=2048,
+            temperature=0.0,
+            do_sample=False
+        )
+        
+        response = self.tokenizer.decode(outputs[0])
+        return self._parse_json_response(response)
+```
+
+**Fine-Tuning Dataset:**
+Create 1,000+ examples of:
+- System prompt + world prompt → valid schedule JSON
+- Various constraint scenarios
+- Edge cases (overbooked days, no tasks, urgent deadlines)
+
+**Model Selection UI:**
+
+Settings → AI Provider
+  ○ Cloud (Groq) - Fast, requires internet but has token limits
+  ● Local (GPT-OSS-20B) - Private, offline capable, unlimited
+
+
+---
+
 
 ## 🌍 Version 2.0 (Q1 2027) - Launch In Appstore
 

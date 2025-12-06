@@ -1,72 +1,12 @@
 {
-  "date": "2025-12-01",
-  "tomorrow_date": "2025-12-02",
-  "generated_at": "2025-12-01T10:22:05.395728",
+  "date": "2025-12-03",
+  "tomorrow_date": "2025-12-04",
+  "generated_at": "2025-12-03T18:05:42.762067",
   "location": "51.01, 4.21",
   "phases": [
     {
       "name": "WOOD",
-      "start": "04:28",
-      "end": "11:50",
-      "qualities": "Growth, Planning, Vitality. Spiritual centering & movement.",
-      "ideal_tasks": [
-        "spiritual",
-        "planning",
-        "movement"
-      ],
-      "date": "today"
-    },
-    {
-      "name": "FIRE",
-      "start": "09:47",
-      "end": "12:32",
-      "qualities": "Peak energy, expression. Deep work & execution.",
-      "ideal_tasks": [
-        "deep_work",
-        "creative",
-        "pomodoro"
-      ],
-      "date": "today"
-    },
-    {
-      "name": "EARTH",
-      "start": "12:32",
-      "end": "13:54",
-      "qualities": "Stability, nourishment. Lunch & restoration.",
-      "ideal_tasks": [
-        "rest",
-        "integration",
-        "light_tasks"
-      ],
-      "date": "today"
-    },
-    {
-      "name": "METAL",
-      "start": "13:54",
-      "end": "16:39",
-      "qualities": "Precision, organization. Admin & review.",
-      "ideal_tasks": [
-        "admin",
-        "planning",
-        "study"
-      ],
-      "date": "today"
-    },
-    {
-      "name": "WATER",
-      "start": "16:39",
-      "end": "04:29",
-      "qualities": "Rest, consolidation. Wind-down & recovery.",
-      "ideal_tasks": [
-        "rest",
-        "reflection",
-        "recovery"
-      ],
-      "date": "today"
-    },
-    {
-      "name": "WOOD",
-      "start": "04:29",
+      "start": "04:30",
       "end": "11:51",
       "qualities": "Growth, Planning, Vitality. Spiritual centering & movement.",
       "ideal_tasks": [
@@ -74,11 +14,11 @@
         "planning",
         "movement"
       ],
-      "date": "tomorrow"
+      "date": "today"
     },
     {
       "name": "FIRE",
-      "start": "09:48",
+      "start": "09:49",
       "end": "12:32",
       "qualities": "Peak energy, expression. Deep work & execution.",
       "ideal_tasks": [
@@ -86,7 +26,7 @@
         "creative",
         "pomodoro"
       ],
-      "date": "tomorrow"
+      "date": "today"
     },
     {
       "name": "EARTH",
@@ -98,7 +38,7 @@
         "integration",
         "light_tasks"
       ],
-      "date": "tomorrow"
+      "date": "today"
     },
     {
       "name": "METAL",
@@ -110,12 +50,72 @@
         "planning",
         "study"
       ],
-      "date": "tomorrow"
+      "date": "today"
     },
     {
       "name": "WATER",
       "start": "16:38",
-      "end": "04:30",
+      "end": "04:31",
+      "qualities": "Rest, consolidation. Wind-down & recovery.",
+      "ideal_tasks": [
+        "rest",
+        "reflection",
+        "recovery"
+      ],
+      "date": "today"
+    },
+    {
+      "name": "WOOD",
+      "start": "04:31",
+      "end": "11:52",
+      "qualities": "Growth, Planning, Vitality. Spiritual centering & movement.",
+      "ideal_tasks": [
+        "spiritual",
+        "planning",
+        "movement"
+      ],
+      "date": "tomorrow"
+    },
+    {
+      "name": "FIRE",
+      "start": "09:50",
+      "end": "12:33",
+      "qualities": "Peak energy, expression. Deep work & execution.",
+      "ideal_tasks": [
+        "deep_work",
+        "creative",
+        "pomodoro"
+      ],
+      "date": "tomorrow"
+    },
+    {
+      "name": "EARTH",
+      "start": "12:33",
+      "end": "13:54",
+      "qualities": "Stability, nourishment. Lunch & restoration.",
+      "ideal_tasks": [
+        "rest",
+        "integration",
+        "light_tasks"
+      ],
+      "date": "tomorrow"
+    },
+    {
+      "name": "METAL",
+      "start": "13:54",
+      "end": "16:37",
+      "qualities": "Precision, organization. Admin & review.",
+      "ideal_tasks": [
+        "admin",
+        "planning",
+        "study"
+      ],
+      "date": "tomorrow"
+    },
+    {
+      "name": "WATER",
+      "start": "16:37",
+      "end": "04:31",
       "qualities": "Rest, consolidation. Wind-down & recovery.",
       "ideal_tasks": [
         "rest",
@@ -127,16 +127,16 @@
   ],
   "anchors": [
     {
-      "time": "08:24",
-      "time_range": "08:24-08:39",
+      "time": "08:27",
+      "time_range": "08:27-08:42",
       "name": "Mindfulness practice",
       "phase": "WOOD",
       "tradition": "Layman's Practice",
       "date": "today"
     },
     {
-      "time": "11:09",
-      "time_range": "11:09-11:34",
+      "time": "11:11",
+      "time_range": "11:11-11:36",
       "name": "Morning Meditation",
       "phase": "FIRE",
       "tradition": "Kyoto Zen",
@@ -151,40 +151,40 @@
       "date": "today"
     },
     {
-      "time": "16:39",
-      "time_range": "16:39-17:09",
+      "time": "16:38",
+      "time_range": "16:38-17:08",
       "name": "'Just sitting'",
       "phase": "WATER",
       "tradition": "Layman's Practice",
       "date": "today"
     },
     {
-      "time": "20:36",
-      "time_range": "20:36-20:46",
+      "time": "20:35",
+      "time_range": "20:35-20:45",
       "name": "Metta practice",
       "phase": "WATER",
       "tradition": "Layman's Practice",
       "date": "today"
     },
     {
-      "time": "04:29",
-      "time_range": "04:29-05:14",
+      "time": "04:31",
+      "time_range": "04:31-05:16",
       "name": "Early Meditation",
       "phase": "WOOD",
       "tradition": "Kyoto Zen",
       "date": "today"
     },
     {
-      "time": "08:26",
-      "time_range": "08:26-08:41",
+      "time": "08:28",
+      "time_range": "08:28-08:43",
       "name": "Mindfulness practice",
       "phase": "WOOD",
       "tradition": "Layman's Practice",
       "date": "tomorrow"
     },
     {
-      "time": "11:10",
-      "time_range": "11:10-11:35",
+      "time": "11:11",
+      "time_range": "11:11-11:36",
       "name": "Morning Meditation",
       "phase": "FIRE",
       "tradition": "Kyoto Zen",
@@ -199,8 +199,8 @@
       "date": "tomorrow"
     },
     {
-      "time": "16:38",
-      "time_range": "16:38-17:08",
+      "time": "16:37",
+      "time_range": "16:37-17:07",
       "name": "'Just sitting'",
       "phase": "WATER",
       "tradition": "Layman's Practice",
@@ -215,8 +215,8 @@
       "date": "tomorrow"
     },
     {
-      "time": "04:30",
-      "time_range": "04:30-05:15",
+      "time": "04:31",
+      "time_range": "04:31-05:16",
       "name": "Early Meditation",
       "phase": "WOOD",
       "tradition": "Kyoto Zen",

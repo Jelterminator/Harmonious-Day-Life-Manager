@@ -164,6 +164,22 @@ harmonious-day/
 └── requirements.txt
 ```
 
+## Source Code Overview
+
+- **src/auth** – Google OAuth authentication utilities.
+- **src/core** – Configuration management and orchestration logic.
+- **src/llm** – Integration with the Groq LLM, prompt building and API calls.
+- **src/models** – Type‑safe data models (tasks, habits, calendar events, etc.).
+- **src/processors** – Business‑logic processors for tasks, habits, and schedule generation.
+- **src/services** – Service layer wrapping Google API interactions.
+- **src/utils** – Logging, helpers, and miscellaneous utilities.
+
+## Scripts Overview
+
+- **scripts/plan.py** – Entry point to generate today’s schedule.
+- **scripts/clear.py** – Remove previously generated AI events from the calendar.
+- **scripts/setup.py** – Interactive setup wizard for authentication, configuration, and initial data creation.
+
 ### Design Principles
 
 **Type Safety** - Dataclasses with enums throughout for catching errors early

@@ -6,14 +6,15 @@ Tests the full workflow with mocked external services.
 
 import pytest
 from unittest.mock import Mock, MagicMock, patch
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from src.core.orchestrator import Orchestrator
-from src.models.models import (
-    Task, PriorityTier, Habit, Frequency, Phase,
-    CalendarEvent, Schedule, ScheduleEntry
-)
+from src.models.tasks import Task, PriorityTier
+from src.models.habits import Habit, Frequency, habit_from_dict
+from src.models.phase import Phase
+from src.models.calendar import CalendarEvent
+from src.models.schedule import Schedule, ScheduleEntry
 
 
 @pytest.fixture
@@ -38,18 +39,20 @@ def sample_tasks():
         {
             'id': '1',
             'title': 'Urgent Task (2h)',
-            'due': (datetime.now() + timedelta(days=1)).isoformat(),
+            'due': (datetime.now(timezone.utc) + timedelta(hours=20)).isoformat(),
             'status': 'needsAction',
             'parent': None,
-            'notes': None
+            'notes': None,
+            'effort_hours': 2.0
         },
         {
             'id': '2',
             'title': 'Normal Task (1h)',
-            'due': (datetime.now() + timedelta(days=7)).isoformat(),
+            'due': (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
             'status': 'needsAction',
             'parent': None,
-            'notes': None
+            'notes': None,
+            'effort_hours': 1.0
         }
     ]
 
@@ -67,7 +70,7 @@ def sample_habits():
 @pytest.fixture
 def sample_calendar_events():
     """Sample calendar events for testing."""
-    tomorrow = datetime.now() + timedelta(days=1)
+    tomorrow = datetime.now(timezone.utc) + timedelta(days=1)
     return [
         {
             'summary': 'Team Meeting',
@@ -81,7 +84,7 @@ def sample_calendar_events():
 class TestOrchestratorDataCollection:
     """Test Orchestrator data collection phase."""
     
-    @patch('src.auth.google_auth.get_google_services')
+    @patch('src.core.orchestrator.get_google_services')
     @patch('src.core.config_manager.Config.validate', return_value=True)
     @patch('src.core.config_manager.Config.load_phase_config')
     def test_data_collection_with_mock_services(
@@ -144,7 +147,7 @@ class TestOrchestratorTaskProcessing:
         
         # Urgent task should be first
         assert len(processed) > 0
-        assert processed[0]['priority'] in ['T1', 'T2']
+        assert processed[0].priority in [PriorityTier.T1, PriorityTier.T2]
     
     def test_subtask_grouping(self):
         """Test that subtasks are grouped with parents."""
@@ -154,9 +157,10 @@ class TestOrchestratorTaskProcessing:
             {
                 'id': 'parent1',
                 'title': 'Parent Task',
-                'due': (datetime.now() + timedelta(days=3)).isoformat(),
+                'due': (datetime.now(timezone.utc) + timedelta(days=1)).isoformat(),
                 'status': 'needsAction',
-                'parent': None
+                'parent': None,
+                'effort_hours': 4.0
             },
             {
                 'id': 'sub1',
@@ -180,7 +184,7 @@ class TestOrchestratorTaskProcessing:
         processed = processor.process_tasks(tasks)
         
         # Should have subtasks in correct order
-        subtasks = [t for t in processed if t.get('is_subtask')]
+        subtasks = [t for t in processed if getattr(t, 'is_subtask', False)]
         assert len(subtasks) >= 2
 
 
@@ -191,12 +195,12 @@ class TestOrchestratorHabitProcessing:
         """Test that daily habits are included."""
         from src.processors.habit_processor import filter_habits
         
-        # Convert sample data to dict format
+        # Convert sample data to Habit objects
         headers = sample_habits[0]
-        habits = [
-            {headers[i]: row[i] for i in range(len(headers))}
-            for row in sample_habits[1:]
-        ]
+        habits = []
+        for row in sample_habits[1:]:
+            data = {headers[i]: row[i] for i in range(len(headers))}
+            habits.append(habit_from_dict(data))
         
         filtered = filter_habits(habits)
         
@@ -210,7 +214,7 @@ class TestOrchestratorHabitProcessing:
         
         today = datetime.date.today().strftime("%A")
         
-        habits = [
+        habits_data = [
             {
                 'title': 'Weekly Habit',
                 'active': 'Yes',
@@ -225,57 +229,13 @@ class TestOrchestratorHabitProcessing:
             }
         ]
         
+        habits = [habit_from_dict(h) for h in habits_data]
+        
         filtered = filter_habits(habits)
         
         # Should only include today's habit
         assert len(filtered) == 1
-        assert filtered[0]['title'] == 'Weekly Habit'
-
-
-class TestOrchestratorScheduleGeneration:
-    """Test schedule generation with mocked LLM."""
-    
-    @patch('src.llm.client.call_groq_llm')
-    def test_schedule_generation_success(self, mock_llm):
-        """Test successful schedule generation."""
-        # Mock LLM response
-        mock_llm.return_value = {
-            'status': 'success',
-            'output': {
-                'schedule_entries': [
-                    {
-                        'title': 'Morning Task',
-                        'start_time': '2025-11-18T09:00:00',
-                        'end_time': '2025-11-18T10:00:00',
-                        'phase': 'FIRE',
-                        'date': 'today'
-                    }
-                ]
-            }
-        }
-        
-        from src.llm.client import call_groq_llm
-        
-        result = call_groq_llm("system prompt", "world prompt")
-        
-        assert result['status'] == 'success'
-        assert 'schedule_entries' in result['output']
-        assert len(result['output']['schedule_entries']) > 0
-    
-    @patch('src.llm.client.call_groq_llm')
-    def test_schedule_generation_failure(self, mock_llm):
-        """Test handling of LLM failures."""
-        mock_llm.return_value = {
-            'status': 'fail',
-            'message': 'API error'
-        }
-        
-        from src.llm.client import call_groq_llm
-        
-        result = call_groq_llm("system prompt", "world prompt")
-        
-        assert result['status'] == 'fail'
-        assert 'message' in result
+        assert filtered[0].title == 'Weekly Habit'
 
 
 class TestOrchestratorConflictDetection:
@@ -288,21 +248,21 @@ class TestOrchestratorConflictDetection:
         processor = ScheduleProcessor()
         
         entries = [
-            {
-                'title': 'Task',
-                'start_time': '2025-11-18T10:00:00',
-                'end_time': '2025-11-18T11:00:00',
-                'phase': 'FIRE',
-                'date': 'today'
-            }
+            ScheduleEntry(
+                title='Task',
+                start_time=datetime(2025, 11, 18, 10, 0),
+                end_time=datetime(2025, 11, 18, 11, 0),
+                phase=Phase.FIRE,
+                date_indicator='today'
+            )
         ]
         
         events = [
-            {
-                'summary': 'Meeting',
-                'start': '2025-11-18T10:30:00',
-                'end': '2025-11-18T11:30:00'
-            }
+            CalendarEvent(
+                summary='Meeting',
+                start=datetime(2025, 11, 18, 10, 30),
+                end=datetime(2025, 11, 18, 11, 30)
+            )
         ]
         
         filtered = processor.filter_conflicting_entries(entries, events)
@@ -317,21 +277,21 @@ class TestOrchestratorConflictDetection:
         processor = ScheduleProcessor()
         
         entries = [
-            {
-                'title': 'Task',
-                'start_time': '2025-11-18T09:00:00',
-                'end_time': '2025-11-18T10:00:00',
-                'phase': 'FIRE',
-                'date': 'today'
-            }
+            ScheduleEntry(
+                title='Task',
+                start_time=datetime(2025, 11, 18, 9, 0),
+                end_time=datetime(2025, 11, 18, 10, 0),
+                phase=Phase.FIRE,
+                date_indicator='today'
+            )
         ]
         
         events = [
-            {
-                'summary': 'Meeting',
-                'start': '2025-11-18T11:00:00',
-                'end': '2025-11-18T12:00:00'
-            }
+            CalendarEvent(
+                summary='Meeting',
+                start=datetime(2025, 11, 18, 11, 0),
+                end=datetime(2025, 11, 18, 12, 0)
+            )
         ]
         
         filtered = processor.filter_conflicting_entries(entries, events)
@@ -372,8 +332,8 @@ class TestOrchestratorPromptBuilding:
         
         # Check key sections
         assert "SCHEDULE REQUEST" in prompt
-        assert "PHASES:" in prompt
-        assert "ANCHORS:" in prompt
+        assert "AVAILABLE PHASE WINDOWS:" in prompt
+        assert "STONES:" in prompt
         assert "PEBBLES:" in prompt
         assert "SAND:" in prompt
 
@@ -381,8 +341,9 @@ class TestOrchestratorPromptBuilding:
 class TestEndToEndPipeline:
     """Test complete end-to-end pipeline (mocked)."""
     
-    @patch('src.auth.google_auth.get_google_services')
-    @patch('src.llm.client.call_groq_llm')
+    @patch('src.core.orchestrator.get_google_services')
+    @patch('src.core.orchestrator.load_system_prompt')
+    @patch('src.core.orchestrator.call_groq_llm')
     @patch('src.core.config_manager.Config.validate', return_value=True)
     @patch('src.core.config_manager.Config.load_phase_config')
     def test_full_pipeline_mock(
@@ -390,6 +351,7 @@ class TestEndToEndPipeline:
         mock_config,
         mock_validate,
         mock_llm,
+        mock_load_prompt,
         mock_auth,
         sample_tasks,
         sample_habits,
@@ -409,6 +371,9 @@ class TestEndToEndPipeline:
             ],
             'anchors': []
         }
+        
+        # Setup mock system prompt
+        mock_load_prompt.return_value = "System Prompt Content"
         
         # Setup services
         mock_calendar = Mock()
@@ -431,19 +396,21 @@ class TestEndToEndPipeline:
         mock_auth.return_value = (mock_calendar, mock_sheets, mock_tasks_service)
         
         # Setup LLM response
+        today = datetime.now(timezone.utc)
+        start_time = today.replace(hour=9, minute=0, second=0, microsecond=0)
+        end_time = today.replace(hour=10, minute=0, second=0, microsecond=0)
+        
         mock_llm.return_value = {
             'status': 'success',
-            'output': {
-                'schedule_entries': [
-                    {
-                        'title': 'Generated Task',
-                        'start_time': '2025-11-18T09:00:00',
-                        'end_time': '2025-11-18T10:00:00',
-                        'phase': 'FIRE',
-                        'date': 'today'
-                    }
-                ]
-            }
+            'output': [
+                ScheduleEntry(
+                    title='Generated Task',
+                    start_time=start_time,
+                    end_time=end_time,
+                    phase=Phase.FIRE,
+                    date_indicator='today'
+                )
+            ]
         }
         
         # Run orchestrator

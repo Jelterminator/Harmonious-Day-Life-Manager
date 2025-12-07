@@ -13,7 +13,7 @@
 - Google Calendar/Tasks/Sheets integration
 - Groq powered GPT-OSS-20B schedule generation
 - Wu Xing phase-based scheduling
-- Islamic prayer time anchors
+- Choose a tradition for prayer time anchors
 - Priority-based task allocation
 - Conflict detection and resolution
 - Type-safe dataclass architecture

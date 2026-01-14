@@ -262,11 +262,8 @@ def call_groq_llm(
             {"role": "user", "content": world_prompt}
         ],
         "temperature": 0,
-        "max_completion_tokens": Config.MAX_COMPLETION_TOKENS,
-        "top_p": 1,
-        "reasoning_effort": reasoning_effort,
-        "response_format": {"type": "json_object"},
-        "stop": None
+        "max_tokens": Config.MAX_COMPLETION_TOKENS,
+        "top_p": 1
     }
     
     try:

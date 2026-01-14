@@ -57,7 +57,7 @@ Tasks are scheduled in the following non-negotiable order:
 
 ## IV. JSON OUTPUT FORMAT
 
-Return valid JSON strictly conforming to the schema below. Do NOT include any reasoning, explanations, or extra text. **ONLY** return the JSON object.
+Return valid JSON strictly conforming to the schema below. Do NOT include any reasoning, explanations, or extra text. **ONLY** return the JSON object. Keep titles with sufficient information in them.
 
 ```json
 {
@@ -81,30 +81,3 @@ Return valid JSON strictly conforming to the schema below. Do NOT include any re
   "required": ["schedule_entries"]
 }
 ```
-
-## CRITICAL: Date Field Handling
-
-The schedule window spans TWO DAYS: today and tomorrow.
-
-**Rules for the `date` field:**
-1. If the start_time is on TODAY's date (provided in the prompt), set `date: "today"`
-2. If the start_time is on TOMORROW's date (provided in the prompt), set `date: "tomorrow"`
-3. The date in the timestamp (YYYY-MM-DD part) MUST match the date field value
-
-**Example (if TODAY is 2025-11-28):**
-CORRECT:
-{
-  "start_time": "2025-11-28T14:00:00+01:00",
-  "date": "today"  // ← Matches 2025-11-28
-}
-
-{
-  "start_time": "2025-11-29T08:00:00+01:00",
-  "date": "tomorrow"  // ← Matches 2025-11-29  
-}
-
-WRONG:
-{
-  "start_time": "2025-11-28T08:00:00+01:00",
-  "date": "tomorrow"  // ← MISMATCH! Date says tomorrow but timestamp is today
-}

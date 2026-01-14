@@ -59,7 +59,7 @@ class Config:
     
     # LLM Settings
     GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-    MODEL_ID = "openai/gpt-oss-20b"
+    MODEL_ID = "openai/gpt-oss-120b"
     REASONING_EFFORT = "medium"
     MAX_COMPLETION_TOKENS = 32768
     

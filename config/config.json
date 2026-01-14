@@ -1,13 +1,13 @@
 {
-  "date": "2025-12-03",
-  "tomorrow_date": "2025-12-04",
-  "generated_at": "2025-12-03T18:05:42.762067",
+  "date": "2026-01-13",
+  "tomorrow_date": "2026-01-14",
+  "generated_at": "2026-01-13T12:48:05.438952",
   "location": "51.01, 4.21",
   "phases": [
     {
       "name": "WOOD",
-      "start": "04:30",
-      "end": "11:51",
+      "start": "04:46",
+      "end": "12:10",
       "qualities": "Growth, Planning, Vitality. Spiritual centering & movement.",
       "ideal_tasks": [
         "spiritual",
@@ -18,8 +18,8 @@
     },
     {
       "name": "FIRE",
-      "start": "09:49",
-      "end": "12:32",
+      "start": "10:05",
+      "end": "12:52",
       "qualities": "Peak energy, expression. Deep work & execution.",
       "ideal_tasks": [
         "deep_work",
@@ -30,8 +30,8 @@
     },
     {
       "name": "EARTH",
-      "start": "12:32",
-      "end": "13:54",
+      "start": "12:52",
+      "end": "14:15",
       "qualities": "Stability, nourishment. Lunch & restoration.",
       "ideal_tasks": [
         "rest",
@@ -42,8 +42,8 @@
     },
     {
       "name": "METAL",
-      "start": "13:54",
-      "end": "16:38",
+      "start": "14:15",
+      "end": "17:02",
       "qualities": "Precision, organization. Admin & review.",
       "ideal_tasks": [
         "admin",
@@ -54,8 +54,8 @@
     },
     {
       "name": "WATER",
-      "start": "16:38",
-      "end": "04:31",
+      "start": "17:02",
+      "end": "04:46",
       "qualities": "Rest, consolidation. Wind-down & recovery.",
       "ideal_tasks": [
         "rest",
@@ -66,8 +66,8 @@
     },
     {
       "name": "WOOD",
-      "start": "04:31",
-      "end": "11:52",
+      "start": "04:46",
+      "end": "12:10",
       "qualities": "Growth, Planning, Vitality. Spiritual centering & movement.",
       "ideal_tasks": [
         "spiritual",
@@ -78,8 +78,8 @@
     },
     {
       "name": "FIRE",
-      "start": "09:50",
-      "end": "12:33",
+      "start": "10:04",
+      "end": "12:52",
       "qualities": "Peak energy, expression. Deep work & execution.",
       "ideal_tasks": [
         "deep_work",
@@ -90,8 +90,8 @@
     },
     {
       "name": "EARTH",
-      "start": "12:33",
-      "end": "13:54",
+      "start": "12:52",
+      "end": "14:16",
       "qualities": "Stability, nourishment. Lunch & restoration.",
       "ideal_tasks": [
         "rest",
@@ -102,8 +102,8 @@
     },
     {
       "name": "METAL",
-      "start": "13:54",
-      "end": "16:37",
+      "start": "14:16",
+      "end": "17:03",
       "qualities": "Precision, organization. Admin & review.",
       "ideal_tasks": [
         "admin",
@@ -114,8 +114,8 @@
     },
     {
       "name": "WATER",
-      "start": "16:37",
-      "end": "04:31",
+      "start": "17:03",
+      "end": "04:46",
       "qualities": "Rest, consolidation. Wind-down & recovery.",
       "ideal_tasks": [
         "rest",
@@ -127,99 +127,131 @@
   ],
   "anchors": [
     {
-      "time": "08:27",
-      "time_range": "08:27-08:42",
-      "name": "Mindfulness practice",
+      "time": "08:41",
+      "time_range": "08:41-08:51",
+      "name": "Fajr",
       "phase": "WOOD",
-      "tradition": "Layman's Practice",
+      "tradition": "Core Salah",
       "date": "today"
     },
     {
-      "time": "11:11",
-      "time_range": "11:11-11:36",
-      "name": "Morning Meditation",
-      "phase": "FIRE",
-      "tradition": "Kyoto Zen",
+      "time": "10:05",
+      "time_range": "10:05-10:20",
+      "name": "Duha",
+      "phase": "WOOD",
+      "tradition": "Complete Salah",
       "date": "today"
     },
     {
-      "time": "13:54",
-      "time_range": "13:54-14:19",
-      "name": "Afternoon Meditation",
+      "time": "12:52",
+      "time_range": "12:52-13:12",
+      "name": "Dhuhr",
+      "phase": "EARTH",
+      "tradition": "Core Salah",
+      "date": "today"
+    },
+    {
+      "time": "15:38",
+      "time_range": "15:38-15:58",
+      "name": "Asr",
       "phase": "METAL",
-      "tradition": "Kyoto Zen",
+      "tradition": "Core Salah",
       "date": "today"
     },
     {
-      "time": "16:38",
-      "time_range": "16:38-17:08",
-      "name": "'Just sitting'",
+      "time": "17:02",
+      "time_range": "17:02-17:17",
+      "name": "Maghrib",
       "phase": "WATER",
-      "tradition": "Layman's Practice",
+      "tradition": "Core Salah",
       "date": "today"
     },
     {
-      "time": "20:35",
-      "time_range": "20:35-20:45",
-      "name": "Metta practice",
+      "time": "19:38",
+      "time_range": "19:38-19:58",
+      "name": "Isha",
       "phase": "WATER",
-      "tradition": "Layman's Practice",
+      "tradition": "Core Salah",
       "date": "today"
     },
     {
-      "time": "04:31",
-      "time_range": "04:31-05:16",
-      "name": "Early Meditation",
-      "phase": "WOOD",
-      "tradition": "Kyoto Zen",
+      "time": "20:56",
+      "time_range": "20:56-21:01",
+      "name": "Witr",
+      "phase": "WATER",
+      "tradition": "Complete Salah",
       "date": "today"
     },
     {
-      "time": "08:28",
-      "time_range": "08:28-08:43",
-      "name": "Mindfulness practice",
+      "time": "04:46",
+      "time_range": "04:46-05:16",
+      "name": "Tahajjud",
       "phase": "WOOD",
-      "tradition": "Layman's Practice",
+      "tradition": "Complete Salah",
+      "date": "today"
+    },
+    {
+      "time": "08:41",
+      "time_range": "08:41-08:51",
+      "name": "Fajr",
+      "phase": "WOOD",
+      "tradition": "Core Salah",
       "date": "tomorrow"
     },
     {
-      "time": "11:11",
-      "time_range": "11:11-11:36",
-      "name": "Morning Meditation",
-      "phase": "FIRE",
-      "tradition": "Kyoto Zen",
+      "time": "10:04",
+      "time_range": "10:04-10:19",
+      "name": "Duha",
+      "phase": "WOOD",
+      "tradition": "Complete Salah",
       "date": "tomorrow"
     },
     {
-      "time": "13:54",
-      "time_range": "13:54-14:19",
-      "name": "Afternoon Meditation",
+      "time": "12:52",
+      "time_range": "12:52-13:12",
+      "name": "Dhuhr",
+      "phase": "EARTH",
+      "tradition": "Core Salah",
+      "date": "tomorrow"
+    },
+    {
+      "time": "15:39",
+      "time_range": "15:39-15:59",
+      "name": "Asr",
       "phase": "METAL",
-      "tradition": "Kyoto Zen",
+      "tradition": "Core Salah",
       "date": "tomorrow"
     },
     {
-      "time": "16:37",
-      "time_range": "16:37-17:07",
-      "name": "'Just sitting'",
+      "time": "17:03",
+      "time_range": "17:03-17:18",
+      "name": "Maghrib",
       "phase": "WATER",
-      "tradition": "Layman's Practice",
+      "tradition": "Core Salah",
       "date": "tomorrow"
     },
     {
-      "time": "20:35",
-      "time_range": "20:35-20:45",
-      "name": "Metta practice",
+      "time": "19:39",
+      "time_range": "19:39-19:59",
+      "name": "Isha",
       "phase": "WATER",
-      "tradition": "Layman's Practice",
+      "tradition": "Core Salah",
       "date": "tomorrow"
     },
     {
-      "time": "04:31",
-      "time_range": "04:31-05:16",
-      "name": "Early Meditation",
+      "time": "20:57",
+      "time_range": "20:57-21:02",
+      "name": "Witr",
+      "phase": "WATER",
+      "tradition": "Complete Salah",
+      "date": "tomorrow"
+    },
+    {
+      "time": "04:46",
+      "time_range": "04:46-05:16",
+      "name": "Tahajjud",
       "phase": "WOOD",
-      "tradition": "Kyoto Zen",
+      "tradition": "Complete Salah",
       "date": "tomorrow"
     }
   ],
